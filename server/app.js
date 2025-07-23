@@ -13,8 +13,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/users', usersRouter);
-app.use('/events', eventsRouter);
-app.use('/clubs', clubsRouter);
+app.use('/api/loadEvents', eventsRouter);
+app.use('/api/findClub', clubsRouter);
 dotenv.config();
 
 mongoose.connect(process.env.DB_URL).then(() => {

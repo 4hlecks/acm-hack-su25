@@ -39,7 +39,7 @@ const createEvent_Schema = new mongoose.Schema({
     
     category: {
         type: String,
-        enum: ['GBMs', 'Free Food', 'Fundraisers'],
+        enum: ['GBMs', 'FreeFood', 'Fundraisers'],
         required: true
     }
 });

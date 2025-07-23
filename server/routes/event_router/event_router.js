@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Event = require('../../models/event_schema');
 
-router.get('/api/loadEvents/:categoryChoice', async (req, res) => {
+router.get('/:categoryChoice', async (req, res) => {
     try{ 
         const {categoryChoice} = req.params;
+        console.log(categoryChoice)
         const events = await Event.find({category: categoryChoice}).
             populate('clubId', 'name-_id').sort({startDate: 1});
         res.json(events);
