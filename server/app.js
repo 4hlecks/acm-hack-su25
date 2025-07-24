@@ -18,9 +18,11 @@ app.use('/users', usersRouter);
 app.use('/api/loadEvents', eventsRouter);
 app.use('/api/findClub', clubsRouter);
 
-
-mongoose.connect(process.env.DB_URL).then(() => {
-  console.log('Connected to MongoDB database');
-});
+mongoose.connect(process.env.DB_URL)
+  .then(() => console.log('Connected to MongoDB database'))
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); 
+  });
 
 module.exports = app;
