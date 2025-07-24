@@ -1,95 +1,184 @@
-import Image from 'next/image'
+import NavBar from './components/NavBar'
 import styles from './page.module.css'
+import EventCard from './components/events/EventCard'
+import EventCarousel from './components/events/EventCarousel'
 
 export default function Home() {
+  const testEvents = [
+    {
+      id: 1,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Triton Fundraiser Night",
+      organization: "UCSD Giving",
+      date: "Aug 20, 2025",
+      time: "6:00 PM",
+      location: "PC Ballroom East",
+      description: "An evening of performances and fundraising for student orgs.",
+      tags: ["Fundraiser", "Public", "Free"],
+    },
+    {
+      id: 2,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Sunset Yoga",
+      organization: "Health & Wellness Club",
+      date: "Aug 22, 2025",
+      time: "5:30 PM",
+      location: "Warren Lawn",
+      description: "Wind down with a free yoga class during golden hour.",
+      tags: ["Free", "Wellness", "Outdoor"],
+    },
+    {
+      id: 3,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Hack for Impact",
+      organization: "TritonHacks",
+      date: "Sep 01, 2025",
+      time: "9:00 AM",
+      location: "CSE Building",
+      description: "24-hour hackathon focused on social good and non-profits.",
+      tags: ["Hackathon", "Tech", "Fundraiser"],
+    },
+    {
+      id: 4,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Cultural Night",
+      organization: "Kaibigang Pilipino",
+      date: "Sep 10, 2025",
+      time: "7:00 PM",
+      location: "Mandeville Auditorium",
+      description: "Annual showcase of cultural dance and performance.",
+      tags: ["Fundraiser", "Performance", "Public"],
+    },
+    {
+      id: 5,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "General Body Meeting",
+      organization: "Women in Computing",
+      date: "Sep 12, 2025",
+      time: "6:00 PM",
+      location: "CSE 1202",
+      description: "Get to know the org and upcoming opportunities.",
+      tags: ["GBM", "Tech", "Free"],
+    },
+    {
+      id: 6,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Food for Finals",
+      organization: "AS Programming",
+      date: "Sep 18, 2025",
+      time: "12:00 PM",
+      location: "Library Walk",
+      description: "Grab free snacks and energy drinks before finals week.",
+      tags: ["Free", "Food", "Stress Relief"],
+    },
+    {
+      id: 7,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Startup Showcase",
+      organization: "The Basement",
+      date: "Sep 22, 2025",
+      time: "3:00 PM",
+      location: "Design Lab",
+      description: "Pitch your startup ideas and network with VCs.",
+      tags: ["Pitch", "Tech", "Entrepreneurship"],
+    },
+    {
+      id: 8,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "International Potluck",
+      organization: "iHouse",
+      date: "Sep 24, 2025",
+      time: "6:30 PM",
+      location: "ERC Lawn",
+      description: "Bring a dish from your culture and make new friends!",
+      tags: ["Cultural", "Food", "Free"],
+    },
+    {
+      id: 9,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Eco-Clean Beach Day",
+      organization: "Green Tritons",
+      date: "Sep 28, 2025",
+      time: "9:00 AM",
+      location: "La Jolla Shores",
+      description: "Volunteer to clean the beach and protect the coast.",
+      tags: ["Volunteer", "Sustainability", "Outdoor"],
+    },
+    {
+      id: 10,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Late Night Laughs",
+      organization: "Campus Comedy Club",
+      date: "Sep 30, 2025",
+      time: "8:00 PM",
+      location: "PC Theater",
+      description: "Stand-up comedy night featuring local student talent.",
+      tags: ["Entertainment", "Free", "Comedy"],
+    },
+    {
+      id: 11,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Game Night",
+      organization: "Revelle Res Life",
+      date: "Oct 1, 2025",
+      time: "7:00 PM",
+      location: "Revelle Commons",
+      description: "Join us for board games, card games, and snacks.",
+      tags: ["Free", "Games", "Community"],
+    },
+    {
+      id: 12,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Research Expo",
+      organization: "Undergrad Research Hub",
+      date: "Oct 3, 2025",
+      time: "2:00 PM",
+      location: "Price Center",
+      description: "Learn about student research and how to get involved.",
+      tags: ["Academic", "STEM", "Opportunity"],
+    },
+    {
+      id: 13,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Kpop Random Play Dance",
+      organization: "Kpop Club",
+      date: "Oct 5, 2025",
+      time: "4:00 PM",
+      location: "Library Walk",
+      description: "Dance along with your favorite Kpop hits in a fun mixer!",
+      tags: ["Dance", "Music", "Free"],
+    },
+    {
+      id: 14,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Meditation Circle",
+      organization: "Triton Mindfulness",
+      date: "Oct 6, 2025",
+      time: "10:00 AM",
+      location: "Wellness Room",
+      description: "Start your morning with guided meditation and reflection.",
+      tags: ["Wellness", "Free", "Mental Health"],
+    },
+    {
+      id: 15,
+      coverImage: "https://via.placeholder.com/400x200",
+      name: "Women in Leadership Panel",
+      organization: "Triton Women",
+      date: "Oct 10, 2025",
+      time: "5:00 PM",
+      location: "Center Hall",
+      description: "Hear from women leaders and network with peers.",
+      tags: ["Leadership", "Career", "Panel"],
+    },
+  ];
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <>
+      <NavBar />
+      <h1>Home</h1>
+      <h2>Filter By:</h2>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+      <EventCarousel title="Featured Events" events={testEvents} />
+    </>
+  );
 }
