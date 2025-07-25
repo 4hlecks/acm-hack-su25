@@ -8,7 +8,7 @@ export default function Home() {
     {
       id: 1,
       eventCover: "https://via.placeholder.com/400x200",
-      eventName: "Triton Fundraiser Night",
+      eventName: "Sleepless Collective Fall Auditions",
       eventOwner: "UCSD Giving",
       eventDate: "Aug 20, 2025",
       eventTime: "6:00 PM",
@@ -37,7 +37,7 @@ export default function Home() {
       eventLocation: "CSE Building",
       eventDescription: "24-hour hackathon focused on social good and non-profits.",
       eventTags: ["Hackathon", "Tech", "Fundraiser"],
-    },
+    },/*
     {
       id: 4,
       eventCover: "https://via.placeholder.com/400x200",
@@ -169,12 +169,12 @@ export default function Home() {
       eventLocation: "Center Hall",
       eventDescription: "Hear from women leaders and network with peers.",
       eventTags: ["Leadership", "Career", "Panel"],
-    },
+    },*/
   ];
 
   return (
     <>
-      <EventCarousel category="Featured Events" events={testEvents} />
+      <EventCarousel category="Free Food" events={testEvents} />
     </>
   );
 }

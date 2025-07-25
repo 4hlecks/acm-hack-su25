@@ -1,10 +1,10 @@
 import React from "react";
-import styles from './events.css'
+import styles from './EventTag.module.css'
 
 const EventTag = ({ label }) => {
     return (
-        <span className="tag">
-            {label}
+        <span className={styles.tag}>
+            <strong>{label}</strong>
         </span>
     );
 };
