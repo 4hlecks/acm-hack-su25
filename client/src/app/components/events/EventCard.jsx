@@ -1,28 +1,35 @@
+"use client"
+
 import React from "react";
 import EventTag from "./EventTag";
-import styles from './events.css'
+import styles from './EventCard.module.css'
 
 const EventCard = ({ event }) => {
-    // event should contain the following metadata
-    const { coverImage, name, organization, date, time, location, description, tags } = event;
+    // Event should contain the following metadata
+    const { eventCover, eventName, eventOwner,
+            eventDate, eventTime, eventLocation,
+            eventDescription, eventTags, eventSrc } = event;
 
     return (
         <article className="event-card">
-            <div className="image-wrapper">
-                <img src={coverImage} alt={`${name} Cover Image`} className="event-cover" />
+            <div className="event-cover">
+                <img src={eventCover} alt={`${eventName} Cover Image`}/>
             </div>
 
-            <div className="tags-wrapper">
-                {tags?.slice(0,3).map((tag, index) => {
+            <div className="event-tags">
+                {eventTags?.slice(0,3).map((tag, index) => {
                     return <EventTag key={index} label={tag} />;
                 })}
             </div>
 
-            <hgroup className="metadata-wrapper">
-                <h3>{name}</h3>
-                <p>{organization}</p>
-                <p>{date} {location}</p>
-            </hgroup>
+            <section className="event-info">
+                <h3 className="event-name">{eventName}</h3>
+                <p className="event-owner">{eventOwner}</p>
+                <div>
+                    <time className="event-date">{eventDate}</time>
+                    <span className="event-location">{eventLocation}</span>
+                </div>
+            </section>
         </article>
     )
 }
