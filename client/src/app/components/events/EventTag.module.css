@@ -1,0 +1,11 @@
+.tag {
+    display: inline-block;
+    background-color: #595959;
+    font-size: 9px;
+    text-transform: uppercase;
+    text-align: center;
+    align-self: center;
+    border-radius: 10px;
+    padding: 4px 8px;
+    max-height: 20px;
+}
