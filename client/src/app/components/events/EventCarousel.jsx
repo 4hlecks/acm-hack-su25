@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight, ArrowRight } from "react-feather";
@@ -9,6 +9,10 @@ import "swiper/css";
 import styles from './EventCarousel.module.css'
 
 const EventCarousel = ({ category, events }) => {
+    const categoryID = category.replace(/\s+/g, "-").toLowerCase(); // e.g. "free-food"
+    const prevRef = useRef(null);
+    const nextRef = useRef(null);
+
     return (
         <section className={styles.carouselSection}>
             <header className={styles.carouselHeader}>
@@ -16,14 +20,14 @@ const EventCarousel = ({ category, events }) => {
                 <p className={styles.carouselSeeAll}>See All <ArrowRight className={styles.carouselSeeAllIcon}/></p>
             </header>
             <div className={styles.carouselContent}>
-                <button className="carousel-left" id={styles.carouselLeft}><ChevronLeft className={styles.carouselLeftIcon}/></button>
+                <button className={styles.carouselLeft} id={`carousel-left-${categoryID}`}><ChevronLeft className={styles.carouselLeftIcon}/></button>
                 <Swiper
                     slidesPerView={"auto"}
                     slidesPerGroup={5}
                     spaceBetween={16}
                     navigation={{
-                        nextEl: ".carousel-right",
-                        prevEl: ".carousel-left",
+                        nextEl: `#carousel-right-${categoryID}`,
+                        prevEl: `#carousel-left-${categoryID}`,
                     }}
                     modules={[Navigation]}
                     className={styles.carouselSwiper}
@@ -34,7 +38,7 @@ const EventCarousel = ({ category, events }) => {
                         </SwiperSlide>
                     ))}
                 </Swiper>
-                <button className="carousel-right" id={styles.carouselRight}><ChevronRight className={styles.carouselRightIcon}/></button>
+                <button className={styles.carouselRight} id={`carousel-right-${categoryID}`}><ChevronRight className={styles.carouselRightIcon}/></button>
             </div>
                 
         </section>
