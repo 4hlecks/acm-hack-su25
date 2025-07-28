@@ -3,7 +3,7 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/users.js');
 const eventsRouter = require('./routes/event_router/event_router')
 const clubsRouter = require('./routes/club_router/club_router')
 const app = express();
@@ -20,6 +20,5 @@ dotenv.config();
 mongoose.connect(process.env.DB_URL).then(() => {
   console.log('Connected to MongoDB database');
 });
-
 
 module.exports = app;
