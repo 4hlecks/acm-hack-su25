@@ -9,7 +9,7 @@ const createEvent_Schema = new mongoose.Schema({
     },
     clubId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Club',
+        ref: 'User',
         required: true
     },
     title: {

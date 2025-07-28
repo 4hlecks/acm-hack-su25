@@ -2,12 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Event = require('../../models/event_schema');
 
+
 router.get('/:categoryChoice', async (req, res) => {
     try{ 
         const {categoryChoice} = req.params;
-        console.log(categoryChoice)
-        const events = await Event.find({category: categoryChoice}).
-            populate('clubId', 'name-_id').sort({startDate: 1});
+        const events = await Event.find({category: categoryChoice}). 
+            populate('clubId', 'name-_id').sort({startDate: 1}); 
         res.json(events);
     } catch (err){
         console.log(err);
@@ -17,3 +17,4 @@ router.get('/:categoryChoice', async (req, res) => {
 });
 
 module.exports = router;
+
