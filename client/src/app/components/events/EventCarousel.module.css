@@ -1,7 +1,7 @@
 .carouselSection {
     display: flex;
     flex-direction: column;
-    padding: .5rem 0;
+    padding: 1rem 0;
 
     .carouselHeader {
         display: flex;
@@ -30,6 +30,7 @@
 
         .carouselSeeAll:hover {
             color: var(--tertiary-color);
+            transition: color 0.3s ease, background-color 0.3s ease;
             cursor: pointer;
         }
     }
@@ -64,14 +65,15 @@
     }
 
     .carouselContent button:hover {
+        transition: color 0.3s ease, background-color 0.3s ease;
         background-color: var(--button-primary-hover);
     }
 
     .carouselLeft {
-        border-radius: 10px 0 0 10px;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
     }
 
     .carouselRight {
-        border-radius: 0 10px 10px 0;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
     }
 }
