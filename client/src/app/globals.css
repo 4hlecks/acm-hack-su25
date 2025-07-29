@@ -7,10 +7,10 @@
 
 :root {
   /* Base Color Scheme Variables */
-  --primary-color: #ffffff;
-  --secondary-color: #ffffff;
-  --tertiary-color: #ffffff;
-  --background-color: #ffffff;
+  --primary-color: #F2F2F2;
+  --secondary-color: #EAE4D5;
+  --tertiary-color: #B6B09F;
+  --background-color: var(--primary-color);
   --text-color: #000000;
   --text-muted-color: #ffffff;
   --link-color: #ffffff;
@@ -20,8 +20,17 @@
   --primary-color-dark: #ffffff;
   --secondary-color-dark: #ffffff;
   --tertiary-color-dark: #ffffff;
-  --background-color-dark: #ffffff;
+  --background-color-dark: var(--primary-color-dark);
   --text-color-dark: #ffffff;
+
+  /* Button Variables */
+  --button-primary-bg: #57564F;
+  --button-primary-color: #ffffff;
+  --button-primary-hover: #7A7A73;
+
+  --button-secondary-bg: #B8001F;
+  --button-secondary-color: #000000;
+  --button-secondary-hover: rgb(194, 70, 70);
 
   /* Typography Variables */
   --font-primary: 'Onest', 'Roboto Mono', monospace;
@@ -51,6 +60,10 @@
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+
+  body {
+    background-color: var(--primary-color);
+  }
 }
 /*
 @media (prefers-color-scheme: dark) {
