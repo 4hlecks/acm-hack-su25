@@ -29,14 +29,14 @@
         padding: 10px;
 
         .eventTitle {
-            font-size: 16px;
+            font-size: var(--font-size-subheading);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .eventOwner {
-            font-size: 14px;
+            font-size: var(--font-size-body);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -45,32 +45,34 @@
         .eventDate, .eventLocation {
             text-overflow: ellipsis;
             overflow: hidden;
-            font-size: 12px;
+            font-size: var(--font-size-small);
         }
 
         .eventLocation {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: var(--line-padding);
             margin-top: auto;
             
             .eventLocationIcon {
                 color: black;
-                height: 14px;
-                width: 14px;
+                height: var(--icon-size-small);
+                width: var(--icon-size-small);
+                stroke-width: var(--icon-width-small);
             }
         }
 
         .eventDate {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: var(--line-padding);
             margin-top: auto;
 
             .eventDateIcon {
                 color: black;
-                height: 14px;
-                width: 14px;
+                height: var(--icon-size-small);
+                width: var(--icon-size-small);
+                stroke-width: var(--icon-width-small);
             }
         }
     }

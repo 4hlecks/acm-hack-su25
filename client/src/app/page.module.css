@@ -5,9 +5,10 @@
   padding: 2rem;
 
   .pageTitle {
-    font-size: 48px;
+    font-size: var(--font-size-title);
   }
 }
+
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
 }
