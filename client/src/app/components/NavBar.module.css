@@ -13,17 +13,20 @@
     align-items: stretch;
     gap: var(--navigation-item-padding);
     padding: 0 1rem;
-    height: 3.5rem;
+    height: 4rem;
     overflow: hidden;
     box-sizing: border-box;
     margin: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 
     /* Icon Styles */
     .navIcon {
         width: var(--icon-size-large);
         height: var(--icon-size-large);
         stroke-width: var(--icon-width-large);
-        color: inherit;
     }
 
     /* Middle Navigation Items*/
@@ -75,7 +78,8 @@
         font-weight: 700;
     }
 
-    .navLogOut:hover, .navItem:hover, .siteLogo:hover {
+    .navLogOut:hover, .navItem:hover, .navItem.navLink:hover, .siteLogo:hover {
+        transition: color 0.3s ease, background-color 0.3s ease;
         color: #9A9A9A;
     }
 }
