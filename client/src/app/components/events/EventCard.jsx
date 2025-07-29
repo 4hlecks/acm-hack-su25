@@ -25,8 +25,14 @@ const EventCard = ({ event }) => {
         return date.toLocaleString("en-US", options).replace(",", "");
     }
 
+    function handleClick() {
+        alert(`Event: ${eventTitle}\nOwner: ${eventOwner}\nDate: ${formatDate(eventDate)}\nLocation: ${eventLocation}`);
+    }
+    
     return (
-        <article className={styles.eventCard}>
+        <article className={styles.eventCard}
+                 onClick={handleClick} 
+        >
             <div className={styles.eventCover}>
                 <img className={styles.eventCoverImage} src={eventCover} alt={`${eventTitle} Cover Image`}/>
             </div>
