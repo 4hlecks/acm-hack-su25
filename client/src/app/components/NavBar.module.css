@@ -1,0 +1,73 @@
+.siteLogo {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.navBar {
+    background-color: #D9D9D9;
+    color: rgb(0, 0, 0);
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 2rem;
+    padding: 0 1rem;
+    height: 56px;
+    overflow: hidden;
+    box-sizing: border-box;
+    margin: 0;
+
+    /* Icon Styles */
+    .navIcon {
+        width: 28px;
+        height: 28px;
+        stroke-width: 2.25px;
+    }
+
+    /* Middle Navigation Items*/
+    .navMiddleItems {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+
+        .navItem {
+            display: flex;
+            flex-direction: row;
+            gap: .5rem;
+            align-items: center;
+            color: inherit;
+            text-decoration: none;
+
+            .navLink {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                height: 100%;
+            }
+        }
+    }
+
+    /* Button Item */
+    .navLogOut {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: .5rem;
+        background: none;
+        padding: 1rem;
+        border: none;
+    }
+
+    /* Text Styles */
+    .navLogOut, .navItem, .siteLogo {
+        font-size: 24px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .navLogOut:hover, .navItem:hover, .siteLogo:hover {
+        color: #9A9A9A;
+        font-size: 24px;
+        font-weight: 700;
+    }
+}
