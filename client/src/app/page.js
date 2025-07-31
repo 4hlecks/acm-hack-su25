@@ -1,6 +1,7 @@
 import styles from './page.module.css'
 import NavBar from './components/NavBar'
-import EventCarousel from './components/events/EventCarousel'
+import EventCard from './components/events/EventCard'
+import ProfileCard from './components/profile/ProfileCard';
 
 export default function Home() {
   const freeFoodEvents = [
@@ -182,10 +183,14 @@ export default function Home() {
     <>
       <NavBar />
       <main className={styles.pageContent}>
-        <h1 className={styles.pageTitle}>Home</h1>
-        <EventCarousel category="Free Food" events={freeFoodEvents} />
-        <EventCarousel category="Fundraisers" events={fundraiserEvents} />
-        <EventCarousel category="GBMs" events={gbmEvents} />
+        <ProfileCard />
+      <main className={styles.pageContent}>
+        <h1 className={styles.pageTitle}>Your Profile</h1>
+        <section className={styles.eventGrid}>
+          {freeFoodEvents.map(event => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </section>
       </main>
     </>
   );

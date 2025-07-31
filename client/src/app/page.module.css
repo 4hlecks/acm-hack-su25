@@ -8,6 +8,15 @@
     font-size: 48px;
   }
 }
+
+    .eventGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 5rem;
+    margin-top: 20rem;
+    margin-left: 5rem;
+    margin-right: 10rem;
+    }
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {
 }
