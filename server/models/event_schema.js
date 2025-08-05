@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const createEvent_Schema = new mongoose.Schema({
     eventId: {
         type: String,
-        default: uuidv4,  
+        default: uuidv4,
         unique: true
     },
     clubId: {
@@ -16,32 +16,40 @@ const createEvent_Schema = new mongoose.Schema({
         type: String,
         required: true
     },
-
     description: {
         type: String,
         required: true
     },
-
     startDate: {
-        type: Date, 
+        type: Date,
         required: true
     },
-
     endDate: {
-        type: Date, 
+        type: Date,
         required: true
     },
-
+    startTime: {           
+        type: String,
+        required: true
+    },
+    endTime: {             
+        type: String,
+        required: true
+    },
     location: {
-        type: String, 
+        type: String,
         required: true,
     },
-    
     category: {
         type: String,
         enum: ['GBMs', 'FreeFood', 'Fundraisers'],
         required: true
+    },
+    tags: [{ type: String }], 
+    // for uploading images
+    coverPhoto: {            
+        type: String
     }
-});
+}, { timestamps: true });
 
-module.exports = new mongoose.model('Event', createEvent_Schema);
+module.exports = mongoose.model('Event', createEvent_Schema);

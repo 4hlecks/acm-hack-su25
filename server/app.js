@@ -15,6 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/users', usersRouter);
 app.use('/api/loadEvents', eventsRouter);
 app.use('/api/findClub', clubsRouter);
+app.use('/uploads', express.static('uploads'));
 dotenv.config();
 
 mongoose.connect(process.env.DB_URL).then(() => {

@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/users_schema.js');
 
 // Sign Up Route (All emails can sign up & answer question if they are club/student)
-router.post('/register', async (req, res) => {
+  router.post('/register', async (req, res) => {
   const { name, email, password, role } = req.body;
 
   if (!/\S+@\S+\.\S+/.test(email)) {
@@ -39,7 +40,7 @@ router.post('/register', async (req, res) => {
   res.status(201).json({ message });
 });
 
-// Login route
+// Updated Login Route with JWT
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -57,8 +58,16 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ message: 'Invalid email or password.' });
   }
 
+  // Generate JWT Token
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET || 'defaultsecret',
+    { expiresIn: '1h' }
+  );
+
   res.status(200).json({
     message: 'Login successful.',
+    token, // Send token to frontend
     user: {
       name: user.name,
       email: user.email,
