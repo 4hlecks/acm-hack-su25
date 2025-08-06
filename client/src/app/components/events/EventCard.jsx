@@ -4,7 +4,7 @@ import React from "react";
 import { Calendar, MapPin } from "react-feather";
 import styles from './EventCard.module.css';
 
-const EventCard = ({ event }) => {
+const EventCard = ({ event, onEventClick } ) => {
     // Event should contain the following metadata
     const {
         eventCover, eventTitle, eventOwner,
@@ -25,8 +25,10 @@ const EventCard = ({ event }) => {
         return date.toLocaleString("en-US", options).replace(",", "");
     }
 
+    //calls the parent component 
     function handleClick() {
-        alert(`Event: ${eventTitle}\nOwner: ${eventOwner}\nDate: ${formatDate(eventDate)}\nLocation: ${eventLocation}`);
+        console.log('EventCard clicked!', eventTitle);
+        onEventClick(event);
     }
     
     return (

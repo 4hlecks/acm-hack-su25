@@ -1,18 +1,22 @@
+"use client"
 import styles from './page.module.css'
 import NavBar from './components/NavBar'
 import EventCarousel from './components/events/EventCarousel'
-
+import EventPopup from './components/events/EventPopup';
+import React, {useState} from 'react';
 export default function Home() {
   const freeFoodEvents = [
     {
       id: 1,
-      eventCover: "https://via.placeholder.com/400x200",
+      eventCover: "/Images/fasd.png",
       eventTitle: "Free Pancake Breakfast",
+      eventTime: '9:00:00',
       eventOwner: "Sixth College Council",
-      eventDate: "2025-08-28T09:00:00",
+      eventDate: "2025-08-28",
       eventLocation: "Dogghouse",
       eventDescription: "Start your day with free pancakes and fruit!",
       eventTags: ["Free", "Food", "Breakfast"],
+
     },
     {
       id: 2,
@@ -178,14 +182,31 @@ export default function Home() {
     eventTags: ["GBM", "Free", "Community"],
   }));
 
+  //Check to see if popup is open
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const openEventPopup = (event) => {
+    setSelectedEvent(event);
+    setIsPopupOpen(true);
+  };
+
+  const closeEventPopup = () => {
+    setSelectedEvent(null);
+    setIsPopupOpen(false);
+  };
+
   return (
     <>
       <NavBar />
       <main className={styles.pageContent}>
         <h1 className={styles.pageTitle}>Home</h1>
-        <EventCarousel category="Free Food" events={freeFoodEvents} />
-        <EventCarousel category="Fundraisers" events={fundraiserEvents} />
-        <EventCarousel category="GBMs" events={gbmEvents} />
+        <EventCarousel category="Free Food" events={freeFoodEvents} onEventClick={openEventPopup}/>
+        <EventCarousel category="Fundraisers" events={fundraiserEvents} onEventClick={openEventPopup}/>
+        <EventCarousel category="GBMs" events={gbmEvents} onEventClick={openEventPopup} />
+
+        {isPopupOpen && (
+          <EventPopup event={selectedEvent} onClose={closeEventPopup} isOpen={isPopupOpen} />)}
       </main>
     </>
   );
