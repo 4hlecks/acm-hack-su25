@@ -10,15 +10,21 @@
     .eventCover {
         display: flex;
         align-items: center;
+        justify-content: center;
         text-align: center;
         background-color: var(--secondary-color);
         width: 100%;
         height: 175px;
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         flex-shrink: 0;
+        overflow: hidden;
 
         .eventCoverImage {
             object-fit: cover;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+
         }
     }
 
