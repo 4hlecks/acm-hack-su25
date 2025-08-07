@@ -184,8 +184,15 @@ export default function Home() {
       <NavBar />
       <main className={styles.pageContent}>
         <ProfileCard />
-      <main className={styles.pageContent}>
-        <h1 className={styles.pageTitle}>Your Profile</h1>
+        <div className={styles.eventsHeader}>
+          <h2>Events</h2>
+          <select className={styles.sortDropdown}>
+            <option>Sort by</option>
+            <option value="gbm">GBM</option>
+            <option value="fundraiser">Fundraiser</option>
+            <option value="free-food">Free Food</option>
+          </select>
+        </div>
         <section className={styles.eventGrid}>
           {freeFoodEvents.map(event => (
             <EventCard key={event.id} event={event} />
