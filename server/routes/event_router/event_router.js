@@ -1,0 +1,19 @@
+const express = require('express');
+const router = express.Router();
+const Event = require('../../models/event_schema');
+
+
+router.get('/:categoryChoice', async (req, res) => {
+    try{ 
+        const {categoryChoice} = req.params;
+        const events = await Event.find({eventCategory: categoryChoice}) 
+            .populate('eventOwner', 'name-_id').sort({eventDate: 1}); 
+        res.json(events);
+    } catch (err){
+        console.log(err);
+        res.status(500).json({error: 'Server error: Check Connections!'})   
+    }
+
+});
+
+module.exports = router;
