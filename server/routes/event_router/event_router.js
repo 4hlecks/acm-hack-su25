@@ -48,4 +48,3 @@ router.get('/:categoryChoice', async (req, res) => {
 });
 
 module.exports = router;
-

@@ -7,16 +7,16 @@ const createEvent_Schema = new mongoose.Schema({
         default: uuidv4,
         unique: true
     },
-    clubId: {
+    eventOwner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
-    title: {
+    eventTitle: {
         type: String,
         required: true
     },
-    description: {
+    eventDescription: {
         type: String,
         required: true
     },
@@ -36,15 +36,20 @@ const createEvent_Schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    location: {
+    eventLocation: {
         type: String,
         required: true,
     },
-    category: {
+    eventCategory: {
         type: String,
         enum: ['GBMs', 'FreeFood', 'Fundraisers'],
         required: true
     },
+    eventSrc: {
+        type: String,
+        required: true
+    },
+    
     tags: [{ type: String }], 
     // for uploading images
     coverPhoto: {            

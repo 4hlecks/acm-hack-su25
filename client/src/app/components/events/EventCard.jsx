@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react";
 import { Calendar, MapPin } from "react-feather";
 import styles from './EventCard.module.css';
@@ -7,9 +5,9 @@ import styles from './EventCard.module.css';
 const EventCard = ({ event }) => {
     // Event should contain the following metadata
     const {
-        eventCover, eventTitle, eventOwner,
-        eventDate, eventTime, eventLocation,
-        eventDescription, eventTags, eventSrc
+        eventCover, eventTitle, eventOwner, eventDate,
+        eventLocation, eventDescription, 
+        eventTags, eventCategory, eventSrc
     } = event;
 
     function formatDate(inputDate) {

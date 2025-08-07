@@ -7,10 +7,13 @@ const usersRouter = require('./routes/users.js');
 const eventsRouter = require('./routes/event_router/event_router')
 const clubsRouter = require('./routes/club_router/club_router')
 const app = express();
+const cors = require('cors');
+app.use(cors({ origin: 'http://localhost:3000' }));
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.static('public'));
 
 app.use('/users', usersRouter);
 app.use('/api/loadEvents', eventsRouter);
@@ -21,5 +24,6 @@ dotenv.config();
 mongoose.connect(process.env.DB_URL).then(() => {
   console.log('Connected to MongoDB database');
 });
+
 
 module.exports = app;
