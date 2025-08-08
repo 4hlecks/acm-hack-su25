@@ -60,3 +60,6 @@ typings/
 
 # next.js build output
 .next
+
+# ignore uploaded event images to avoid pushing them to GitHub
+uploads/
