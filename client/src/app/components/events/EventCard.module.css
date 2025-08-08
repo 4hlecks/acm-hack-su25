@@ -1,0 +1,86 @@
+.eventCard {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--tertiary-color);
+    width: 175px;
+    height: 275px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+
+    .eventCover {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: var(--secondary-color);
+        width: 100%;
+        height: 175px;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        flex-shrink: 0;
+        overflow: hidden;
+
+        .eventCoverImage {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+
+        }
+    }
+
+    .eventInfo {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: space-evenly;
+        padding: 10px;
+
+        .eventTitle {
+            font-size: var(--font-size-subheading);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .eventOwner {
+            font-size: var(--font-size-body);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .eventDate, .eventLocation {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            font-size: var(--font-size-small);
+        }
+
+        .eventLocation {
+            display: flex;
+            align-items: center;
+            gap: var(--line-padding);
+            margin-top: auto;
+            
+            .eventLocationIcon {
+                color: black;
+                height: var(--icon-size-small);
+                width: var(--icon-size-small);
+                stroke-width: var(--icon-width-small);
+            }
+        }
+
+        .eventDate {
+            display: flex;
+            align-items: center;
+            gap: var(--line-padding);
+            margin-top: auto;
+
+            .eventDateIcon {
+                color: black;
+                height: var(--icon-size-small);
+                width: var(--icon-size-small);
+                stroke-width: var(--icon-width-small);
+            }
+        }
+    }
+}

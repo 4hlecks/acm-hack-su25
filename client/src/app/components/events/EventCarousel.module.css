@@ -1,0 +1,79 @@
+.carouselSection {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+
+    .carouselHeader {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        .carouselTitle {
+            font-size: var(--font-size-heading);
+        }
+        
+        .carouselSeeAll {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            gap: .25rem;
+
+            .carouselSeeAllIcon {
+                width: var(--icon-size-large);
+                height: var(--icon-size-large);
+                stroke-width: var(--icon-width-large);
+            }
+        }
+
+        .carouselSeeAll:hover {
+            color: var(--tertiary-color);
+            transition: color 0.3s ease, background-color 0.3s ease;
+            cursor: pointer;
+        }
+    }
+
+    .carouselContent {
+        display: flex;
+        flex-direction: row;
+        overflow: hidden;
+
+        .carouselSwiper {
+            .carouselCard {
+                width: auto;
+            }
+        }
+    }
+
+    .carouselContent button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--button-primary-bg);
+        min-width: 30px;
+        border: none;
+        cursor: pointer;
+
+        .carouselLeftIcon, .carouselRightIcon {
+            color: var(--button-primary-color);
+            width: 48px;
+            height: 48px;
+            stroke-width: 2.25px;
+        }
+    }
+
+    .carouselContent button:hover {
+        transition: color 0.3s ease, background-color 0.3s ease;
+        background-color: var(--button-primary-hover);
+    }
+
+    .carouselLeft {
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+    }
+
+    .carouselRight {
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    }
+}
