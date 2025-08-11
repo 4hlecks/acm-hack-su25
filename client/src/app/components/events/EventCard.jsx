@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react";
 import { Calendar, MapPin } from "react-feather";
 import styles from './EventCard.module.css';
@@ -7,9 +5,9 @@ import styles from './EventCard.module.css';
 const EventCard = ({ event }) => {
     // Event should contain the following metadata
     const {
-        eventCover, eventTitle, eventOwner,
-        eventDate, eventTime, eventLocation,
-        eventDescription, eventTags, eventSrc
+        eventCover, eventTitle, eventOwner, eventDate,
+        eventLocation, eventDescription, 
+        eventTags, eventCategory, eventSrc
     } = event;
 
     function formatDate(inputDate) {
@@ -25,8 +23,14 @@ const EventCard = ({ event }) => {
         return date.toLocaleString("en-US", options).replace(",", "");
     }
 
+    function handleClick() {
+        alert(`Event: ${eventTitle}\nOwner: ${eventOwner}\nDate: ${formatDate(eventDate)}\nLocation: ${eventLocation}`);
+    }
+    
     return (
-        <article className={styles.eventCard}>
+        <article className={styles.eventCard}
+                 onClick={handleClick} 
+        >
             <div className={styles.eventCover}>
                 <img className={styles.eventCoverImage} src={eventCover} alt={`${eventTitle} Cover Image`}/>
             </div>

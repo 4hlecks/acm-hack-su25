@@ -2,47 +2,54 @@
     display: flex;
     align-items: center;
     font-size: 2rem;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .navBar {
-    background-color: #D9D9D9;
-    color: rgb(0, 0, 0);
+    background-color: var(--secondary-color);
     display: flex;
     justify-content: space-between;
     align-items: stretch;
-    gap: 2rem;
+    gap: var(--navigation-item-padding);
     padding: 0 1rem;
-    height: 56px;
+    height: 4rem;
     overflow: hidden;
     box-sizing: border-box;
     margin: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 
     /* Icon Styles */
     .navIcon {
-        width: 28px;
-        height: 28px;
-        stroke-width: 2.25px;
+        width: var(--icon-size-large);
+        height: var(--icon-size-large);
+        stroke-width: var(--icon-width-large);
     }
 
     /* Middle Navigation Items*/
     .navMiddleItems {
         display: flex;
-        gap: 2rem;
+        gap: var(--navigation-item-padding);
         list-style: none;
+        text-decoration: none;
 
         .navItem {
             display: flex;
             flex-direction: row;
             gap: .5rem;
             align-items: center;
-            color: inherit;
-            text-decoration: none;
+            font-weight: var(--font-weight-navigation);
 
             .navLink {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 height: 100%;
+                text-decoration: none;
+                color: inherit;
             }
         }
     }
@@ -56,18 +63,23 @@
         background: none;
         padding: 1rem;
         border: none;
+        white-space: nowrap;
+        overflow: hidden;
     }
 
     /* Text Styles */
     .navLogOut, .navItem, .siteLogo {
-        font-size: 24px;
-        font-weight: 700;
+        font-size: var(--font-size-navigation);
+        color: var(--text-color);
         cursor: pointer;
     }
 
-    .navLogOut:hover, .navItem:hover, .siteLogo:hover {
-        color: #9A9A9A;
-        font-size: 24px;
+    .navLogOut, .siteLogo {
         font-weight: 700;
+    }
+
+    .navLogOut:hover, .navItem:hover, .navItem.navLink:hover, .siteLogo:hover {
+        transition: color 0.3s ease, background-color 0.3s ease;
+        color: #9A9A9A;
     }
 }
