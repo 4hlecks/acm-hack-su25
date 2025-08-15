@@ -18,11 +18,24 @@ const EventPopup = ({ event, onClose, isOpen }) => {
 
     if (!event || !mounted) return null;
 
+
     const {
-        eventCover, eventTitle, eventOwner,
-        eventDate, eventTime, eventLocation,
-        eventDescription, eventTags, eventSrc
+        coverPhoto, eventTitle, eventOwner,
+        eventDate, startTime, endTime, eventLocation,
+        eventDescription, tags, eventSrc
     } = event;
+
+    function formatDisplayDateTime(){
+        const [year, month, day] = eventDate.split('-');
+        const date = new Date(year, month - 1, day);
+        
+        const formattedDate = date.toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "short",
+            day: "numeric"
+        });
+        return `${formattedDate} | ${startTime} - ${endTime}`;
+    }
 
     const dialogContent = (
         <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -38,7 +51,7 @@ const EventPopup = ({ event, onClose, isOpen }) => {
                     <div className={styles.content}>
                         {/* Event image */}
                         <div className={styles.imageSection}>
-                            <img src={eventCover} alt="Event cover" className={styles.eventImage}/>          
+                            <img src={coverPhoto} alt="Event cover" className={styles.eventImage}/>          
                         </div>  
                         {/*Event details*/}                
                         <div className={styles.rightPanel}>
@@ -60,7 +73,7 @@ const EventPopup = ({ event, onClose, isOpen }) => {
                                     </div>
                                     <div className={styles.infoItem}>
                                         <Calendar size={16} className={styles.infoIcon} />
-                                        <span>{eventDate} | {eventTime}</span>
+                                        <span>{formatDisplayDateTime()}</span>
                                     </div>
                                 </div>                              
                                 <Dialog.Description className={styles.description}>

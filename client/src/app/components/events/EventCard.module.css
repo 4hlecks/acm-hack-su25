@@ -2,11 +2,13 @@
     display: flex;
     flex-direction: column;
     background-color: var(--tertiary-color);
-    width: 175px;
-    height: 275px;
+    width: 225px;
+    height: 300px;
     border-radius: var(--border-radius);
     cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 
+    
     .eventCover {
         display: flex;
         align-items: center;
@@ -33,9 +35,11 @@
         flex-direction: column;
         flex-grow: 1;
         justify-content: space-evenly;
-        padding: 10px;
+        padding: 12px 14px;
+
 
         .eventTitle {
+            font-weight: 600;
             font-size: var(--font-size-subheading);
             white-space: nowrap;
             overflow: hidden;
@@ -50,9 +54,17 @@
         }
 
         .eventDate, .eventLocation {
-            text-overflow: ellipsis;
-            overflow: hidden;
-            font-size: var(--font-size-small);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+
+        .eventLocationIcon {
+                color: black;
+                height: var(--icon-size-small);
+                width: var(--icon-size-small);
+                stroke-width: var(--icon-width-small);
         }
 
         .eventLocation {
@@ -61,13 +73,19 @@
             gap: var(--line-padding);
             margin-top: auto;
             
-            .eventLocationIcon {
-                color: black;
-                height: var(--icon-size-small);
-                width: var(--icon-size-small);
-                stroke-width: var(--icon-width-small);
-            }
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
+
+        .eventLocation span{
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            min-width: 0; /* required inside flex for ellipsis to work */
+        }
+
+
 
         .eventDate {
             display: flex;
@@ -81,6 +99,30 @@
                 width: var(--icon-size-small);
                 stroke-width: var(--icon-width-small);
             }
+
+            .dateTimeContainer{
+                display:flex;
+                flex-direction: column;
+                gap: 1px;
+                min-width: 0;
+            }
+
+            .dateText {
+                font-weight: 500;
+                line-height: 1.2;
+                font-size: var(--font-size-small);
+            }
+
+            .timeText {
+                font-weight: 500;
+                font-size: var(--font-size-small);
+                line-height: 1.2;
+            }
         }
     }
+}
+
+.eventCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
 }
