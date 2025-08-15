@@ -3,8 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './page.module.css'
 import NavBar from './components/NavBar'
-import EventCard from './components/events/EventCard'
-import ProfileCard from './components/profile/ProfileCard';
+import EventCarousel from './components/events/EventCarousel'
 
 export default function Home() {
   const [eventsByCategory, setEventsByCategory] = useState({});
@@ -34,21 +33,14 @@ export default function Home() {
     <>
       <NavBar />
       <main className={styles.pageContent}>
-        <ProfileCard />
-        <div className={styles.eventsHeader}>
-          <h2>Events</h2>
-          <select className={styles.sortDropdown}>
-            <option>Sort by</option>
-            <option value="gbm">GBM</option>
-            <option value="fundraiser">Fundraiser</option>
-            <option value="free-food">Free Food</option>
-          </select>
-        </div>
-        <section className={styles.eventGrid}>
-          {freeFoodEvents.map(event => (
-            <EventCard key={event.id} event={event} />
+        <h1 className={styles.pageTitle}>Home</h1>
+          {categories.map(category => (
+            <EventCarousel
+              key={category}
+              category={category}
+              events={eventsByCategory[category] || []}
+            /> 
           ))}
-        </section>
       </main>
     </>
   );
