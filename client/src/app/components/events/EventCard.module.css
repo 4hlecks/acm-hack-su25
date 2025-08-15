@@ -53,52 +53,42 @@
             text-overflow: ellipsis;
         }
 
-        .eventDate, .eventLocation {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-
-        .eventLocationIcon {
+        
+        .eventLocationIcon, .eventDateIcon {
                 color: black;
                 height: var(--icon-size-small);
                 width: var(--icon-size-small);
                 stroke-width: var(--icon-width-small);
+                flex-shrink: 0;
         }
 
         .eventLocation {
             display: flex;
-            align-items: center;
+            align-items: flex-start; 
             gap: var(--line-padding);
             margin-top: auto;
             
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            .eventLocationText {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+                line-height: normal; 
+            }
         }
 
         .eventLocation span{
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
-            min-width: 0; /* required inside flex for ellipsis to work */
+            min-width: 0; 
         }
-
-
 
         .eventDate {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: var(--line-padding);
             margin-top: auto;
-
-            .eventDateIcon {
-                color: black;
-                height: var(--icon-size-small);
-                width: var(--icon-size-small);
-                stroke-width: var(--icon-width-small);
-            }
 
             .dateTimeContainer{
                 display:flex;
@@ -124,5 +114,5 @@
 
 .eventCard:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
