@@ -8,12 +8,11 @@ module.exports = function (req, res, next) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    console.log('✅ Decoded token:', decoded); 
+    console.log(' Decoded token:', decoded); 
     req.user = decoded;
     next();
   } catch (err) {
-    console.log('❌ Token error:', err.message);
+    console.log(' Token error:', err.message);
     return res.status(401).json({ message: 'Token is not valid' });
   }
 };
-
