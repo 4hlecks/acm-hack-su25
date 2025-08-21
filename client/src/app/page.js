@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import styles from './page.module.css'
-import NavBar from './components/NavBar'
+import NavBar from './components/navbar/NavBar'
+import MobileNavBar from './components/navbar/MobileNavBar'
 import EventCarousel from './components/events/EventCarousel'
 
 export default function Home() {
@@ -42,6 +43,7 @@ export default function Home() {
             /> 
           ))}
       </main>
+      <MobileNavBar />
     </>
   );
 }
