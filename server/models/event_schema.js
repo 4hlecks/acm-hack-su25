@@ -45,15 +45,12 @@ const createEvent_Schema = new mongoose.Schema({
         enum: ['GBM', 'FreeFood', 'Fundraiser'],
         required: true
     },
-    eventSrc: {
-        type: String,
-        required: true
-    },
     
     tags: [{ type: String }], 
     // for uploading images
     coverPhoto: {            
-        type: String
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 
