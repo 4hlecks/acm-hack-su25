@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Club = require('../../models/club_schema');
+const Event = require('../../models/event_schema');
 const auth = require('../../middleware/auth');
 const clubAuth = require('../../middleware/clubAuth');
 const upload = require('../../middleware/upload');
@@ -17,10 +18,8 @@ router.get('/', async (req, res) => {
 });
 
 
-
-
 //Update club profile 
-router.put('/profile', auth, clubAuth, upload.single('profilePic'), async (req, res) =>{
+router.put('/updateProfile', auth, clubAuth, upload.single('profilePic'), async (req, res) =>{
     try {
         const {bio} = req.body;
         const clubId = req.user.id;
@@ -79,6 +78,7 @@ router.get('/profile/me', auth, clubAuth, async(req, res) => {
             return res.status(404).json({message: 'Club not found.'})
         }
 
+        const events = await Event.find({eventOwner: req.user.id}).sort({createdAt: -1})
         res.json({
             id: club._id,
             name: club.name,
@@ -86,7 +86,9 @@ router.get('/profile/me', auth, clubAuth, async(req, res) => {
             bio: club.bio,
             profilePic: club.profilePic,
             approved:club.approved,
-            role: club.role
+            role: club.role,
+            events: events,
+            eventCount: events.length
         })
     } catch (error){
         res.status(500).json({error: 'Server error'})
