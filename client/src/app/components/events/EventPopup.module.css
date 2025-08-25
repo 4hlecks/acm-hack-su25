@@ -1,0 +1,169 @@
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+}
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 0.75rem;
+    max-width: 90vw; 
+    max-height: 90vh;
+    min-width: 50rem;
+    min-height: 31.25rem;
+    overflow: hidden;
+    z-index: 1002;
+    display: flex;
+    box-shadow: 0 1.5625rem 3.125rem -0.75rem rgba(0, 0, 0, 0.25);
+
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.closeButton:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.content {
+    display: flex;
+    width: 100%;
+    flex: 1
+}
+
+.imageSection {
+    flex: 1.25; 
+    height: 100%; /* Full height of popup */
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.eventImage {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
+}
+
+.rightPanel{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.clubInfo{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.clubLogo{
+    width:4rem;
+    height: 4rem;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid black;
+    margin-right: 2rem;
+}
+.owner {
+    font-size: 1.5rem;
+    font-weight: 700; 
+    color: #000000; 
+}
+
+.detailsSection {
+    flex: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto; 
+}
+
+.title {
+    font-size: 1.35rem;
+    font-weight: bold;
+    margin: 0;
+    color: #1f2937;
+}
+
+.infoContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.infoItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.infoIcon {
+    color: #6b7280;
+}
+
+.description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #374151;
+    flex-grow: 1;
+}
+
+.buttonContainer{
+    padding: 1rem 2rem 1.5rem;
+    border-radius: 0 !important;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    background: none !important;
+    border: none !important;
+}
+.saveButton {
+    background-color: #fbbf24;
+    color: #1f2937;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px; 
+    border: 2px solid 
+#000000;
+    margin-top: auto; 
+}
+
+.saveButton:hover {
+    background-color: #f59e0b;
+}
+
+.popup[data-popup] {
+    border-radius: 0 !important;
+}

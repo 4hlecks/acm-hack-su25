@@ -26,7 +26,7 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
             tags: tags ? tags.split(',') : [],
             eventLocation,
             eventCategory,
-            eventSrc: req.file ? req.file.filename : null
+            coverPhoto: req.file ? (req.file.secure_url || req.file.path) : 'https://via.placeholder.com/400x200'
           });
 
         await newEvent.save();
@@ -41,7 +41,7 @@ router.get('/:categoryChoice', async (req, res) => {
     try{ 
         const {categoryChoice} = req.params;
         const events = await Event.find({eventCategory: categoryChoice}). 
-            populate('eventOwner', 'name _id').sort({startDate: 1}); 
+            populate('eventOwner', 'name profilePic').sort({startDate: 1}); 
         res.json(events);
     } catch (err){
         console.log(err);

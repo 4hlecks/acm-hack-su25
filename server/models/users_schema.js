@@ -15,7 +15,9 @@ const userSchema = new mongoose.Schema({
     // asks if the user is a regular user or a club affiliate
     role: { type: String, enum: ['club', 'user'], default: 'user' },
     // only used for club affiliates (UCSD emails)
-    approved: { type: Boolean, default: false } 
+    approved: { type: Boolean, default: false },
+    //profile pic for both users and clubs (empty by default)
+    profilePic: {type: String, default: ""}
 }, userSchemaOptions);
 
 const User = mongoose.model('User', userSchema);
