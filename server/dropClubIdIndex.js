@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 async function dropClubIdIndex() {
   try {
-    await mongoose.connect('mongodb+srv://vinhn28:!Vn12282005@cluster0.j4qp7fq.mongodb.net/test?retryWrites=true&w=majority', {
+    await mongoose.connect('mongodb+srv://SerinaW:5e9q00ueBTHl3aw0@cluster0.zhjvjai.mongodb.net/test?retryWrites=true&w=majority', {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });

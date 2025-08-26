@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, MapPin } from "react-feather";
+import { Calendar, MapPin, Clock } from "react-feather";
 import styles from './EventCard.module.css';
 
 const EventCard = ({ event, onEventClick } ) => {
@@ -49,7 +49,7 @@ const EventCard = ({ event, onEventClick } ) => {
         const [endHourMin, endAMPM] = endTime.split(' ');
 
         if (startAMPM === endAMPM) {
-            return `${startHourMin}-${endHourMin} ${startAMPM}`;
+            return `${startHourMin} - ${endHourMin} ${startAMPM}`;
         } else {
             return `${startHourMin} ${startAMPM} - ${endHourMin} ${endAMPM}`;
         }
@@ -76,19 +76,24 @@ const EventCard = ({ event, onEventClick } ) => {
                 }}/>
             </div>
             <section className={styles.eventInfo}>
-                <h3 className={styles.eventTitle}>{eventTitle}</h3>
-                <p className={styles.eventOwner}>{eventOwner?.name}</p>
-                <span className={styles.eventLocation}>
-                    <MapPin className={styles.eventLocationIcon}/> 
-                    <span className={styles.eventLocationText}>{eventLocation}</span>
-                </span>
-                <time className={styles.eventDate}>
-                    <Calendar className={styles.eventDateIcon}/> 
-                    <div className={styles.dateTimeContainer}>
-                        <div className={styles.dateText}>{displayDate}</div>
-                        {displayTime && <div className={styles.timeText}>{displayTime}</div>}
-                    </div>
-                </time>
+                <header className={styles.eventHeader}>
+                    <h3 className={styles.eventTitle}>{eventTitle}</h3>
+                    <p className={styles.eventOwner}>{eventOwner?.name}</p>
+                </header>
+                <div className={styles.eventDetails}>
+                    <span className={styles.eventAttribute}>
+                        <MapPin className={styles.eventIcon}/> 
+                        <span className={styles.eventDetailsText}>{eventLocation}</span>
+                    </span>
+                    <time className={styles.eventAttribute}>
+                        <Calendar className={styles.eventIcon}/> 
+                        <span className={styles.eventDetailsText}>{displayDate}</span>
+                    </time>
+                    <time className={styles.eventAttribute}>
+                        <Clock className={styles.eventIcon}/>
+                        <span className={styles.eventDetailsText}>{displayTime}</span>
+                    </time>
+                </div>
             </section>
         </article>
     )

@@ -38,7 +38,7 @@
     .carouselContent {
         display: flex;
         flex-direction: row;
-        overflow: hidden;
+        /* overflow: hidden; */
 
         .carouselSwiper {
             .carouselCard {
@@ -77,3 +77,4 @@
         border-radius: 0 var(--border-radius) var(--border-radius) 0;
     }
 }
+
