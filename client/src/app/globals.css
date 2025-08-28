@@ -1,10 +1,3 @@
-@font-face {
-  font-family: 'Onest';
-  src: url('/fonts/Onest-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
 :root {
   /* Base Color Scheme Variables */
   --primary-color: #F2F2F2;
@@ -33,7 +26,7 @@
   --button-secondary-hover: rgb(194, 70, 70);
 
   /* Typography Variables */
-  --font-primary: 'Onest', 'Roboto Mono', monospace;
+  font-family: var(--font-onest), system-ui, sans-serif;
   --font-size-nav: 1rem;
   --font-size-navigation: 1.5rem;
   --font-weight-navigation: 600;
@@ -56,7 +49,6 @@
 }
 
 * {
-  font-family: var(--font-primary);
   box-sizing: border-box;
   padding: 0;
   margin: 0;
