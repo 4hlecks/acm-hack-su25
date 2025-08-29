@@ -5,7 +5,7 @@
   --tertiary-color: #B6B09F;
   --background-color: var(--primary-color);
   --text-color: #000000;
-  --text-muted-color: #ffffff;
+  --text-muted-color: #999999;
   --link-color: #ffffff;
   --link-hover-color: #ffffff;
 
@@ -21,29 +21,36 @@
   --button-primary-color: #ffffff;
   --button-primary-hover: #7A7A73;
 
-  --button-secondary-bg: #B8001F;
+  --button-secondary-bg: #FFD05E;
   --button-secondary-color: #000000;
-  --button-secondary-hover: rgb(194, 70, 70);
+  --button-secondary-hover: #b7881a;
 
   /* Typography Variables */
   font-family: var(--font-onest), system-ui, sans-serif;
   --font-size-nav: 1rem;
   --font-size-navigation: 1.5rem;
   --font-weight-navigation: 600;
+  --font-weight-button: 600;
+  --font-weight-heading: 700;
   --font-size-title: 3rem;
   --font-size-heading: 2rem;
-  --font-size-subheading: 1rem;
+  --font-size-subheading: 1.5rem;
+  --font-size-subheading2: 1.25rem;
+  --font-size-subheading3: 1rem;
   --font-size-body: 1rem;
+  --font-size-medium: 0.875rem;
   --font-size-small: 0.75rem;
   --line-padding: 4px;
 
   /* Border & Spacing Variables */
-  --border-radius: 10px;
+  --border-radius: 1rem;
   --navigation-item-padding: 2rem;
+  --event-component-padding: 1rem;
 
   /* Icon Variables */
   --icon-size-large: 1.75rem;
   --icon-width-large: 0.125rem;
+  --icon-size-medium: 1rem;
   --icon-size-small: 0.875rem;
   --icon-width-small: 0.125rem;
 }

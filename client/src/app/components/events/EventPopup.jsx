@@ -35,17 +35,17 @@ const EventPopup = ({ event, onClose, isOpen }) => {
         if (isSameDay){
             return start.toLocaleDateString("en-US", {
                 weekday: "long",
-                month: "short",
+                month: "long",
                 day: "numeric"
             });
         } else{
             const startFormatted = start.toLocaleDateString("en-US", {
-                month: "short",
+                month: "long",
                 day: "numeric"
             })
 
             const endFormatted = end.toLocaleDateString("en-US", {
-                month: "short",
+                month: "long",
                 day: "numeric"
             })
 
@@ -61,7 +61,7 @@ const EventPopup = ({ event, onClose, isOpen }) => {
         const [endHourMin, endAMPM] = endTime.split(' ');
 
         if (startAMPM === endAMPM) {
-            return `${startHourMin}-${endHourMin} ${startAMPM}`;
+            return `${startHourMin} - ${endHourMin} ${startAMPM}`;
         } else {
             return `${startHourMin} ${startAMPM} - ${endHourMin} ${endAMPM}`;
         }
@@ -74,63 +74,51 @@ const EventPopup = ({ event, onClose, isOpen }) => {
             <Dialog.Portal container={document.body}>
                 <Dialog.Backdrop className={styles.backdrop} />
                 <Dialog.Popup className={styles.popup}>
-                    {/* Close button */}
+                    {/* Close Button */}
                     <button onClick={onClose} className={styles.closeButton}>
                         <X size={20} />
                     </button>
                     
-                    {/* Popup content */}
-                    <div className={styles.content}>
-                        {/* Event image */}
-                        <div className={styles.imageSection}>
+                    {/* Popup Content */}
+                    <article className={styles.eventContent}>
+                        {/* Event Image */}
+                        <figure className={styles.imageSection}>
                             <img 
                                 src={coverPhoto} 
-                                alt="Event cover" 
+                                alt="Event Flyer" 
                                 className={styles.eventImage}
                                 onError={(e) => {
-                                    console.log('Image failed to load in popup');
+                                    console.log('Image failed to load in Event Popup');
                                     e.target.src = 'https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png'
                                 }}
                             />          
-                        </div>  
+                        </figure>  
                         
-                        {/* Event details */}                
-                        <div className={styles.rightPanel}>
-                            <div className={styles.detailsSection}>
-                                <div className={styles.clubInfo}>
-                                    <img src={eventOwner?.profilePic} alt="Club logo" className={styles.clubLogo}></img>
-                                    <p className={styles.owner}>
-                                        {eventOwner?.name || eventOwner || 'Unknown Organizer'}
-                                    </p>
-                                </div>                                                            
-                                
-                                <Dialog.Title className={styles.title}>
+                        {/* Event Section */}                
+                        <section className={styles.eventSection}>
+                            <div className={styles.clubInfo}>
+                                <img src={eventOwner?.profilePic} alt="Club Logo" className={styles.clubLogo}></img>
+                                <h3 className={styles.clubOwner}>
+                                    {eventOwner?.name || eventOwner || 'Unknown Organizer'}
+                                </h3>
+                            </div>
+                            <div className={styles.eventInfo}>
+                                <span className={styles.eventDate}>{formatDisplayDate()} | {formatTimeRange()}</span>
+                                <Dialog.Title className={styles.eventTitle}>
                                     {eventTitle}                                    
                                 </Dialog.Title>
-                                
-                                <div className={styles.infoContainer}>
-                                    <div className={styles.infoItem}>
-                                        <MapPin size={16} className={styles.infoIcon} />
-                                        <span>{eventLocation || 'Location TBD'}</span>
-                                    </div>
-                                    <div className={styles.infoItem}>
-                                        <Calendar size={16} className={styles.infoIcon} />
-                                        <span>{formatDisplayDate()} | {formatTimeRange()}</span>
-                                    </div>
-                                </div>                              
-                                
-                                <Dialog.Description className={styles.description}>
+                                <span className={styles.eventLocation}> <MapPin className={styles.eventIcon} /> {eventLocation || 'Location TBD'}</span>
+                                <Dialog.Description className={styles.eventDescription}>
                                     {eventDescription || 'No description available.'}
-                                </Dialog.Description>                               
-                            </div>
-                            
+                                </Dialog.Description>
+                            </div>                              
                             <div className={styles.buttonContainer}>          
                                 <button onClick={onClose} className={styles.saveButton}>
                                     Save Event
                                 </button>                               
                             </div>
-                        </div>
-                    </div>
+                        </section>
+                    </article>
                 </Dialog.Popup>
             </Dialog.Portal>
         </Dialog.Root>

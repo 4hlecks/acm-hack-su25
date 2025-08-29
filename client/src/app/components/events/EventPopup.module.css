@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
     z-index: 1001;
 }
 
@@ -30,10 +30,10 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
+    background: none;
+    color: var(--button-secondary-color);
     border: none;
-    border-radius: 50%;
+    border-radius: var(--border-radius);
     width: 2.5rem;
     height: 2.5rem;
     display: flex;
@@ -44,126 +44,194 @@
 }
 
 .closeButton:hover {
-    background: rgba(0, 0, 0, 0.8);
+    color: var(--button-secondary-hover);
 }
 
-.content {
-    display: flex;
+.eventContent {
+    display: grid;
+    grid-template-columns: .5fr .5fr;
     width: 100%;
-    flex: 1
 }
 
 .imageSection {
     flex: 1.25; 
     height: 100%; /* Full height of popup */
-    background-color: #f3f4f6;
+    background-color: #000000;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+
+    .eventImage {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        object-position: center;
+    }
 }
 
-.eventImage {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    object-position: center;
-}
 
-.rightPanel{
-    flex: 1;
+
+.eventSection{
     display: flex;
     flex-direction: column;
-    min-height: 0;
-}
-
-.clubInfo{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.clubLogo{
-    width:4rem;
-    height: 4rem;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 2px solid black;
-    margin-right: 2rem;
-}
-.owner {
-    font-size: 1.5rem;
-    font-weight: 700; 
-    color: #000000; 
-}
-
-.detailsSection {
     flex: 1;
-    padding: 2rem;
-    display: flex;
-    flex-direction: column;
+    padding: 2rem 1rem;
     gap: 1rem;
-    overflow-y: auto; 
+    min-height: 0;
+
+    .clubInfo{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+
+        .clubLogo{
+            flex: 0 0 auto;
+            width: 4rem;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid black;
+        }
+
+        .clubOwner {
+            font-size: var(--font-size-subheading);
+            font-weight: var(--font-weight-heading);
+            color: var(--text-color); 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    .eventInfo {
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        gap: 0.25rem;
+        min-height: 0;    /* allow internal overflow if needed */
+        overflow-y: auto; /* scroll if description is super long */
+
+        .eventDate {
+            font-size: var(--font-size-medium);
+            color: var(--text-muted-color); 
+        }
+
+        .eventTitle {
+            font-size: var(--font-size-subheading2);
+            font-weight: var(--font-weight-heading);
+            color: var(--text-color); 
+            margin: 0;
+        }
+
+        .eventLocation {
+            display: inline-flex;
+            font-size: var(--font-size-medium);
+            color: var(--text-muted-color); 
+            gap: var(--line-padding);
+        }
+
+        .eventDescription {
+            font-size: var(--font-size-medium);
+            line-height: 1.5;
+            color: var(--text-color);
+            flex-grow: 1;
+            padding-right: 4px; /* tiny breathing room for scrollbar */
+        }
+    }
+
+    .buttonContainer{
+        margin-top: auto; /* pushes this to the bottom */
+        display: flex;
+        justify-content: flex-end; /* right align the content */
+
+        .saveButton {
+            background-color: var(--button-secondary-bg);
+            color: var(--button-secondary-color);
+            padding: 0.75rem 2rem;
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-button);
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            border-style: none;
+            margin-top: auto; 
+        }
+
+        .saveButton:hover {
+            background-color: var(--button-secondary-hover);
+        }
+    }
 }
 
-.title {
-    font-size: 1.35rem;
-    font-weight: bold;
-    margin: 0;
-    color: #1f2937;
-}
-
-.infoContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.infoItem {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.infoIcon {
-    color: #6b7280;
-}
-
-.description {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #374151;
-    flex-grow: 1;
-}
-
-.buttonContainer{
-    padding: 1rem 2rem 1.5rem;
-    border-radius: 0 !important;
+.eventIcon {
+    color: var(--text-muted-color);
+    height: var(--icon-size-medium);
+    width: var(--icon-size-medium);
+    stroke-width: var(--icon-width-small);
     flex-shrink: 0;
-    display: flex;
-    justify-content: center;
-    background: none !important;
-    border: none !important;
-}
-.saveButton {
-    background-color: #fbbf24;
-    color: #1f2937;
-    padding: 0.75rem 2rem;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 8px; 
-    border: 2px solid 
-#000000;
-    margin-top: auto; 
-}
-
-.saveButton:hover {
-    background-color: #f59e0b;
 }
 
 .popup[data-popup] {
     border-radius: 0 !important;
+}
+
+/* Mobile: Stack Vertically like an Instagram post */
+@media (max-width: 768px) {
+    .popup {
+        /* Full-screen sheet on mobile */
+        top: 0;
+        left: 0;
+        transform: none;
+        width: 100vw;
+        height: 100vh;
+
+        max-width: none;
+        max-height: none;
+        min-width: 0;
+        min-height: 0;
+
+        border-radius: 0;                 /* edge-to-edge */
+        box-shadow: none;                 /* optional: remove drop shadow */
+    }
+
+    .eventContent {
+        /* one column: image above, info below */
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr; /* image takes natural height, details fill */
+        width: 100%;
+    }
+
+    .imageSection {
+        /* keep the image big but not overpowering */
+        max-height: 45vh;                 /* tweak 40–55vh to taste */
+    }
+
+    .imageSection .eventImage {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;              /* show full flyer without cropping */
+        object-position: center;
+    }
+
+    .eventSection {
+        /* use your single source of truth for padding */
+        padding: var(--event-component-padding, 1rem);
+        min-height: 0;                    /* allow inner scrolling */
+    }
+
+    .eventSection .eventInfo {
+        /* details can scroll if description is long */
+        overflow-y: auto;
+        min-height: 0;
+    }
+
+    .closeButton {
+        /* keep the close button reachable in full-screen mode */
+        top: 0.75rem;
+        right: 0.75rem;
+    }
 }

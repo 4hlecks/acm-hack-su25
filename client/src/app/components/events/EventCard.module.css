@@ -52,7 +52,7 @@
 
             .eventTitle {
                 font-weight: 600;
-                font-size: var(--font-size-subheading);
+                font-size: var(--font-size-subheading3);
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
