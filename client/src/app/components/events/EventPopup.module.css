@@ -1,3 +1,4 @@
+
 .backdrop {
     position: fixed;
     top: 0;
@@ -13,54 +14,78 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: white;
+    background: var(--background-color);
     border-radius: 0.75rem;
     max-width: 90vw; 
     max-height: 90vh;
-    min-width: 50rem;
-    min-height: 31.25rem;
+    width: clamp(48rem, 90vw, 64rem);
+    min-width: 0;
     overflow: hidden;
     z-index: 1002;
     display: flex;
-    box-shadow: 0 1.5625rem 3.125rem -0.75rem rgba(0, 0, 0, 0.25);
+    box-shadow: 0 2rem 3rem -1rem rgba(0, 0, 0, 0.25);
 
 }
 
-.closeButton {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    color: var(--button-secondary-color);
-    border: none;
-    border-radius: var(--border-radius);
-    width: 2.5rem;
-    height: 2.5rem;
+.buttonContainer {
+    width: 100%;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
     display: flex;
-    align-items: center;
     justify-content: center;
-    cursor: pointer;
-    z-index: 10;
+    align-items: center;
+    flex-shrink: 0;
+    margin-top: auto;
+    height: var(--navbar-height);
+    background-color: var(--background-color);
+    padding: var(--event-info-padding);
+    border-top: 0.5px solid var(--text-muted-color);
+    
+    .saveButton {
+            background-color: var(--button-secondary-bg);
+            color: var(--button-secondary-color);
+            padding: 0.75rem 2rem;
+            width: 100%;
+            font-size: var(--font-size-body);
+            font-weight: var(--font-weight-button);
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            border-style: none;
+    }
+
+    .saveButton:hover {
+        background-color: var(--button-secondary-hover);
+    }
 }
 
-.closeButton:hover {
+.closeButton:hover * {
     color: var(--button-secondary-hover);
 }
 
+.closeButton:active, .closeButton:focus {
+    outline: none;
+}
+
 .eventContent {
-    display: grid;
-    grid-template-columns: .5fr .5fr;
+    display: flex;
+    flex-direction: row;
     width: 100%;
+    min-height: 0;
+    height: auto;
+}
+
+/* Mobile Query Club Bar */
+.clubInfoMobile {
+    display: none;
 }
 
 .imageSection {
-    flex: 1.25; 
-    height: 100%; /* Full height of popup */
+    flex: 0 1 auto;
     background-color: #000000;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
 
     .eventImage {
         max-width: 100%;
@@ -72,25 +97,24 @@
     }
 }
 
-
-
 .eventSection{
+    flex: 1 1 clamp(24rem, 10vw, 32rem);
     display: flex;
     flex-direction: column;
-    flex: 1;
-    padding: 2rem 1rem;
-    gap: 1rem;
     min-height: 0;
 
-    .clubInfo{
+    .clubInfo {
         display: flex;
         flex-direction: row;
         align-items: center;
-        gap: 1rem;
+        gap: var(--event-info-padding);
+        grid-area: clubSection;
+        padding: var(--event-info-padding);
+        border-bottom: 0.5px solid var(--text-muted-color);
 
         .clubLogo{
             flex: 0 0 auto;
-            width: 4rem;
+            width: 2rem;
             aspect-ratio: 1 / 1;
             object-fit: cover;
             border-radius: 50%;
@@ -98,40 +122,55 @@
         }
 
         .clubOwner {
-            font-size: var(--font-size-subheading);
+            font-size: var(--font-size-subheading-2);
             font-weight: var(--font-weight-heading);
             color: var(--text-color); 
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        .closeButton {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            background: none;
+            border: none;
+            color: var(--button-secondary-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
     }
 
     .eventInfo {
         display: flex;
-        flex: 1 1 0;
+        flex: 1 1 auto;
         flex-direction: column;
-        gap: 0.25rem;
-        min-height: 0;    /* allow internal overflow if needed */
-        overflow-y: auto; /* scroll if description is super long */
-
-        .eventDate {
-            font-size: var(--font-size-medium);
-            color: var(--text-muted-color); 
-        }
+        padding: var(--event-info-padding);
+        gap: var(--event-info-padding-2);
+        min-height: 0;
+        overflow-y: auto;
 
         .eventTitle {
-            font-size: var(--font-size-subheading2);
+            font-size: var(--font-size-subheading-2);
             font-weight: var(--font-weight-heading);
             color: var(--text-color); 
             margin: 0;
         }
 
-        .eventLocation {
+        .eventDetail {
             display: inline-flex;
             font-size: var(--font-size-medium);
-            color: var(--text-muted-color); 
+            color: var(--text-color); 
             gap: var(--line-padding);
+
+            .eventDetailText {
+                overflow: hidden;
+                font-weight: var(--font-weight-body);
+            }
         }
 
         .eventDescription {
@@ -139,35 +178,12 @@
             line-height: 1.5;
             color: var(--text-color);
             flex-grow: 1;
-            padding-right: 4px; /* tiny breathing room for scrollbar */
-        }
-    }
-
-    .buttonContainer{
-        margin-top: auto; /* pushes this to the bottom */
-        display: flex;
-        justify-content: flex-end; /* right align the content */
-
-        .saveButton {
-            background-color: var(--button-secondary-bg);
-            color: var(--button-secondary-color);
-            padding: 0.75rem 2rem;
-            font-size: var(--font-size-body);
-            font-weight: var(--font-weight-button);
-            cursor: pointer;
-            border-radius: var(--border-radius);
-            border-style: none;
-            margin-top: auto; 
-        }
-
-        .saveButton:hover {
-            background-color: var(--button-secondary-hover);
         }
     }
 }
 
 .eventIcon {
-    color: var(--text-muted-color);
+    color: var(--text-color);
     height: var(--icon-size-medium);
     width: var(--icon-size-medium);
     stroke-width: var(--icon-width-small);
@@ -179,59 +195,93 @@
 }
 
 /* Mobile: Stack Vertically like an Instagram post */
-@media (max-width: 768px) {
+@media (max-width: 825px) {
     .popup {
-        /* Full-screen sheet on mobile */
-        top: 0;
-        left: 0;
-        transform: none;
-        width: 100vw;
-        height: 100vh;
-
-        max-width: none;
-        max-height: none;
+        /* Centered popup with backdrop, not fullscreen */
+        max-height: 90vh;
+        width: clamp(24rem, 60vw, 28rem);
         min-width: 0;
-        min-height: 0;
 
-        border-radius: 0;                 /* edge-to-edge */
-        box-shadow: none;                 /* optional: remove drop shadow */
+        /* keep transform translate(-50%, -50%) to center */
+        border-radius: var(--border-radius);
+        box-shadow: 0 1.25rem 2.25rem -0.75rem rgba(0, 0, 0, 0.25);
     }
 
     .eventContent {
-        /* one column: image above, info below */
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr; /* image takes natural height, details fill */
-        width: 100%;
+        grid-template-rows: auto auto auto;
+        grid-template-areas:
+        "clubSection"
+        "imageSection"
+        "eventSection";
+        height: 100%;
+
+    }
+    
+    .eventSection .clubInfo { display: none !important; }
+
+    .clubInfoMobile {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--event-info-padding);
+        padding: var(--event-info-padding);
+        grid-area: clubSection;
+        height: var(--navbar-height);
+
+        .clubLogo{
+            flex: 0 0 auto;
+            width: 2rem;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid black;
+        }
+
+        .clubOwner {
+            font-size: var(--font-size-subheading-2);
+            font-weight: var(--font-weight-heading);
+            color: var(--text-color); 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .closeButton {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            background: none;
+            border: none;
+            color: var(--button-secondary-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
     }
 
     .imageSection {
-        /* keep the image big but not overpowering */
-        max-height: 45vh;                 /* tweak 40–55vh to taste */
-    }
-
-    .imageSection .eventImage {
+        grid-area: imageSection;
         width: 100%;
-        height: 100%;
-        object-fit: contain;              /* show full flyer without cropping */
-        object-position: center;
     }
 
     .eventSection {
-        /* use your single source of truth for padding */
-        padding: var(--event-component-padding, 1rem);
-        min-height: 0;                    /* allow inner scrolling */
-    }
-
-    .eventSection .eventInfo {
-        /* details can scroll if description is long */
-        overflow-y: auto;
+        grid-area: eventSection;
+        display: flex;
+        flex-direction: column;
         min-height: 0;
-    }
 
-    .closeButton {
-        /* keep the close button reachable in full-screen mode */
-        top: 0.75rem;
-        right: 0.75rem;
+        .eventInfo {
+            overflow-y: auto;
+            max-height: 25vh;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: var(--event-info-padding-2);
+            flex: 1 1 auto;
+        }
     }
 }

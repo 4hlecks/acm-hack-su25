@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react";
 import { createPortal } from 'react-dom';
-import { Calendar, MapPin, X } from "react-feather";
+import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from '@base-ui-components/react/dialog'; 
 import styles from './EventPopup.module.css';
 
@@ -74,14 +74,24 @@ const EventPopup = ({ event, onClose, isOpen }) => {
             <Dialog.Portal container={document.body}>
                 <Dialog.Backdrop className={styles.backdrop} />
                 <Dialog.Popup className={styles.popup}>
-                    {/* Close Button */}
-                    <button onClick={onClose} className={styles.closeButton}>
-                        <X size={20} />
-                    </button>
-                    
                     {/* Popup Content */}
                     <article className={styles.eventContent}>
-                        {/* Event Image */}
+                        {/* Mobile Query Club Bar */}
+                        <div className={styles.clubInfoMobile}>
+                            {eventOwner?.profilePic ? (
+                                    <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
+                            ) : (
+                                <canvas className={styles.clubLogo}></canvas>
+                            )}
+                            <h3 className={styles.clubOwner}>
+                                    {eventOwner?.name || eventOwner || 'Unknown Organizer'}
+                            </h3>
+                            <button onClick={onClose} className={styles.closeButton}>
+                                <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
+                            </button>
+                        </div>
+
+                        {/* Event Image Cover */}
                         <figure className={styles.imageSection}>
                             <img 
                                 src={coverPhoto} 
@@ -97,17 +107,41 @@ const EventPopup = ({ event, onClose, isOpen }) => {
                         {/* Event Section */}                
                         <section className={styles.eventSection}>
                             <div className={styles.clubInfo}>
-                                <img src={eventOwner?.profilePic} alt="Club Logo" className={styles.clubLogo}></img>
+                                {eventOwner?.profilePic ? (
+                                    <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
+                                ) : (
+                                    <canvas className={styles.clubLogo}></canvas>
+                                )}
                                 <h3 className={styles.clubOwner}>
                                     {eventOwner?.name || eventOwner || 'Unknown Organizer'}
                                 </h3>
+                                <button onClick={onClose} className={styles.closeButton}>
+                                    <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
+                                </button>
                             </div>
                             <div className={styles.eventInfo}>
-                                <span className={styles.eventDate}>{formatDisplayDate()} | {formatTimeRange()}</span>
-                                <Dialog.Title className={styles.eventTitle}>
-                                    {eventTitle}                                    
-                                </Dialog.Title>
-                                <span className={styles.eventLocation}> <MapPin className={styles.eventIcon} /> {eventLocation || 'Location TBD'}</span>
+                                {/* Title */}
+                                <Dialog.Title className={styles.eventTitle}>{eventTitle}</Dialog.Title>
+
+                                {/* Location */}
+                                <section className={styles.eventDetail}>
+                                    <MapPin className={styles.eventIcon} />
+                                    <span className={styles.eventDetailText}>{eventLocation || 'Location TBD'}</span>
+                                </section>
+
+                                {/* Date */}
+                                <section className={styles.eventDetail}>
+                                    <Calendar className={styles.eventIcon} />
+                                    <span className={styles.eventDetailText}>{formatDisplayDate()}</span>
+                                </section>
+
+                                {/* Time */}
+                                <section className={styles.eventDetail}>
+                                    <Clock className={styles.eventIcon} />
+                                    <span className={styles.eventDetailText}>{formatTimeRange() || 'Time TBD'}</span>
+                                </section>
+
+                                {/* Description */}
                                 <Dialog.Description className={styles.eventDescription}>
                                     {eventDescription || 'No description available.'}
                                 </Dialog.Description>

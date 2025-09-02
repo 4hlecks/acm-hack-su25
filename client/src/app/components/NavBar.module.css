@@ -13,7 +13,7 @@
     align-items: stretch;
     gap: var(--navigation-item-padding);
     padding: 0 1rem;
-    height: 4rem;
+    height: var(--navbar-height);
     overflow: hidden;
     box-sizing: border-box;
     margin: 0;

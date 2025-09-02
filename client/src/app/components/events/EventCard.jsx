@@ -81,15 +81,15 @@ const EventCard = ({ event, onEventClick } ) => {
                     <p className={styles.eventOwner}>{eventOwner?.name}</p>
                 </header>
                 <div className={styles.eventDetails}>
-                    <span className={styles.eventAttribute}>
+                    <span className={styles.eventDetail}>
                         <MapPin className={styles.eventIcon}/> 
                         <span className={styles.eventDetailsText}>{eventLocation}</span>
                     </span>
-                    <time className={styles.eventAttribute}>
+                    <time className={styles.eventDetail}>
                         <Calendar className={styles.eventIcon}/> 
                         <span className={styles.eventDetailsText}>{displayDate}</span>
                     </time>
-                    <time className={styles.eventAttribute}>
+                    <time className={styles.eventDetail}>
                         <Clock className={styles.eventIcon}/>
                         <span className={styles.eventDetailsText}>{displayTime}</span>
                     </time>

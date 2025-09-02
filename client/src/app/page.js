@@ -16,7 +16,7 @@ export default function Home() {
       
       for (const category of categories) {
         try {
-          const response = await fetch(`http://localhost:3000/api/loadEvents/${category}`);
+          const response = await fetch(`http://localhost:5000/api/loadEvents/${category}`);
           const data = await response.json();
           newEventsByCategory[category] = data;
         } catch (error) {

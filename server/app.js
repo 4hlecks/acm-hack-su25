@@ -10,7 +10,7 @@ const clubsRouter = require('./routes/club_router/club_router')
 const app = express();
 const cors = require('cors');
 
-app.use(cors({ origin: 'http://localhost:3001' }));
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(logger('dev'));
 app.use(express.static('public'));
 

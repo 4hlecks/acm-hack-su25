@@ -5,7 +5,7 @@
   --tertiary-color: #B6B09F;
   --background-color: var(--primary-color);
   --text-color: #000000;
-  --text-muted-color: #999999;
+  --text-muted-color: #bebebe;
   --link-color: #ffffff;
   --link-hover-color: #ffffff;
 
@@ -32,20 +32,23 @@
   --font-weight-navigation: 600;
   --font-weight-button: 600;
   --font-weight-heading: 700;
+  --font-weight-subheading: 600;
+  --font-weight-body: 500;
   --font-size-title: 3rem;
   --font-size-heading: 2rem;
   --font-size-subheading: 1.5rem;
-  --font-size-subheading2: 1.25rem;
-  --font-size-subheading3: 1rem;
+  --font-size-subheading-2: 1.25rem;
+  --font-size-subheading-3: 1rem;
   --font-size-body: 1rem;
   --font-size-medium: 0.875rem;
   --font-size-small: 0.75rem;
-  --line-padding: 4px;
+  --line-padding: .25rem;
 
   /* Border & Spacing Variables */
   --border-radius: 1rem;
   --navigation-item-padding: 2rem;
-  --event-component-padding: 1rem;
+  --event-info-padding: 1rem;
+  --event-info-padding-2: .5rem;
 
   /* Icon Variables */
   --icon-size-large: 1.75rem;
@@ -53,6 +56,9 @@
   --icon-size-medium: 1rem;
   --icon-size-small: 0.875rem;
   --icon-width-small: 0.125rem;
+
+  /* Size Variables */
+  --navbar-height: 4rem;
 }
 
 * {
