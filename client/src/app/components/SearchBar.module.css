@@ -1,0 +1,85 @@
+/* The element inside the navbar that participates in flex alignment. Fixed height. */
+.searchBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--searchbar-height);     /* stays centered in navbar */
+  width: 24rem;
+  font-size: var(--font-size-body);
+  z-index: 1001;
+}
+
+/* ONE unified background + border + shadow for bar + dropdown via ::before */
+.searchBar::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: var(--searchbar-height);
+  border-radius: var(--border-radius);
+  background: var(--button-primary-color);
+  border: 1px solid var(--tertiary-color);
+  box-shadow: none;
+  transition: box-shadow 100ms ease, border-color 100ms ease, height 100ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* When open/focused, extend the unified layer to cover dropdown too */
+.open::before,
+.searchBar:focus-within::before {
+  height: var(--combo-shadow-h, var(--searchbar-height));
+  border-color: var(--button-primary-hover, #7A7A73);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+}
+
+/* Children sit above ::before */
+.searchBar > * { position: relative; z-index: 1; }
+
+/* Top row */
+.searchInput {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding-inline: var(--searchbar-padding);
+  gap: var(--searchbar-padding);
+}
+
+.searchIcon,
+.clearIcon {
+  flex: 0 0 auto;
+  width: var(--icon-size-medium);
+  height: var(--icon-size-medium);
+  stroke-width: 0.15rem;
+}
+
+.clearButton {
+  flex: 0 0 auto;
+  display: inline-flex;
+  margin-left: auto;                     /* push to right */
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.clearButton:hover .clearIcon { color: var(--button-primary-hover); }
+
+.searchInputField {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-body);
+  color: var(--text-color);
+}
+
+/* hide native webkit clear */
+.searchInputField::-webkit-search-cancel-button,
+.searchInputField::-webkit-search-decoration {
+  -webkit-appearance: none;
+}

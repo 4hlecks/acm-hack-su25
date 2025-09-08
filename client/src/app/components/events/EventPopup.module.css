@@ -40,7 +40,7 @@
     height: var(--navbar-height);
     background-color: var(--background-color);
     padding: var(--event-info-padding);
-    border-top: 0.5px solid var(--text-muted-color);
+    border-top: 0.5px solid var(--tertiary-color);
     
     .saveButton {
             background-color: var(--button-secondary-bg);
@@ -110,11 +110,11 @@
         gap: var(--event-info-padding);
         grid-area: clubSection;
         padding: var(--event-info-padding);
-        border-bottom: 0.5px solid var(--text-muted-color);
+        border-bottom: 0.5px solid var(--tertiary-color);
 
         .clubLogo{
             flex: 0 0 auto;
-            width: 2rem;
+            width: var(--image-thumb-size-medium);
             aspect-ratio: 1 / 1;
             object-fit: cover;
             border-radius: 50%;
@@ -199,8 +199,9 @@
     .popup {
         /* Centered popup with backdrop, not fullscreen */
         max-height: 90vh;
-        width: clamp(24rem, 60vw, 28rem);
+        width: clamp(50vw, 60vw, 53vw);
         min-width: 0;
+        height: auto;
 
         /* keep transform translate(-50%, -50%) to center */
         border-radius: var(--border-radius);

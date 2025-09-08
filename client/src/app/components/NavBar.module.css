@@ -4,6 +4,7 @@
     font-size: 2rem;
     white-space: nowrap;
     overflow: hidden;
+    text-decoration: none;
 }
 
 .navBar {
@@ -14,13 +15,26 @@
     gap: var(--navigation-item-padding);
     padding: 0 1rem;
     height: var(--navbar-height);
-    overflow: hidden;
+    overflow: visible;
     box-sizing: border-box;
     margin: 0;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
+    align-items: center;
+
+    .leftSide {
+        display: flex;
+        justify-content: space-between;
+        width: 50%;
+    }
+
+    .rightSide {
+        display: flex;
+        justify-content: space-between;
+        width: 50%;
+    }
 
     /* Icon Styles */
     .navIcon {
@@ -35,17 +49,18 @@
         gap: var(--navigation-item-padding);
         list-style: none;
         text-decoration: none;
+        align-items: center;
 
         .navItem {
             display: flex;
             flex-direction: row;
-            gap: .5rem;
             align-items: center;
             font-weight: var(--font-weight-navigation);
 
             .navLink {
                 display: flex;
-                flex-direction: column;
+                flex-direction: row;
+                gap: .5rem;
                 justify-content: center;
                 height: 100%;
                 text-decoration: none;
@@ -72,6 +87,7 @@
         font-size: var(--font-size-navigation);
         color: var(--text-color);
         cursor: pointer;
+        transition: color 0.3s ease, background-color 0.3s ease;
     }
 
     .navLogOut, .siteLogo {
@@ -79,7 +95,6 @@
     }
 
     .navLogOut:hover, .navItem:hover, .navItem.navLink:hover, .siteLogo:hover {
-        transition: color 0.3s ease, background-color 0.3s ease;
-        color: #9A9A9A;
+        color: var(--tertiary-color);
     }
 }

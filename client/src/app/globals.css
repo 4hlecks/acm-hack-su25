@@ -6,8 +6,8 @@
   --background-color: var(--primary-color);
   --text-color: #000000;
   --text-muted-color: #bebebe;
-  --link-color: #ffffff;
-  --link-hover-color: #ffffff;
+  --text-link-color: #008cff;
+  --text-link-hover-color: #225e8f;
 
   /* Dark Color Scheme Variables */
   --primary-color-dark: #ffffff;
@@ -49,6 +49,7 @@
   --navigation-item-padding: 2rem;
   --event-info-padding: 1rem;
   --event-info-padding-2: .5rem;
+  --searchbar-padding: 1rem;
 
   /* Icon Variables */
   --icon-size-large: 1.75rem;
@@ -59,6 +60,12 @@
 
   /* Size Variables */
   --navbar-height: 4rem;
+  --searchbar-height: 2.5rem;
+
+  /* Image Variables */
+  --image-thumb-size-large: 3rem;
+  --image-thumb-size-medium: 2rem;
+  --image-thumb-size-small: 1.125rem;
 }
 
 * {
