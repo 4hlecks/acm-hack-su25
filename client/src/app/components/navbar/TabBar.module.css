@@ -1,0 +1,84 @@
+.navBar {
+    display: none;
+}
+
+/* Mobile Styles */
+@media (max-width: 48rem) {
+    .siteLogo {
+        display: flex;
+        align-items: center;
+        font-size: 2rem;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .navBar {
+        background-color: var(--secondary-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: var(--navbar-height);
+        padding: 0 4rem;
+        overflow: hidden;
+        box-sizing: border-box;
+        margin: 0;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        z-index: 1000;
+
+        /* Icon Styles */
+        .navIcon {
+            width: var(--icon-size-large);
+            height: var(--icon-size-large);
+            stroke-width: var(--icon-width-large);
+        }
+
+        /* Middle Navigation Items*/
+        .navMiddleItems {
+            display: flex;
+            gap: var(--navigation-item-padding);
+            width: 100%;
+            justify-content: space-between;
+            box-sizing: border-box;
+            list-style: none;
+            text-decoration: none;
+
+            .navItem {
+                .navLink, .navButton {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: .25rem;
+                    font-size: 0.75rem;
+                    font-weight: var(--font-weight-navigation);
+                    justify-content: center;
+                    height: 100%;
+                    text-decoration: none;
+                    color: inherit;
+                }
+            }
+        }
+
+        /* Button Item */
+        .navButton {
+            background: none;
+            border: none;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        /* Text Styles */
+        .navButton, .navItem, .siteLogo {
+            font-size: var(--font-size-navigation);
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .navButton:hover, .navItem:hover, .navItem.navLink:hover, .siteLogo:hover {
+            transition: color 0.3s ease, background-color 0.3s ease;
+            color: #9A9A9A;
+        }
+    }
+}

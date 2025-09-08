@@ -1,6 +1,6 @@
 import styles from './NavBar.module.css';
 import { LogOut, Home, Search, Bookmark, PlusSquare, User} from 'react-feather';
-import SearchBar from './SearchBar'
+import SearchBar from '../SearchBar'
 
 export default function NavBar() {
     return (
