@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import Link from 'next/link';
 import { Navigation } from "swiper/modules";
 import { ChevronLeft, ChevronRight, ArrowRight } from "react-feather";
 import EventCard from "./EventCard";
@@ -15,7 +16,7 @@ const EventCarousel = ({ category, events = [], onEventClick }) => {
         <section className={styles.carouselSection}>
             <header className={styles.carouselHeader}>
                 <h2 className={styles.carouselTitle}>{category}</h2>
-                <p className={styles.carouselSeeAll}>See All <ArrowRight className={styles.carouselSeeAllIcon}/></p>
+                <Link href={`/${categoryID}`} className={styles.carouselSeeAll}>See All <ArrowRight className={styles.carouselSeeAllIcon}/></Link>
             </header>
             <div className={styles.carouselContent}>
                 <button className={styles.carouselLeft} id={`carousel-left-${categoryID}`}><ChevronLeft className={styles.carouselLeftIcon}/></button>
