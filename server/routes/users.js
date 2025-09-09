@@ -3,9 +3,12 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users_schema.js');
-
+const Club = require('../models/club_schema.js')
+const upload = require('../middleware/upload.js');
 // Sign Up Route (All emails can sign up & answer question if they are club/student)
-  router.post('/register', async (req, res) => {
+  router.post('/register', express.json(), async (req, res) => {
+    console.log('Register request received:', req.body); // Add this line
+
   const { name, email, password, role } = req.body;
 
   if (!/\S+@\S+\.\S+/.test(email)) {
@@ -23,13 +26,28 @@ const User = require('../models/users_schema.js');
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = new User({
-    name,
-    email,
-    password: hashedPassword,
-    role,
-    approved: role === 'club' ? false : undefined
-  });
+  let user;
+  if (role === 'club'){
+    user = new Club({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'club',
+      approved: false,
+      profilePic: "",
+      bio: "",
+      
+    })
+  } else{
+    user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: 'user',
+      approved: true,
+      profilePic: ""
+    })
+  }
 
   await user.save();
 
@@ -71,7 +89,12 @@ router.post('/login', async (req, res) => {
     user: {
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      ...(user.profilePic && {profilePic: user.profilePic}),
+      ...(user.role === 'club' && {
+        bio: user.bio,
+        approved: user.approved
+      })
     }
   });
 });
