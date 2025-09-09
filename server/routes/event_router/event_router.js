@@ -20,14 +20,7 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
   console.log("USER:", req.user);
 
   try {
-    const {
-      eventTitle,
-      eventDescription,
-      startTime,
-      endTime,
-      tags,
-      eventLocation
-    } = req.body;
+    const { eventTitle, eventDescription, startTime, endTime, tags, eventLocation } = req.body;
 
     const eventDate = req.body.Date;
     if (!eventDate) return res.status(400).json({ message: 'Date is required' });
@@ -66,8 +59,32 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
   }
 });
 
-// fetching events by category
-router.get('/:categoryChoice', async (req, res) => {
+// Get events for the logged-in club
+router.get('/byOwner/me', auth, async (req, res) => {
+  try {
+    const events = await Event.find({ eventOwner: req.user.id })
+      .populate('eventOwner', 'name _id')
+      .sort({ Date: 1 });
+    res.json({ events });
+  } catch (e) {
+    res.status(500).json({ message: 'Server error', error: e.message });
+  }
+});
+
+// Get events for any owner by id (public)
+router.get('/byOwner/:ownerId', async (req, res) => {
+  try {
+    const events = await Event.find({ eventOwner: req.params.ownerId })
+      .populate('eventOwner', 'name _id')
+      .sort({ Date: 1 });
+    res.json({ events });
+  } catch (e) {
+    res.status(500).json({ message: 'Server error', error: e.message });
+  }
+});
+
+// fetching events by category (make the path explicit to avoid conflicts)
+router.get('/category/:categoryChoice', async (req, res) => {
   try {
     const { categoryChoice } = req.params;
     const events = await Event.find({ eventCategory: categoryChoice })
