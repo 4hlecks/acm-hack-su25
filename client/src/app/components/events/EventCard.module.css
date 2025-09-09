@@ -6,6 +6,7 @@
     height: 275px;
     border-radius: var(--border-radius);
     cursor: pointer;
+    flex-shrink: 0;
 
     .eventCover {
         display: flex;

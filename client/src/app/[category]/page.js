@@ -5,6 +5,7 @@ import {useState, useEffect} from 'react';
 import EventCard from '../components/events/EventCard';
 import styles from './CategoryEvents.module.css'
 import { ArrowLeft } from "react-feather";
+import NavBar from '../components/NavBar'
 
 export default function CategoryEvensPage() {
     const params = useParams();
@@ -18,7 +19,7 @@ export default function CategoryEvensPage() {
     useEffect(() => {
         const fetchCategoryEvents = async () => {
             try{
-                const response = await fetch(`/api/loadEvents/${categoryDisplayName}`);
+                const response = await fetch(`http://localhost:5000/api/loadEvents/${categoryDisplayName}`);
                 const data = await response.json();
                 setEvents(data);
             } catch (error){
@@ -41,33 +42,33 @@ export default function CategoryEvensPage() {
     }
 
     return(
-        <div className={styles.container}>
-            <header className={styles.header}>
-                <div className={styles.headerTop}>
-                    <button onClick={handleBackClick} className={styles.backButton}>
-                        <ArrowLeft className={styles.backIcon} />
-                        {categoryDisplayName}
-                    </button>
-                </div>
-                <div className={styles.searchSection}>
+        <>
+            <NavBar />
+            <div className={styles.container}>
+                <header className={styles.header}>
+                    {/* Main title */}
                     <h1 className={styles.title}>Discover Events</h1>
-                    <div className={styles.searchContainer}>
-                        <input type="text" placeHolder="Search events..." className={styles.searchInput}></input>
+                    
+                    {/* Category section with back button */}
+                    <div className={styles.categorySection}>
+                        <button onClick={handleBackClick} className={styles.backButton}>
+                            <ArrowLeft className={styles.backIcon} />
+                            {categoryDisplayName}
+                        </button>
                     </div>
-                </div>
-            </header>
-
-            <div className={styles.eventsGrid}>
+                </header>
                 {events.length > 0 ? (
-                    events.map((event) => (
+                    <div className={styles.eventsGrid}>     
+                    {events.map((event) => (
                         <EventCard key={event.id} event={event} />
-                    ))
+                    ))}
+                    </div>
                 ) : (
                     <div className={styles.noEvents}>
                         <p>No {categoryDisplayName} events found.</p>
                     </div>
                 )}
             </div>
-        </div>
+        </>
     );
 }
