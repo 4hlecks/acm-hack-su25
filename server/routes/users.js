@@ -59,11 +59,18 @@ router.post('/login', async (req, res) => {
   }
 
   // Generate JWT Token
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET || 'defaultsecret',
-    { expiresIn: '1h' }
-  );
+const token = jwt.sign(
+  { id: user._id.toString(), role: user.role },  // payload
+  process.env.JWT_SECRET || 'defaultsecret',
+  {
+    expiresIn: '1h',
+    noTimestamp: false   // ensure `iat` is included
+  }
+);
+
+console.log("Generated token:", token);
+console.log("Decoded token:", jwt.decode(token));
+
 
   res.status(200).json({
     message: 'Login successful.',

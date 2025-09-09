@@ -18,7 +18,6 @@ export default function AddEventPage() {
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
 
-  // Add new tag
   const handleAddTag = (e) => {
     e.preventDefault();
     if (newTag.trim() && !tags.includes(newTag.trim())) {
@@ -27,14 +26,14 @@ export default function AddEventPage() {
     }
   };
 
-  // Remove tag
   const handleRemoveTag = (tag) => {
     setTags(tags.filter((t) => t !== tag));
   };
 
-  // Submit event
+  // Submit to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("✅ handleSubmit fired!");
 
     const formData = new FormData();
     formData.append("eventTitle", eventTitle);
@@ -61,10 +60,11 @@ export default function AddEventPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to create event");
-      alert("Event created successfully!");
-      console.log(data);
+
+      alert("✅ Event created successfully!");
+      console.log("Backend response:", data);
     } catch (err) {
-      console.error("Error creating event:", err);
+      console.error("❌ Error creating event:", err);
       alert("Error: " + err.message);
     }
   };
@@ -72,9 +72,7 @@ export default function AddEventPage() {
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
-        <p style={{ fontWeight: "bold", fontSize: "1.25rem", marginBottom: "0.5rem" }}>
-          Add New Event
-        </p>
+        <h2>Add New Event</h2>
 
         <form onSubmit={handleSubmit}>
           {/* Upload */}
@@ -173,7 +171,6 @@ export default function AddEventPage() {
               </span>
             ))}
 
-            {/* Input with + button */}
             <div className={styles.addTagForm}>
               <input
                 type="text"
@@ -183,15 +180,14 @@ export default function AddEventPage() {
                 className={styles.addTagInput}
               />
               <button
-                type="button"           
-                onClick={handleAddTag}  
+                type="button"
+                onClick={handleAddTag}
                 className={styles.addTagButton}
               >
                 +
               </button>
             </div>
           </div>
-
 
           <button type="submit" className={styles.postButton}>Post</button>
         </form>

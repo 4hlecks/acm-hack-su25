@@ -1,7 +1,10 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const logger = require('morgan');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+
 
 const usersRouter = require('./routes/users.js');
 const eventsRouter = require('./routes/event_router/event_router')
@@ -19,7 +22,6 @@ app.use('/users', usersRouter);
 app.use('/api/loadEvents', eventsRouter);
 app.use('/api/findClub', clubsRouter);
 app.use('/uploads', express.static('uploads'));
-dotenv.config();
 
 mongoose.connect(process.env.DB_URL).then(() => {
   console.log('Connected to MongoDB database');
