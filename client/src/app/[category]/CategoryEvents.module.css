@@ -61,7 +61,7 @@
 .eventsGrid{
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 6rem;
     margin-bottom: 3rem;
 }
 
