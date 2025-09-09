@@ -2,52 +2,41 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/users_schema.js');
-const Club = require('../models/club_schema.js')
-const upload = require('../middleware/upload.js');
-// Sign Up Route (All emails can sign up & answer question if they are club/student)
-  router.post('/register', express.json(), async (req, res) => {
-    console.log('Register request received:', req.body); // Add this line
+const User = require('../models/users_schema.js'); // only one model now
 
+// Register route
+router.post('/register', express.json(), async (req, res) => {
   const { name, email, password, role } = req.body;
 
+  // Validate email
   if (!/\S+@\S+\.\S+/.test(email)) {
     return res.status(400).json({ message: 'Invalid email address.' });
   }
 
+  // Validate role
   if (!['user', 'club'].includes(role)) {
     return res.status(400).json({ message: 'Invalid role.' });
   }
 
+  // Check for duplicates
   const existing = await User.findOne({ email });
   if (existing) {
     return res.status(409).json({ message: 'Email already in use.' });
   }
 
+  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  let user;
-  if (role === 'club'){
-    user = new Club({
-      name,
-      email,
-      password: hashedPassword,
-      role: 'club',
-      approved: false,
-      profilePic: "",
-      bio: "",
-      
-    })
-  } else{
-    user = new User({
-      name,
-      email,
-      password: hashedPassword,
-      role: 'user',
-      approved: true,
-      profilePic: ""
-    })
-  }
+  // Create user
+  const user = new User({
+    name,
+    email,
+    password: hashedPassword,
+    role,
+    approved: role === 'user' ? true : false, // auto-approve students
+    profilePic: "",
+    bio: ""
+  });
 
   await user.save();
 
@@ -58,50 +47,44 @@ const upload = require('../middleware/upload.js');
   res.status(201).json({ message });
 });
 
-// Updated Login Route with JWT
+// Login route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
+  // Look up user
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(401).json({ message: 'Invalid email or password.' });
   }
 
+  // Clubs must be approved
   if (user.role === 'club' && !user.approved) {
     return res.status(403).json({ message: 'Club registration not yet approved.' });
   }
 
+  // Compare password
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
     return res.status(401).json({ message: 'Invalid email or password.' });
   }
 
-  // Generate JWT Token
-const token = jwt.sign(
-  { id: user._id.toString(), role: user.role },  // payload
-  process.env.JWT_SECRET || 'defaultsecret',
-  {
-    expiresIn: '1h',
-    noTimestamp: false   // ensure `iat` is included
-  }
-);
-
-console.log("Generated token:", token);
-console.log("Decoded token:", jwt.decode(token));
-
+  // Create JWT
+  const token = jwt.sign(
+    { id: user._id.toString(), role: user.role },
+    process.env.JWT_SECRET || 'defaultsecret',
+    { expiresIn: '12h' }
+  );
 
   res.status(200).json({
     message: 'Login successful.',
-    token, // Send token to frontend
+    token,
     user: {
       name: user.name,
       email: user.email,
       role: user.role,
-      ...(user.profilePic && {profilePic: user.profilePic}),
-      ...(user.role === 'club' && {
-        bio: user.bio,
-        approved: user.approved
-      })
+      profilePic: user.profilePic,
+      bio: user.bio,
+      approved: user.approved
     }
   });
 });

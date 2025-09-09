@@ -1,11 +1,39 @@
 'use client';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSignUp = () => {
     router.push('/register');
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("http://localhost:5002/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
+
+      // Save token + user info in localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      alert("Logged in successfully!");
+      router.push("/"); // redirect after login
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Error: " + err.message);
+    }
   };
 
   return (
@@ -35,13 +63,16 @@ export default function LoginPage() {
         <p>Log in to manage or save events</p>
 
         {/* Login Form */}
-        <form style={{ textAlign: 'left', marginTop: '2rem' }}>
+        <form onSubmit={handleLogin} style={{ textAlign: 'left', marginTop: '2rem' }}>
           <label>
             Username or email:<br />
             <input
-              type="text"
-              placeholder="Enter your email or username"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
               style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }}
+              required
             />
           </label>
           <br /><br />
@@ -49,8 +80,11 @@ export default function LoginPage() {
             Password:<br />
             <input
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }}
+              required
             />
           </label>
           <br />
@@ -91,4 +125,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

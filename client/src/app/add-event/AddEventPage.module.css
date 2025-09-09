@@ -3,6 +3,8 @@
   min-height: 100vh;
   background: #f9f9f9;
   padding-top: 3rem;
+  overflow: visible;
+  position: relative;
 }
 
 .formWrapper {
@@ -12,32 +14,37 @@
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  overflow: visible;
+  position: relative;
 }
 
 .topRow {
   display: flex;
   gap: 2rem;
   margin-bottom: 1.5rem;
+  overflow: visible;
+  position: relative;
 }
 
 .uploadBox {
-    flex: 1;
-    border: 2px dashed #ccc;
-    border-radius: 12px;
-    height: 300px;          
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: gray;
-  }
-  
+  flex: 1;
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: gray;
+}
 
 .inputs {
   flex: 2;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  overflow: visible;
+  position: relative;
 }
 
 .inputs input {
@@ -87,7 +94,48 @@
   font-style: italic;
 }
 
-/* Tags */
+.title {
+  font-size: 1.3rem;
+  line-height: 1.2;
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+
+.comboWrapper {
+  position: relative;
+  overflow: visible;
+}
+
+.categoryList {
+  position: absolute;
+  z-index: 9999;
+  margin-top: 4px;
+  width: 100%;
+  max-height: 180px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  padding: 4px;
+  list-style: none;
+}
+
+.categoryItem {
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.categoryItem:hover,
+.activeItem {
+  background: rgba(0,0,0,0.06);
+}
+
+.selectedItem {
+  font-weight: 600;
+}
+
 .tagContainer {
   display: flex;
   flex-wrap: wrap;

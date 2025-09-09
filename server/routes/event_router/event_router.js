@@ -7,6 +7,11 @@ const auth = require('../../middleware/auth');
 const clubAuth = require('../../middleware/clubAuth');
 const upload = require('../../middleware/upload');
 
+// confirm which schema is loaded
+console.log('Event schema keys:', Object.keys(Event.schema.paths));
+console.log('Loaded Event model from:', require.resolve('../../models/event_schema'));
+console.log('Allowed categories:', Event.schema.path('eventCategory').enumValues);
+
 // create event route
 router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, res) => {
   console.log("FRONTEND HIT THIS ROUTE");
@@ -15,31 +20,49 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
   console.log("USER:", req.user);
 
   try {
-    const { eventTitle, eventDescription, startDate, endDate, startTime, endTime, tags, eventLocation, eventCategory } = req.body;
+    const {
+      eventTitle,
+      eventDescription,
+      startTime,
+      endTime,
+      tags,
+      eventLocation
+    } = req.body;
+
+    const eventDate = req.body.Date;
+    if (!eventDate) return res.status(400).json({ message: 'Date is required' });
+
+    const dateObj = new Date(eventDate);
+    if (isNaN(dateObj.getTime())) {
+      return res.status(400).json({ message: 'Invalid Date value' });
+    }
+
+    // trim category then validate against enum
+    const eventCategory = (req.body.eventCategory || '').trim();
+    const allowedCategories = Event.schema.path('eventCategory').enumValues;
+    console.log('Incoming category:', JSON.stringify(eventCategory));
+    if (!allowedCategories.includes(eventCategory)) {
+      return res.status(400).json({ message: 'Invalid Event Category' });
+    }
 
     const newEvent = new Event({
       eventOwner: req.user.id,
       eventTitle,
       eventDescription,
-      startDate,
-      endDate,
+      Date: dateObj,
       startTime,
       endTime,
-      tags: tags ? tags.split(",") : [],
       eventLocation,
       eventCategory,
-      coverPhoto: req.file ? `/uploads/${req.file.filename}` : null, //  use coverPhoto
+      tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      coverPhoto: req.file ? `/uploads/${req.file.filename}` : null
     });
 
     await newEvent.save();
-    res.status(201).json({ message: "Event created successfully", event: newEvent });
+    res.status(201).json({ message: 'Event created successfully', event: newEvent });
   } catch (error) {
-    console.error("❌ Error creating event:", error);
-    res.status(500).json({ 
-      message: "Server error", 
-      error: error.message,
-      stack: error.stack 
-    });
+    console.error('Error creating event:', error);
+    res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
   }
 });
 
@@ -49,7 +72,7 @@ router.get('/:categoryChoice', async (req, res) => {
     const { categoryChoice } = req.params;
     const events = await Event.find({ eventCategory: categoryChoice })
       .populate('eventOwner', 'name _id')
-      .sort({ startDate: 1 });
+      .sort({ Date: 1 });
 
     res.json(events);
   } catch (err) {

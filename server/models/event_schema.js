@@ -20,11 +20,7 @@ const createEvent_Schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    startDate: {
-        type: Date,
-        required: true
-    },
-    endDate: {
+    Date: {
         type: Date,
         required: true
     },
@@ -42,7 +38,17 @@ const createEvent_Schema = new mongoose.Schema({
     },
     eventCategory: {
         type: String,
-        enum: ['GBM', 'FreeFood', 'Fundraiser'],
+        enum: [
+          'GBM',
+          'Free Food',
+          'Fundraiser',
+          'Game Night',
+          'Networking',
+          'Panel',
+          'Social',
+          'Study Jam',
+          'Workshop'
+        ],
         required: true
     },
     
