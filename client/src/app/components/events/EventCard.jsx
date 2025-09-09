@@ -36,7 +36,7 @@ const EventCard = ({ event }) => {
             </div>
             <section className={styles.eventInfo}>
                 <h3 className={styles.eventTitle}>{eventTitle}</h3>
-                <p className={styles.eventOwner}>{eventOwner}</p>
+                <p className={styles.eventOwner}>{eventOwner?.name || eventOwner}</p>
                 <span className={styles.eventLocation}><MapPin className={styles.eventLocationIcon}/> {eventLocation}</span>
                 <time className={styles.eventDate}><Calendar className={styles.eventDateIcon}/> {formatDate(eventDate)}</time>
             </section>
