@@ -7,11 +7,17 @@ const userSchema = new mongoose.Schema({
   role: { type: String, enum: ['club', 'user'], default: 'user' },
   approved: { type: Boolean, default: false }, // clubs: false until admin approves
   profilePic: { type: String, default: "" },
-  bio: { type: String, default: "" }
-}, {
+  bio: { type: String, default: "" },
+
+  // for resetting password
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date }
+},
+{
   collection: 'users',
   timestamps: true
-});
+  }
+);
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

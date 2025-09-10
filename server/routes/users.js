@@ -103,6 +103,81 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Forgot Password Route
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body;
+
+  // checks email existence in MongoDB
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.json({ message: 'If that email exists, a reset link has been sent! Check inbox or spam :)' });
+  }
+
+  // hashing rawToken for reset link in email so others can't use token directly
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+  user.resetPasswordToken = hashedToken;
+  // expiration time 30 mins
+  user.resetPasswordExpires = Date.now() + 30 * 60 * 1000; // 15 minutes
+
+  await user.save();
+
+  // reset link in the email 
+  // ****** REPLACE CLIENT_URL WITH FRONTEND SITE LINK ********
+  const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${rawToken}`;
+  
+  // DEV: log reset link instead of sending email 
+  // ****** DELETE AFTER EMAIL SET UP *******
+  console.log(`Password reset link: ${resetLink}`);
+
+  // Code for when we send reset link via email using Nodemailer
+  // ****** uncomment after our email connected to the website is set up *****
+  /*
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+  });
+
+  await transporter.sendMail({
+    to: user.email,
+    subject: 'Password Reset',
+    html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`
+  });
+  */
+
+  res.json({ message: 'If that email exists, a reset link has been sent! Check inbox or spam :)' });
+});
+
+// Resetting Password
+router.post('/reset-password', async (req, res) => {
+  const { token, password } = req.body;
+
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  // looks for user whose resetPasswordToken matches the hashed token and resetPasswordExpires is still valid
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: 'Invalid or expired token.' });
+  }
+
+  // new password hashed before storing
+  const hashedPassword = await bcrypt.hash(password, 10);
+  // updates the user’s password to the new hashed password.
+  user.password = hashedPassword;
+  // clears the reset token and expiration time so the token can’t be reused.
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  // saves the updated user object back to MongoDB
+  await user.save();
+
+  res.json({ message: 'Password has been reset successfully.' });
+});
+
 // Get own club profile 
 router.get('/profile/me', auth, clubAuth, async (req, res) => {
   try {
