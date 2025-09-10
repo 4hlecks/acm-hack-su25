@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   /* Base Color Scheme Variables */
   --primary-color: #F2F2F2;
@@ -57,6 +59,11 @@
   --icon-size-medium: 1rem;
   --icon-size-small: 0.875rem;
   --icon-width-small: 0.125rem;
+}
+
+/* Global resets */
+* {
+  font-family: var(--font-primary);
 
   /* Size Variables */
   --navbar-height: 4rem;

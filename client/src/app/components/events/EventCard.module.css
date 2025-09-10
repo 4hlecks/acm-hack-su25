@@ -95,4 +95,6 @@
     transform: translateY(-4px);
     box-shadow: 0 0px 1rem var(--tertiary-color);
     z-index: 5;
+    box-shadow: 0 0px 1rem var(--tertiary-color);
+    z-index: 5;
 }
