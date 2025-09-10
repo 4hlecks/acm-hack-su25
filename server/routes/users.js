@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const User = require('../models/users_schema'); // ONLY users model now
 const auth = require('../middleware/auth');
 const clubAuth = require('../middleware/clubAuth');
 const upload = require('../middleware/upload');
+
 
 // Register
 router.post('/register', async (req, res) => {

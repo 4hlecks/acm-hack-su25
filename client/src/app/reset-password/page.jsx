@@ -5,7 +5,6 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
 
-  // Token comes from the URL: /reset-password?token=abc123
   const token = typeof window !== "undefined"
     ? new URLSearchParams(window.location.search).get("token")
     : null;
@@ -27,23 +26,31 @@ export default function ResetPasswordPage() {
     }
   };
 
+  if (!token) {
+    return <p>Invalid or missing token. Please use the link from your email.</p>;
+  }
+
   return (
     <main style={{ maxWidth: "500px", margin: "2rem auto", textAlign: "center" }}>
       <h1>Reset Password</h1>
-      <form onSubmit={handleSubmit} style={{ marginTop: "1.5rem" }}>
-        <input
-          type="password"
-          placeholder="Enter new password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          style={{ width: "100%", padding: "0.5rem" }}
-        />
-        <button type="submit" style={{ marginTop: "1rem", padding: "0.5rem 1rem" }}>
-          Reset Password
-        </button>
-      </form>
-      {message && <p style={{ marginTop: "1rem" }}>{message}</p>}
+
+      {message ? (
+        <p style={{ marginTop: "1rem" }}>{message}</p>
+      ) : (
+        <form onSubmit={handleSubmit} style={{ marginTop: "1.5rem" }}>
+          <input
+            type="password"
+            placeholder="Enter new password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: "100%", padding: "0.5rem" }}
+          />
+          <button type="submit" style={{ marginTop: "1rem", padding: "0.5rem 1rem" }}>
+            Reset Password
+          </button>
+        </form>
+      )}
     </main>
   );
 }

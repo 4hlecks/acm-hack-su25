@@ -20,6 +20,9 @@ const searchRouter = require('./routes/search_router/search_router')
 
 const app = express();
 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
+
 // change w/ our domain to whitelist 
 const FRONTEND_ORIGINS = [
   process.env.FRONTEND_ORIGIN || 'http://localhost:3000',
@@ -53,9 +56,6 @@ app.use('/users', usersRouter);
 app.use('/api/loadEvents', eventsRouter);
 app.use('/api/findClub', clubsRouter);
 app.use('/api/search', searchRouter);
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 
 app.use('/users', usersRouter);
 app.use('/uploads', express.static('uploads'));
