@@ -1,3 +1,6 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const logger = require('morgan');
 const mongoose = require('mongoose');
@@ -13,6 +16,8 @@ const usersRouter = require('./routes/users.js');
 const eventsRouter = require('./routes/event_router/event_router');
 const clubsRouter = require('./routes/club_router/club_router');
 const requireAuth = require('./middleware/auth');
+
+const searchRouter = require('./routes/search_router/search_router')
 
 const app = express();
 
@@ -35,8 +40,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
 app.use(cookieParser()); // read/write refresh cookie
 
@@ -50,6 +53,12 @@ app.use('/auth', authRoutes);
 app.use('/users', usersRouter);
 app.use('/api/loadEvents', eventsRouter);
 app.use('/api/findClub', clubsRouter);
+app.use('/api/search', searchRouter);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+app.use('/users', usersRouter);
 app.use('/uploads', express.static('uploads'));
 
 mongoose.connect(process.env.DB_URL).then(() => {

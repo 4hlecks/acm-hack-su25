@@ -20,11 +20,7 @@ const createEvent_Schema = new mongoose.Schema({
         type: String,
         required: true
     },
-    startDate: {
-        type: Date,
-        required: true
-    },
-    endDate: {
+    Date: {
         type: Date,
         required: true
     },
@@ -42,19 +38,26 @@ const createEvent_Schema = new mongoose.Schema({
     },
     eventCategory: {
         type: String,
-        enum: ['GBM', 'FreeFood', 'Fundraiser'],
-        required: true
-    },
-    eventSrc: {
-        type: String,
+        enum: [
+          'GBM',
+          'Free Food',
+          'Fundraiser',
+          'Game Night',
+          'Networking',
+          'Panel',
+          'Social',
+          'Study Jam',
+          'Workshop'
+        ],
         required: true
     },
     
     tags: [{ type: String }], 
     // for uploading images
-    coverPhoto: {            
-        type: String
-    }
+    coverPhoto: {
+        type: String,
+        required: false
+      }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Event', createEvent_Schema);
