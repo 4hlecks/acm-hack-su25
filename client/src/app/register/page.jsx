@@ -4,16 +4,55 @@ import { useState } from 'react';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [accountType, setAccountType] = useState('');
 
-  const handleSubmit = (e) => {
+  // form state
+  const [username, setUsername] = useState(''); // (optional) not sent to backend yet
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [accountType, setAccountType] = useState(''); // "Student" or "Club"
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!accountType) {
       alert('Please select an account type.');
       return;
     }
-    alert(`Account created as ${accountType}!`);
-    // You can redirect or process data here
+    if (password !== confirmPassword) {
+      alert('Passwords do not match.');
+      return;
+    }
+
+    // Map UI selection -> backend role
+    const role = accountType === 'Club' ? 'club' : 'user';
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('http://localhost:5002/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fullName,  // backend expects "name"
+          email,
+          password,
+          role,            // "user" or "club"
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
+
+      alert(` ${data.message}`);
+      router.push('/login');
+    } catch (err) {
+      console.error(' Registration error:', err);
+      alert('Error: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -32,6 +71,7 @@ export default function RegisterPage() {
         display: 'flex',
         alignItems: 'center'
       }}>
+        {/* If /logo.png is 404, either add the file under /public or remove this <img> */}
         <img src="/logo.png" alt="App Logo" style={{ height: '30px', marginRight: '0.75rem' }} />
         <h2 style={{ margin: 0, fontSize: '1.3rem' }}>EventConnect</h2>
       </header>
@@ -51,7 +91,8 @@ export default function RegisterPage() {
             <input
               type="text"
               placeholder="Create a username"
-              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               style={{ width: '100%', padding: '0.5rem', marginBottom: '0.8rem' }}
             />
           </label>
@@ -62,6 +103,8 @@ export default function RegisterPage() {
               type="text"
               placeholder="Full Name"
               required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               style={{ width: '100%', padding: '0.5rem', marginBottom: '0.8rem' }}
             />
           </label>
@@ -72,6 +115,8 @@ export default function RegisterPage() {
               type="email"
               placeholder="Email"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               style={{ width: '100%', padding: '0.5rem', marginBottom: '0.8rem' }}
             />
           </label>
@@ -82,6 +127,8 @@ export default function RegisterPage() {
               type="password"
               placeholder="Password"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               style={{ width: '100%', padding: '0.5rem', marginBottom: '0.8rem' }}
             />
           </label>
@@ -92,6 +139,8 @@ export default function RegisterPage() {
               type="password"
               placeholder="Confirm Password"
               required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
             />
           </label>
@@ -103,6 +152,7 @@ export default function RegisterPage() {
                 type="radio"
                 name="accountType"
                 value="Student"
+                checked={accountType === 'Student'}
                 onChange={(e) => setAccountType(e.target.value)}
               /> Student
             </label>
@@ -111,6 +161,7 @@ export default function RegisterPage() {
                 type="radio"
                 name="accountType"
                 value="Club"
+                checked={accountType === 'Club'}
                 onChange={(e) => setAccountType(e.target.value)}
               /> Club <span style={{ fontSize: '0.9rem' }}>(Must use school email)</span>
             </label>
@@ -118,14 +169,15 @@ export default function RegisterPage() {
 
           <button
             type="submit"
+            disabled={submitting}
             style={{
               width: '100%',
               padding: '0.5rem',
-              backgroundColor: '#F0B323',
+              backgroundColor: submitting ? '#d6d6d6' : '#F0B323',
               border: 'none',
-              cursor: 'pointer'
+              cursor: submitting ? 'not-allowed' : 'pointer'
             }}>
-            Create Account
+            {submitting ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 

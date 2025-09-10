@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Event = require('../../models/event_schema');
-const Club = require('../../models/club_schema');
+const User = require('../../models/users_schema');
 
 //Search clubs by name
 router.get('/all', async (req, res) => {

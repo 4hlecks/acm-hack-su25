@@ -1,97 +1,52 @@
 const express = require('express');
 const router = express.Router();
-const Club = require('../../models/club_schema');
-const Event = require('../../models/event_schema');
-const auth = require('../../middleware/auth');
-const clubAuth = require('../../middleware/clubAuth');
-const upload = require('../../middleware/upload');
+const User = require('../../models/users_schema');
 
-//get all clubs
+// List approved clubs
+// GET /api/findClub
 router.get('/', async (req, res) => {
-    try{
-        const clubs = await Club.find({approved: true});
-        res.json(clubs);
-    } catch (err){
-        console.log(err);
-        res.status(500).json({error: 'Server error: Check Connections!'})   
-    }
+  try {
+    const clubs = await User
+      .find({ role: 'club', approved: true })
+      .select('name email bio profilePic approved');
+    res.json(clubs);
+  } catch (err) {
+    console.error('Error listing clubs:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
+// Search clubs by name (case-insensitive)
+// GET /api/findClub/search?q=acm
+router.get('/search', async (req, res) => {
+  try {
+    const q = (req.query.q || '').trim();
+    const filter = { role: 'club', approved: true };
+    if (q) filter.name = { $regex: q, $options: 'i' };
 
-//Update club profile 
-router.put('/updateProfile', auth, clubAuth, upload.single('profilePic'), async (req, res) =>{
-    try {
-        const {bio} = req.body;
-        const clubId = req.user.id;
+    const clubs = await User
+      .find(filter)
+      .select('name email bio profilePic approved');
+    res.json(clubs);
+  } catch (err) {
+    console.error('Error searching clubs:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
-        const updateData = {};
-        if (bio !== undefined){
-            updateData.bio = bio;
-            console.log('Added bio to updateData');
-        }
+// Get a single club by id
+// GET /api/findClub/:id
+router.get('/:id', async (req, res) => {
+  try {
+    const club = await User
+      .findOne({ _id: req.params.id, role: 'club' })
+      .select('name email bio profilePic approved');
+    if (!club) return res.status(404).json({ message: 'Club not found' });
+    res.json(club);
+  } catch (err) {
+    console.error('Error fetching club:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
-        if (req.file) {
-            updateData.profilePic = req.file.path;
-            console.log('Added file to updateData:', req.file.path);
-            console.log('Full file object:', req.file);
-        } else {
-            console.log('No file received');
-        }
-
-        console.log('Final updateData:', updateData);
-
-        const updatedClub = await Club.findByIdAndUpdate(
-            clubId,
-            updateData,
-            {new: true, runValidators: true}
-        )
-
-        if (!updatedClub){
-            return res.status(404).json({message: 'Club not found'})
-        }
-
-        console.log('Updated club:', {
-            bio: updatedClub.bio,
-            profilePic: updatedClub.profilePic
-        });
-
-        res.json({
-            message: 'Profile updated successfully',
-            club: {
-                id: updatedClub._id,
-                name: updatedClub.name,
-                bio: updatedClub.bio,
-                profilePic: updatedClub.profilePic
-            }
-        })
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({message: 'Server error', error: error.message})
-    }
-})
-
-//Get Club's own profile (when club clicks 'Profile' Nav)
-router.get('/profile/me', auth, clubAuth, async(req, res) => {
-    try{
-        const club = await Club.findById(req.user.id).select('-password')
-        if(!club){
-            return res.status(404).json({message: 'Club not found.'})
-        }
-
-        const events = await Event.find({eventOwner: req.user.id}).sort({createdAt: -1})
-        res.json({
-            id: club._id,
-            name: club.name,
-            email: club.email,
-            bio: club.bio,
-            profilePic: club.profilePic,
-            approved:club.approved,
-            role: club.role,
-            events: events,
-            eventCount: events.length
-        })
-    } catch (error){
-        res.status(500).json({error: 'Server error'})
-    }
-})
 module.exports = router;
