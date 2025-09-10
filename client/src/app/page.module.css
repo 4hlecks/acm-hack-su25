@@ -6,6 +6,7 @@
 
   .pageTitle {
     font-size: var(--font-size-title);
+    font-weight: var(--font-weight-heading);
   }
 }
 

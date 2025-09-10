@@ -63,6 +63,7 @@
     flex-direction: row;
     align-items: center;
     font-weight: var(--font-weight-navigation);
+    gap: 0.5rem;
 }
 
 .navBar .navMiddleItems .navItem .navLink {

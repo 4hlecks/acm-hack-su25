@@ -46,18 +46,16 @@
             text-decoration: none;
 
             .navItem {
-                .navLink, .navButton {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    gap: .25rem;
-                    font-size: 0.75rem;
-                    font-weight: var(--font-weight-navigation);
-                    justify-content: center;
-                    height: 100%;
-                    text-decoration: none;
-                    color: inherit;
-                }
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: .25rem;
+                font-size: 0.75rem;
+                font-weight: var(--font-weight-navigation);
+                justify-content: center;
+                height: 100%;
+                text-decoration: none;
+                color: inherit;
             }
         }
 

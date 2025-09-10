@@ -2,8 +2,8 @@
 
 :root {
   /* Base Color Scheme Variables */
-  --primary-color: #F2F2F2;
-  --secondary-color: #EAE4D5;
+  --primary-color: #ffffff;
+  --secondary-color: #F5F5F5;
   --tertiary-color: #B6B09F;
   --background-color: var(--primary-color);
   --text-color: #000000;
@@ -19,9 +19,9 @@
   --text-color-dark: #ffffff;
 
   /* Button Variables */
-  --button-primary-bg: #57564F;
+  --button-primary-bg: #7A7A73;
   --button-primary-color: #ffffff;
-  --button-primary-hover: #7A7A73;
+  --button-primary-hover: #D7D7D7;
 
   --button-secondary-bg: #FFD05E;
   --button-secondary-color: #000000;
