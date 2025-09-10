@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import styles from './page.module.css'
-import NavBar from '../components/NavBar'
+import NavBar from '../components/navbar/NavBar'
 import EventCard from '../components/events/EventCard'
 import ProfileCard from '../components/profile/ProfileCard';
+import TabBar from '../components/navbar/TabBar'
 
 export default function Profile() {
   const [orgEvents, setOrgEvents] = useState([]);
@@ -38,6 +39,7 @@ export default function Profile() {
           ))}
         </section>
       </main>
+      <TabBar />
     </>
   );
 }

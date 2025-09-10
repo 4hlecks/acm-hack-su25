@@ -6,6 +6,14 @@
 
   .pageTitle {
     font-size: var(--font-size-title);
+    font-weight: var(--font-weight-heading);
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 48rem) {
+  .pageContent {
+    padding: 6rem 2rem 6rem 2rem;
   }
 }
 

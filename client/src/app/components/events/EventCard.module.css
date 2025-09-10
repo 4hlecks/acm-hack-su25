@@ -2,10 +2,10 @@
     display: flex;
     flex-direction: column;
     background-color: var(--tertiary-color);
-    width: 225px;
-    height: 300px;
+    width: 200px;
     border-radius: var(--border-radius);
     cursor: pointer;
+    z-index: 1;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     
@@ -16,7 +16,7 @@
         text-align: center;
         background-color: var(--secondary-color);
         width: 100%;
-        height: 175px;
+        aspect-ratio: 1 / 1;
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         flex-shrink: 0;
         overflow: hidden;
@@ -30,6 +30,13 @@
         }
     }
 
+    .eventIcon {
+        color: var(--text-color);
+        height: var(--icon-size-small);
+        width: var(--icon-size-small);
+        stroke-width: var(--icon-width-small);
+        flex-shrink: 0;
+    }
 
     .eventInfo {
         display: flex;
@@ -37,78 +44,47 @@
         flex-grow: 1;
         justify-content: space-evenly;
         padding: 12px 14px;
+        gap: var(--line-padding);
 
-
-        .eventTitle {
-            font-weight: 600;
-            font-size: var(--font-size-subheading);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .eventOwner {
-            font-size: var(--font-size-body);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        
-        .eventLocationIcon, .eventDateIcon {
-                color: black;
-                height: var(--icon-size-small);
-                width: var(--icon-size-small);
-                stroke-width: var(--icon-width-small);
-                flex-shrink: 0;
-                margin-top: 3px;
-        }
-
-        .eventLocation {
+        .eventHeader {
             display: flex;
-            align-items: flex-start; 
+            flex-direction: column;
+            .eventTitle {
+                font-weight: 600;
+                font-size: var(--font-size-subheading-3);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .eventOwner {
+                font-size: var(--font-size-body);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        }
+
+        .eventDetails {
+            display: flex;
+            flex-direction: column;
             gap: var(--line-padding);
-            margin-top: auto;
-            
-            .eventLocationText {
+
+            .eventDetail {
+                display: flex;
+                align-items: center;
+                gap: var(--line-padding);
+            }
+
+            .eventDetailsText {
+                font-weight: 500;
+                font-size: var(--font-size-small);
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 min-width: 0;
                 line-height: normal; 
-            }
-        }
-
-        .eventLocation span{
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            min-width: 0; 
-        }
-
-        .eventDate {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--line-padding);
-            margin-top: auto;
-
-            .dateTimeContainer{
-                display:flex;
-                flex-direction: column;
-                gap: 1px;
-                min-width: 0;
-            }
-
-            .dateText {
-                font-weight: 500;
-                line-height: 1.2;
-                font-size: var(--font-size-small);
-            }
-
-            .timeText {
-                font-weight: 500;
-                font-size: var(--font-size-small);
-                line-height: 1.2;
             }
         }
     }

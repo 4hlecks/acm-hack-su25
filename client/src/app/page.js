@@ -1,7 +1,8 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import styles from './page.module.css'
-import NavBar from './components/NavBar'
+import NavBar from './components/navbar/NavBar'
+import TabBar from './components/navbar/TabBar'
 import EventCarousel from './components/events/EventCarousel'
 import EventPopup from './components/events/EventPopup'
 
@@ -61,6 +62,7 @@ export default function Home() {
       
       {isPopupOpen && (
       <EventPopup event={selectedEvent} onClose={closeEventPopup} isOpen={isPopupOpen} />)}
+      <TabBar />
     </>
   );
 }

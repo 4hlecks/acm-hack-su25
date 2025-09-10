@@ -18,6 +18,7 @@ const requireAuth = require('./middleware/auth');
 
 const searchRouter = require('./routes/search_router/search_router')
 
+
 const app = express();
 
 app.use(express.json()); 
