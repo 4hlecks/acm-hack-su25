@@ -88,7 +88,7 @@ export default function LoginPage() {
             />
           </label>
           <br />
-          <a href="#" style={{ fontSize: '0.9rem' }}>Forgot password?</a>
+          <a href="/forgot-password" style={{ fontSize: '0.9rem' }}>Forgot password?</a>
           <br /><br />
           <div style={{ textAlign: 'center' }}>
             <button type="submit" style={{ padding: '0.5rem 1rem' }}>
