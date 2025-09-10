@@ -6,7 +6,6 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const dotenv = require('dotenv');
 
 // load env FIRST
 dotenv.config();
@@ -64,7 +63,5 @@ app.use('/uploads', express.static('uploads'));
 mongoose.connect(process.env.DB_URL).then(() => {
   console.log('Connected to MongoDB database');
 });
-
-
 
 module.exports = app;
