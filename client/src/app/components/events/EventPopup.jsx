@@ -146,6 +146,7 @@ const EventPopup = ({ event, onClose, isOpen }) => {
                                     {eventDescription || 'No description available.'}
                                 </Dialog.Description>
                             </div>                              
+
                             <div className={styles.buttonContainer}>          
                                 <button onClick={onClose} className={styles.saveButton}>
                                     Save Event

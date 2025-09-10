@@ -11,6 +11,7 @@ const eventsRouter = require('./routes/event_router/event_router')
 const clubsRouter = require('./routes/club_router/club_router')
 const searchRouter = require('./routes/search_router/search_router')
 
+
 const app = express();
 const cors = require('cors');
 
