@@ -7,10 +7,10 @@ import styles from './CategoryEvents.module.css'
 import { ArrowLeft } from "react-feather";
 import NavBar from '../components/NavBar'
 
-export default function CategoryEvensPage() {
+export default function CategoryEventsPage() {
     const params = useParams();
     const router = useRouter();
-    const category = params.category;
+    const category = params?.category;
 
     const categoryDisplayName = category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     const [events, setEvents] = useState([]);

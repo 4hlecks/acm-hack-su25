@@ -8,7 +8,7 @@ import EventPopup from './components/events/EventPopup'
 export default function Home() {
   const [eventsByCategory, setEventsByCategory] = useState({});
 
-  const categories = ["Fundraiser", "FreeFood", "GBM"];
+  const categories = ["Fundraiser", "Free Food", "GBM"];
 
   useEffect(() => {
     const fetchEvents = async () => {
