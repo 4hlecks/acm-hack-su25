@@ -1,42 +1,92 @@
 "use client"
 
 import React, { useEffect, useState } from 'react';
-import styles from './page.module.css'
-import NavBar from '../components/navbar/NavBar'
-import EventCard from '../components/events/EventCard'
+import styles from './page.module.css';
+import NavBar from '../components/navbar/NavBar';
+import EventCard from '../components/events/EventCard';
 import ProfileCard from '../components/profile/ProfileCard';
-import TabBar from '../components/navbar/TabBar'
+import TabBar from '../components/navbar/TabBar';
+import { useRouter } from 'next/navigation';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001';
 
 export default function Profile() {
+  const router = useRouter();
+
+  const [club, setClub] = useState(null);
   const [orgEvents, setOrgEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   //const organizationId = "YOUR_ORG_ID"; Replace with actual org ID
 
   useEffect(() => {
-    const fetchOrgEvents = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      router.push('/login');
+      return;
+    }
+
+    const fetchProfile = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/findClub/${organizationId}`);
-        const data = await response.json();
-        //setOrgEvents(data.events || []); if API returns events directly
-      } catch (error) {
-        console.error("Error fetching organization events:", error);
-        setOrgEvents([]);
+        // Get the signed-in club’s profile
+        const res = await fetch(`${API_BASE}/users/profile/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) throw new Error(`Profile fetch failed: ${res.status}`);
+        const data = await res.json();
+        setClub(data.club);
+
+        if (data.club?._id) {
+          try {
+            const evRes = await fetch(`${API_BASE}/api/events/byClub/${data.club._id}`);
+            if (evRes.ok) {
+              const events = await evRes.json();
+              setOrgEvents(Array.isArray(events) ? events : events.events || []);
+            }
+          } catch {
+            setOrgEvents([]);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchOrgEvents();
-  }, []);
+
+    fetchProfile();
+  }, [router]);
+
+  const handleEdit = () => {
+    router.push('/profile_page/edit'); 
+  };
+
+  if (loading) return <div>Loading…</div>;
 
   return (
     <>
       <NavBar />
       <main className={styles.pageContent}>
-        <ProfileCard />
+        <ProfileCard 
+          name={club?.name}
+          handle={club?.email?.split('@')[0]}  
+          bio={club?.bio}
+          profilePic={club?.profilePic}
+          onEdit={handleEdit}
+          isOwner={true}
+        />
+
         <div className={styles.eventsHeader}>
-          <h2>Events</h2>
+          <h2><strong>Events</strong></h2>
         </div>
+
         <section className={styles.eventGrid}>
-          {orgEvents.map(event => (
-            <EventCard key={event._id} event={event} />
-          ))}
+          {orgEvents.length === 0 ? (
+            <p>No events yet.</p>
+          ) : (
+            orgEvents.map((event) => <EventCard key={event._id} event={event} />)
+          )}
         </section>
       </main>
       <TabBar />

@@ -13,8 +13,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 2rem;
-  margin-top: 1rem;
-  margin-left: 23.5rem;
+  margin-top: 0.5rem;
+  margin-left: 10rem;
   margin-right: 23.5rem;
 }
 
@@ -22,8 +22,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 2rem;
-  margin-left: 23.5rem;
+  margin-top: 0rem;
+  margin-left: 10rem;
 }
 
 .sortDropdown {
@@ -52,4 +52,9 @@
 }
 
 @keyframes rotate {
+}
+
+.eventsHeader h2 {
+  font-weight: 800; 
+  font-size: 21px;
 }
