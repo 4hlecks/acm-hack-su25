@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
-import styles from "./EventPopup.module.css";
+import styles from "./ProfileEventPopup.module.css";
 
-const EventPopup = ({ event, onClose, isOpen }) => {
+const ProfileEventPopup = ({ event, onClose }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -13,25 +13,23 @@ const EventPopup = ({ event, onClose, isOpen }) => {
     return () => setMounted(false);
   }, []);
 
-  if (!mounted || !event || !isOpen) return null;
+  if (!mounted || !event) return null;
 
   const {
     coverPhoto,
     eventTitle,
     eventOwner,
     date,
-    Date: DateLegacy, // fallback
+    Date: DateLegacy, // fallback if mismatch
     startTime,
     endTime,
     eventLocation,
     eventDescription,
-    tags,
   } = event;
 
-  function formatDisplayDate(dateValue) {
-    const d = new Date(dateValue);
+  function formatDisplayDate(value) {
+    const d = new Date(value);
     if (isNaN(d.getTime())) return "Date TBD";
-
     return d.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
@@ -39,52 +37,34 @@ const EventPopup = ({ event, onClose, isOpen }) => {
     });
   }
 
-  function formatTimeRange(startTime, endTime) {
-    if (!startTime || !endTime) return "Time TBD";
-
+  function formatTimeRange(start, end) {
+    if (!start || !end) return "Time TBD";
     const options = { hour: "numeric", minute: "2-digit", hour12: true };
-
-    const startDate = new Date(
-      startTime.includes("T") ? startTime : `1970-01-01T${startTime}`
-    );
-    const endDate = new Date(
-      endTime.includes("T") ? endTime : `1970-01-01T${endTime}`
-    );
-
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      return "Time TBD";
-    }
+    const startDate = new Date(start.includes("T") ? start : `1970-01-01T${start}`);
+    const endDate = new Date(end.includes("T") ? end : `1970-01-01T${end}`);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return "Time TBD";
 
     const startStr = startDate.toLocaleTimeString([], options);
     const endStr = endDate.toLocaleTimeString([], options);
-
     const startAMPM = startStr.split(" ").pop();
     const endAMPM = endStr.split(" ").pop();
-
-    if (startAMPM === endAMPM) {
-      return `${startStr.replace(" " + startAMPM, "")} - ${endStr}`;
-    } else {
-      return `${startStr} - ${endStr}`;
-    }
+    return startAMPM === endAMPM
+      ? `${startStr.replace(" " + startAMPM, "")} - ${endStr}`
+      : `${startStr} - ${endStr}`;
   }
 
   const displayDate = formatDisplayDate(date || DateLegacy);
   const displayTime = formatTimeRange(startTime, endTime);
 
   const dialogContent = (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog.Root open={!!event} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal container={document.body}>
         <Dialog.Backdrop className={styles.backdrop} />
         <Dialog.Popup className={styles.popup}>
           <article className={styles.eventContent}>
-            {/* Mobile header */}
             <div className={styles.clubInfoMobile}>
               {eventOwner?.profilePic ? (
-                <img
-                  src={eventOwner.profilePic}
-                  alt="Club Logo"
-                  className={styles.clubLogo}
-                />
+                <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
               ) : (
                 <canvas className={styles.clubLogo}></canvas>
               )}
@@ -96,29 +76,22 @@ const EventPopup = ({ event, onClose, isOpen }) => {
               </button>
             </div>
 
-
             <figure className={styles.imageSection}>
               <img
                 src={coverPhoto}
                 alt="Event Flyer"
                 className={styles.eventImage}
                 onError={(e) => {
-                  console.log("Image failed to load in Event Popup");
                   e.target.src =
                     "https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png";
                 }}
               />
             </figure>
 
-            {/* Event info */}
             <section className={styles.eventSection}>
               <div className={styles.clubInfo}>
                 {eventOwner?.profilePic ? (
-                  <img
-                    src={eventOwner.profilePic}
-                    alt="Club Logo"
-                    className={styles.clubLogo}
-                  />
+                  <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
                 ) : (
                   <canvas className={styles.clubLogo}></canvas>
                 )}
@@ -126,30 +99,21 @@ const EventPopup = ({ event, onClose, isOpen }) => {
                   {eventOwner?.name || eventOwner || "Unknown Organizer"}
                 </h3>
                 <button onClick={onClose} className={styles.closeButton}>
-                  <X
-                    size={25}
-                    strokeWidth={2.5}
-                    className={styles.closeButtonIcon}
-                  />
+                  <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
                 </button>
               </div>
+
               <div className={styles.eventInfo}>
-                <Dialog.Title className={styles.eventTitle}>
-                  {eventTitle}
-                </Dialog.Title>
+                <Dialog.Title className={styles.eventTitle}>{eventTitle}</Dialog.Title>
 
                 <section className={styles.eventDetail}>
                   <MapPin className={styles.eventIcon} />
-                  <span className={styles.eventDetailText}>
-                    {eventLocation || "Location TBD"}
-                  </span>
+                  <span className={styles.eventDetailText}>{eventLocation || "Location TBD"}</span>
                 </section>
 
                 <section className={styles.eventDetail}>
                   <Calendar className={styles.eventIcon} />
-                  <span className={styles.eventDetailText}>
-                    {displayDate}
-                  </span>
+                  <span className={styles.eventDetailText}>{displayDate}</span>
                 </section>
 
                 <section className={styles.eventDetail}>
@@ -177,4 +141,4 @@ const EventPopup = ({ event, onClose, isOpen }) => {
   return createPortal(dialogContent, document.body);
 };
 
-export default EventPopup;
+export default ProfileEventPopup;

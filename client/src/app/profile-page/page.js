@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import NavBar from "../components/navbar/NavBar";
 import EventCard from "../components/events/EventCard";
+import EventPopup from "./ProfileEventPopup"; 
 import ProfileCard from "../components/profile/ProfileCard";
 import TabBar from "../components/navbar/TabBar";
 import { useRouter } from "next/navigation";
@@ -16,6 +17,7 @@ export default function Profile() {
   const [club, setClub] = useState(null);
   const [orgEvents, setOrgEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState(null); 
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -34,17 +36,21 @@ export default function Profile() {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-
+    
         if (!profileRes.ok)
           throw new Error(`Profile fetch failed: ${profileRes.status}`);
         if (!eventsRes.ok)
           throw new Error(`Events fetch failed: ${eventsRes.status}`);
-
+    
         const profileData = await profileRes.json();
         const { events } = await eventsRes.json();
-
+    
+        const sortedEvents = (events || []).sort(
+          (a, b) => new Date(b.Date) - new Date(a.Date)
+        );
+    
         setClub(profileData.club);
-        setOrgEvents(events || []);
+        setOrgEvents(sortedEvents);
       } catch (err) {
         console.error(err);
         setOrgEvents([]);
@@ -52,6 +58,7 @@ export default function Profile() {
         setLoading(false);
       }
     };
+    
 
     fetchData();
   }, [router]);
@@ -84,9 +91,25 @@ export default function Profile() {
           {orgEvents.length === 0 ? (
             <p>No events yet.</p>
           ) : (
-            orgEvents.map((event) => <EventCard key={event._id} event={event} />)
+            orgEvents.map((event) => (
+              <div
+                key={event._id}
+                onClick={() => setSelectedEvent(event)} 
+                style={{ cursor: "pointer" }}
+              >
+                <EventCard event={event} />
+              </div>
+            ))
           )}
         </section>
+
+        {/* 🔑 Popup modal */}
+        {selectedEvent && (
+          <EventPopup
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+          />
+        )}
       </main>
       <TabBar />
     </>
