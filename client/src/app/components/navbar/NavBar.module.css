@@ -121,3 +121,25 @@
         width: 100%;
     }
 }
+
+.navAuth {
+    display: flex;              
+    align-items: center;       
+    gap: 0.35rem;               
+    font-size: 1rem;          
+    font-weight: normal;       
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    color: #000000;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;    
+    text-decoration: none;     
+  }
+  
+  .navAuth:hover {
+    border-color: #ccc;
+    background: rgba(255, 255, 255, 0.1); 
+  }
+  

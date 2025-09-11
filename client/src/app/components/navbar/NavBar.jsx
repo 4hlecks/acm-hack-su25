@@ -2,18 +2,28 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import styles from './NavBar.module.css';
-import { LogOut, Home, Search, Bookmark, PlusSquare, User} from 'react-feather';
+import { LogOut, LogIn, Home, Search, Bookmark, PlusSquare, User} from 'react-feather';
 import SearchBar from '../SearchBar'
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
 
 export default function NavBar() {
     const router = useRouter();
     const pathname = usePathname();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        // Checks if JWT exists in localStorage
+        const token = localStorage.getItem('token');
+        setIsLoggedIn(!!token);
+      }, []);
 
     const handleLogout = async () => {
         try {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setIsLoggedIn(false);
         router.push('/login');
         } catch (err) {
         console.error('Logout failed:', err);
@@ -59,7 +69,19 @@ export default function NavBar() {
                 </Link>
                 </li>
             </ul>
-            <button onClick={handleLogout} className={styles.navLogOut}><LogOut className={styles.navIcon} /> <span>Log Out</span></button>
-        </div>
+            {/* Conditionally show login/logout */}
+            {isLoggedIn ? (
+                <button onClick={handleLogout} className={styles.navAuth}> 
+                <LogOut size={16} className={styles.navIcon} /> 
+                <span>Logout</span>
+          </button>
+        ) : (
+          <Link href="/login" className={styles.navAuth}>
+            <LogIn size={16} className={styles.navIcon} /> 
+            <span>Login</span> 
+          </Link>
+        )}
+      </div>
     </nav>
-)};
+  );
+}

@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -46,8 +48,9 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
       }}>
-        <img src="/logo.png" alt="App Logo" style={{ height: '40px', marginRight: '1rem' }} />
-        <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>APP NAME</h2>
+        <Link href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: 'black' }}>
+          current
+        </Link>
       </header>
 
       {/* Main Content */}
