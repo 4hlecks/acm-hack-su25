@@ -139,6 +139,71 @@ router.delete('/:id', auth, clubAuth, async (req, res) => {
   }
 });
 
+// Get single event by ID (owner only)
+router.get('/:id', auth, clubAuth, async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // ensure the logged-in user owns it
+    if (event.eventOwner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to view this event' });
+    }
+
+    res.json(event);
+  } catch (err) {
+    console.error('Error fetching event:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// Update event by ID (only owner can update)
+router.put('/:id', auth, clubAuth, upload.single('coverPhoto'), async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // ensure the logged-in user owns it
+    if (event.eventOwner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to update this event' });
+    }
+
+    // build update data
+    const updateData = {
+      eventTitle: req.body.eventTitle,
+      eventDescription: req.body.eventDescription,
+      date: req.body.date ? new Date(req.body.date) : event.date,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
+      eventLocation: req.body.eventLocation,
+      eventCategory: req.body.eventCategory,
+      tags: req.body.tags ? req.body.tags.split(',').map(t => t.trim()) : event.tags,
+    };
+
+    if (req.file) {
+      updateData.coverPhoto = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    res.json({ message: 'Event updated successfully', event: updatedEvent });
+  } catch (err) {
+    console.error('Error updating event:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+
 
 
 

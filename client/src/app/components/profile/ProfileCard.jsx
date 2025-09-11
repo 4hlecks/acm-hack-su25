@@ -46,7 +46,7 @@ function ProfileCard({ name, bio, profilePic, onEdit, isOwner, startTime, endTim
                 onClick={onEdit}
                 aria-label="Edit profile"
               >
-                Edit
+                Edit Profile / Events
               </button>
             ) : (
               <button className="follow-btn">Follow</button>
