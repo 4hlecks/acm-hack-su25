@@ -9,6 +9,7 @@ import EventPopup from './components/events/EventPopup'
 export default function Home() {
   const [eventsByCategory, setEventsByCategory] = useState({});
 
+  {/*Different categories for events! */}
    const categories = [
     "Fundraiser",
     "Free Food", 

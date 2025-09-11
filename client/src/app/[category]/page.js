@@ -12,6 +12,7 @@ export default function CategoryEventsPage() {
     const router = useRouter();
     const category = params?.category;
 
+    {/*Different categories for events! */}
     const categoryMapping = {
         'gbm': 'GBM',
         'free-food': 'Free Food',
@@ -24,12 +25,14 @@ export default function CategoryEventsPage() {
         'workshop': 'Workshop'
     };
 
+    //Capitalizes the first letter and removes the '-'if there is a gap
     const categoryDisplayName = categoryMapping[category] || 
         category.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
     const [events, setEvents] = useState([]);
     const [loading , setLoading] = useState(true);
 
+    //Popup Feature
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 

@@ -16,7 +16,10 @@ const EventCarousel = ({ category, events = [], onEventClick }) => {
         <section className={styles.carouselSection}>
             <header className={styles.carouselHeader}>
                 <h2 className={styles.carouselTitle}>{category}</h2>
-                <Link href={`/${categoryID}`} className={styles.carouselSeeAll}>See All <ArrowRight className={styles.carouselSeeAllIcon}/></Link>
+
+                {/*Link to the See All Page */}
+                <Link href={`/${categoryID}`} className={styles.carouselSeeAll}>See All <ArrowRight className={styles.carouselSeeAllIcon}/></Link> 
+                
             </header>
             <div className={styles.carouselContent}>
                 <button className={styles.carouselLeft} id={`carousel-left-${categoryID}`}><ChevronLeft className={styles.carouselLeftIcon}/></button>
