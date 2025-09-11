@@ -40,7 +40,13 @@
     display: flex;
     justify-content: space-between;
     width: 50%;
+    align-items: center;
 }
+
+.rightSideLoggedOut {
+    justify-content: flex-end; 
+    width: 50%;              
+  }
 
 /* Icon Styles */
 .navBar .navIcon {
@@ -92,7 +98,7 @@
 .navBar .navLogOut,
 .navBar .navItem,
 .navBar .siteLogo {
-    font-size: var(--font-size-navigation);
+    font-size: 1.2rem;
     color: var(--text-color);
     cursor: pointer;
     transition: color 0.3s ease, background-color 0.3s ease;
@@ -142,4 +148,5 @@
     border-color: #ccc;
     background: rgba(255, 255, 255, 0.1); 
   }
+  
   
