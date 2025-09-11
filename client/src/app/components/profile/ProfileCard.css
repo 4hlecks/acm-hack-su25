@@ -108,3 +108,11 @@
   max-width: 800px;   
   text-align: left;
 }
+
+.profile-time {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #555;
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
+}

@@ -1,84 +1,106 @@
 import React from "react";
 import { Calendar, MapPin, Clock } from "react-feather";
-import styles from './EventCard.module.css';
+import styles from "./EventCard.module.css";
 
-const EventCard = ({ event, onEventClick } ) => {
-    // Event should contain the following metadata
-    const {
-        coverPhoto, eventTitle, eventOwner,          
-        date, startTime, endTime, eventLocation, 
-        tags      
-    } = event;
+const EventCard = ({ event, onEventClick }) => {
+  const {
+    coverPhoto,
+    eventTitle,
+    eventOwner,
+    date,
+    Date: DateLegacy, // fallback for old DB records
+    startTime,
+    endTime,
+    eventLocation,
+    tags,
+  } = event;
 
-    function formatDisplayDate(){
-        const d = new Date(date || event.Date);
+  console.log("EventCard event:", event);
 
-        if (isNaN(d.getTime())) {
-            return 'Date TBD';
-        }
+  function formatDisplayDate(dateValue) {
+    const d = new Date(dateValue);
+    if (isNaN(d.getTime())) return "Date TBD";
 
-        return d.toLocaleDateString("en-US", {
-            weekday: "short",
-            month: "short",
-            day: "numeric",
-        });
+    return d.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  }
+
+  function formatTimeRange(startTime, endTime) {
+    if (!startTime || !endTime) return "Time TBD";
+
+    const options = { hour: "numeric", minute: "2-digit", hour12: true };
+
+    const startDate = new Date(
+      startTime.includes("T") ? startTime : `1970-01-01T${startTime}`
+    );
+    const endDate = new Date(
+      endTime.includes("T") ? endTime : `1970-01-01T${endTime}`
+    );
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return "Time TBD";
     }
 
-    function formatTimeRange(startTime, endTime) {
-        if (!startTime || !endTime) return '';
+    const startStr = startDate.toLocaleTimeString([], options);
+    const endStr = endDate.toLocaleTimeString([], options);
 
-        const [startHourMin, startAMPM] = startTime.split(' ');
-        const [endHourMin, endAMPM] = endTime.split(' ');
+    const startAMPM = startStr.split(" ").pop();
+    const endAMPM = endStr.split(" ").pop();
 
-        if (startAMPM === endAMPM) {
-            return `${startHourMin} - ${endHourMin} ${startAMPM}`;
-        } else {
-            return `${startHourMin} ${startAMPM} - ${endHourMin} ${endAMPM}`;
-        }
+    if (startAMPM === endAMPM) {
+      return `${startStr.replace(" " + startAMPM, "")} - ${endStr}`;
+    } else {
+      return `${startStr} - ${endStr}`;
     }
+  }
 
-    const displayDate = formatDisplayDate();
-    const displayTime = formatTimeRange(startTime, endTime);
+  const displayDate = formatDisplayDate(date || DateLegacy);
+  const displayTime = formatTimeRange(startTime, endTime);
 
+  function handleClick() {
+    console.log("EventCard clicked!", eventTitle);
+    if (onEventClick) onEventClick(event);
+  }
 
-    //calls the parent component 
-    function handleClick() {
-        console.log('EventCard clicked!', eventTitle);
-        if (onEventClick) onEventClick(event);
-    }
-    return (
-        <article className={styles.eventCard}
-                 onClick={handleClick} 
-        >
-            <div className={styles.eventCover}>
-                <img className={styles.eventCoverImage} src={coverPhoto} alt={`${eventTitle} Cover Image`} 
-                onError={(e) => {
-                    console.log('Image failed to load:');
-                    e.target.src = 'https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png'
-                }}/>
-            </div>
-            <section className={styles.eventInfo}>
-                <header className={styles.eventHeader}>
-                    <h3 className={styles.eventTitle}>{eventTitle}</h3>
-                    <p className={styles.eventOwner}>{eventOwner?.name}</p>
-                </header>
-                <div className={styles.eventDetails}>
-                    <span className={styles.eventDetail}>
-                        <MapPin className={styles.eventIcon}/> 
-                        <span className={styles.eventDetailsText}>{eventLocation}</span>
-                    </span>
-                    <time className={styles.eventDetail}>
-                        <Calendar className={styles.eventIcon}/> 
-                        <span className={styles.eventDetailsText}>{displayDate}</span>
-                    </time>
-                    <time className={styles.eventDetail}>
-                        <Clock className={styles.eventIcon}/>
-                        <span className={styles.eventDetailsText}>{displayTime}</span>
-                    </time>
-                </div>
-            </section>
-        </article>
-    )
+  return (
+    <article className={styles.eventCard} onClick={handleClick}>
+      <div className={styles.eventCover}>
+        <img
+          className={styles.eventCoverImage}
+          src={coverPhoto}
+          alt={`${eventTitle} Cover Image`}
+          onError={(e) => {
+            console.log("Image failed to load:");
+            e.target.src =
+              "https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png";
+          }}
+        />
+      </div>
+      <section className={styles.eventInfo}>
+        <header className={styles.eventHeader}>
+          <h3 className={styles.eventTitle}>{eventTitle}</h3>
+          <p className={styles.eventOwner}>{eventOwner?.name}</p>
+        </header>
+        <div className={styles.eventDetails}>
+          <span className={styles.eventDetail}>
+            <MapPin className={styles.eventIcon} />
+            <span className={styles.eventDetailsText}>{eventLocation}</span>
+          </span>
+          <time className={styles.eventDetail}>
+            <Calendar className={styles.eventIcon} />
+            <span className={styles.eventDetailsText}>{displayDate}</span>
+          </time>
+          <time className={styles.eventDetail}>
+            <Clock className={styles.eventIcon} />
+            <span className={styles.eventDetailsText}>{displayTime}</span>
+          </time>
+        </div>
+      </section>
+    </article>
+  );
 };
 
 export default EventCard;

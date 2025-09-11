@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import styles from "./edit.module.css";
 import NavBar from "../../components/navbar/NavBar";
@@ -9,10 +10,12 @@ import TabBar from "../../components/navbar/TabBar";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
 export default function EditProfile() {
+  const router = useRouter();
   const [club, setClub] = useState(null);
   const [orgEvents, setOrgEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingEvent, setEditingEvent] = useState(null);
+  const [deleteEventId, setDeleteEventId] = useState(null); // 🔑 for delete confirmation
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -61,6 +64,7 @@ export default function EditProfile() {
 
     if (res.ok) {
       alert("Profile updated!");
+      router.push("/profile-page");
     } else {
       alert("Error updating profile");
     }
@@ -87,7 +91,7 @@ export default function EditProfile() {
       <main className={styles.pageContent}>
         {/* Editable Profile Info */}
         <div className={styles.profileHeader}>
-          {/* Profile Pic */}
+          {/* Profile Pic + Button */}
           <div className={styles.profilePicWrapper}>
             <img
               src={
@@ -97,31 +101,39 @@ export default function EditProfile() {
               alt="Profile"
               className={styles.profilePic}
             />
-            <input
-              type="file"
-              onChange={(e) =>
-                setClub({ ...club, profilePicFile: e.target.files[0] })
-              }
-            />
+            <label className={styles.actionBtn}>
+              Edit Logo
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setClub({ ...club, profilePicFile: e.target.files[0] })
+                }
+                hidden
+              />
+            </label>
           </div>
 
           {/* Editable fields */}
           <div className={styles.profileForm}>
             <label className={styles.label}>Edit Name</label>
             <input
-              className={styles.input}
+              className={styles.inputWide}
               value={club?.name || ""}
               onChange={(e) => setClub({ ...club, name: e.target.value })}
             />
 
             <label className={styles.label}>Edit About</label>
             <textarea
-              className={styles.textarea}
+              className={styles.textareaWide}
               value={club?.bio || ""}
               onChange={(e) => setClub({ ...club, bio: e.target.value })}
             />
 
-            <button onClick={handleSaveProfile} className={styles.saveBtn}>
+            <button
+              onClick={handleSaveProfile}
+              className={`${styles.actionBtn} ${styles.saveBtn}`}
+            >
               Save Profile
             </button>
           </div>
@@ -144,13 +156,13 @@ export default function EditProfile() {
                 <div className={styles.eventActions}>
                   <button
                     onClick={() => setEditingEvent(event)}
-                    className={styles.editBtn}
+                    className={styles.actionBtn}
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => handleDeleteEvent(event._id)}
-                    className={styles.deleteBtn}
+                    onClick={() => setDeleteEventId(event._id)} // 🔑 open confirm popup
+                    className={`${styles.actionBtn} ${styles.deleteBtn}`}
                   >
                     Delete
                   </button>
@@ -202,10 +214,47 @@ export default function EditProfile() {
                   setEditingEvent(null);
                 }
               }}
+              className={styles.actionBtn}
             >
               Save Event
             </button>
-            <button onClick={() => setEditingEvent(null)}>Cancel</button>
+            <button
+              onClick={() => setEditingEvent(null)}
+              className={`${styles.actionBtn} ${styles.deleteBtn}`}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        {/* 🔑 Popup for delete confirmation */}
+        {deleteEventId && (
+          <div className={styles.popup}>
+            <h3>Are you sure you want to delete this event?</h3>
+            <div
+              style={{
+                display: "flex",
+                gap: "1rem",
+                justifyContent: "center",
+                marginTop: "1rem",
+              }}
+            >
+              <button
+                className={styles.actionBtn}
+                onClick={() => setDeleteEventId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                onClick={async () => {
+                  await handleDeleteEvent(deleteEventId);
+                  setDeleteEventId(null);
+                }}
+              >
+                Delete
+              </button>
+            </div>
           </div>
         )}
       </main>

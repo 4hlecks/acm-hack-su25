@@ -1,7 +1,28 @@
 import React from "react";
 import "./ProfileCard.css";
 
-function ProfileCard({ name, bio, profilePic, onEdit, isOwner }) {
+function formatTimeRange(startTime, endTime) {
+  if (!startTime || !endTime) return "";
+
+  const options = {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true, // ensures AM/PM instead of 24h
+  };
+
+  const start = new Date(startTime).toLocaleTimeString([], options);
+  const end = new Date(endTime).toLocaleTimeString([], options);
+
+  // remove :00 if exact hour
+  const cleanStart = start.replace(":00", "");
+  const cleanEnd = end.replace(":00", "");
+
+  return `${cleanStart} - ${cleanEnd}`;
+}
+
+function ProfileCard({ name, bio, profilePic, onEdit, isOwner, startTime, endTime }) {
+  const timeRange = formatTimeRange(startTime, endTime);
+
   return (
     <section className="profile-section">
       <div className="profile-header">
@@ -31,11 +52,14 @@ function ProfileCard({ name, bio, profilePic, onEdit, isOwner }) {
               <button className="follow-btn">Follow</button>
             )}
           </div>
+          {timeRange && (
+            <p className="profile-time">{timeRange}</p>
+          )}
 
           <section className="profile-about">
             <h2>About</h2>
             <div className="about-description">
-              {bio || "This club has not added a bio yet."}
+              {bio || "This club does not have a bio yet."}
             </div>
           </section>
         </div>

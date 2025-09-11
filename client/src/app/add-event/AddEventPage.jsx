@@ -113,7 +113,7 @@ export default function AddEventPage() {
     const formData = new FormData();
     formData.append("eventTitle", eventTitle);
     formData.append("eventDescription", eventDescription);
-    formData.append("Date", eventDate);
+    formData.append("date", eventDate);
     formData.append("startTime", startTime);
     formData.append("endTime", endTime);
     formData.append("eventLocation", eventLocation);
