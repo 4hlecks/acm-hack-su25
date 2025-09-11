@@ -76,7 +76,7 @@ export default function RegisterPage() {
               Username:
               <input
                 type="text"
-                placeholder="Create a username"
+                placeholder="Create a username or enter full name"
                 required
                 style={{
                   backgroundColor: '#f0f0f0',       
@@ -85,23 +85,6 @@ export default function RegisterPage() {
                   marginBottom: '0.8rem',
                   border: '1px solid #ccc',           
                   borderRadius: '4px'                
-                }}
-              />
-            </label>
-
-            <label>
-              Full Name:
-              <input
-                type="text"
-                placeholder="Full Name"
-                required
-                style={{
-                  backgroundColor: '#f0f0f0',         
-                  width: '100%',
-                  padding: '0.5rem',
-                  marginBottom: '0.8rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
                 }}
               />
             </label>
