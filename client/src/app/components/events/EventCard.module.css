@@ -2,11 +2,13 @@
     display: flex;
     flex-direction: column;
     background-color: var(--tertiary-color);
-    width: 175px;
-    height: 275px;
+    width: 200px;
     border-radius: var(--border-radius);
     cursor: pointer;
+    z-index: 1;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 
+    
     .eventCover {
         display: flex;
         align-items: center;
@@ -14,7 +16,7 @@
         text-align: center;
         background-color: var(--secondary-color);
         width: 100%;
-        height: 175px;
+        aspect-ratio: 1 / 1;
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         flex-shrink: 0;
         overflow: hidden;
@@ -23,9 +25,17 @@
             object-fit: cover;
             width: 100%;
             height: 100%;
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            border-radius: var(--border-radius) var(--border-radius) 0 0; /* Match parent radius */
 
         }
+    }
+
+    .eventIcon {
+        color: var(--text-color);
+        height: var(--icon-size-small);
+        width: var(--icon-size-small);
+        stroke-width: var(--icon-width-small);
+        flex-shrink: 0;
     }
 
     .eventInfo {
@@ -33,54 +43,55 @@
         flex-direction: column;
         flex-grow: 1;
         justify-content: space-evenly;
-        padding: 10px;
+        padding: 12px 14px;
+        gap: var(--line-padding);
 
-        .eventTitle {
-            font-size: var(--font-size-subheading);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .eventOwner {
-            font-size: var(--font-size-body);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .eventDate, .eventLocation {
-            text-overflow: ellipsis;
-            overflow: hidden;
-            font-size: var(--font-size-small);
-        }
-
-        .eventLocation {
+        .eventHeader {
             display: flex;
-            align-items: center;
-            gap: var(--line-padding);
-            margin-top: auto;
-            
-            .eventLocationIcon {
-                color: black;
-                height: var(--icon-size-small);
-                width: var(--icon-size-small);
-                stroke-width: var(--icon-width-small);
+            flex-direction: column;
+            .eventTitle {
+                font-weight: 600;
+                font-size: var(--font-size-subheading-3);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
+
+            .eventOwner {
+                font-size: var(--font-size-body);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
         }
 
-        .eventDate {
+        .eventDetails {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: var(--line-padding);
-            margin-top: auto;
 
-            .eventDateIcon {
-                color: black;
-                height: var(--icon-size-small);
-                width: var(--icon-size-small);
-                stroke-width: var(--icon-width-small);
+            .eventDetail {
+                display: flex;
+                align-items: center;
+                gap: var(--line-padding);
+            }
+
+            .eventDetailsText {
+                font-weight: 500;
+                font-size: var(--font-size-small);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+                line-height: normal; 
             }
         }
     }
+}
+
+.eventCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0px 1rem var(--tertiary-color);
+    z-index: 5;
 }

@@ -1,44 +1,99 @@
 import React from "react";
-import { Calendar, MapPin } from "react-feather";
+import { Calendar, MapPin, Clock } from "react-feather";
 import styles from './EventCard.module.css';
 
-const EventCard = ({ event }) => {
+const EventCard = ({ event, onEventClick } ) => {
     // Event should contain the following metadata
     const {
-        eventCover, eventTitle, eventOwner, eventDate,
-        eventLocation, eventDescription, 
-        eventTags, eventCategory, eventSrc
+        coverPhoto, eventTitle, eventOwner,          
+        startDate, endDate, startTime, endTime, eventLocation, 
+        tags      
     } = event;
 
-    function formatDate(inputDate) {
-        const date = new Date(inputDate);
-        const options = {
-            weekday: "short",
-            month: "short",
-            day: "numeric",
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true
-        };
-        return date.toLocaleString("en-US", options).replace(",", "");
+    function formatDisplayDate(){
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        if (isNaN(start.getTime()) || isNaN(end.getTime())){
+            return 'Date TBD';
+        }
+
+        //check if same day
+        const isSameDay = start.toDateString() === end.toDateString();
+
+        if (isSameDay){
+            return start.toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric"
+            });
+        } else{
+            const startFormatted = start.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric"
+            })
+
+            const endFormatted = end.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric"
+            })
+
+            return `${startFormatted} - ${endFormatted}`
+        } 
     }
 
-    function handleClick() {
-        alert(`Event: ${eventTitle}\nOwner: ${eventOwner}\nDate: ${formatDate(eventDate)}\nLocation: ${eventLocation}`);
+    function formatTimeRange(startTime, endTime) {
+        if (!startTime || !endTime) return '';
+
+        const [startHourMin, startAMPM] = startTime.split(' ');
+        const [endHourMin, endAMPM] = endTime.split(' ');
+
+        if (startAMPM === endAMPM) {
+            return `${startHourMin} - ${endHourMin} ${startAMPM}`;
+        } else {
+            return `${startHourMin} ${startAMPM} - ${endHourMin} ${endAMPM}`;
+        }
     }
-    
+
+    const displayDate = formatDisplayDate();
+    const displayTime = formatTimeRange(startTime, endTime);
+
+
+    //calls the parent component 
+    function handleClick() {
+        console.log('EventCard clicked!', eventTitle);
+        onEventClick(event);
+    }
     return (
         <article className={styles.eventCard}
                  onClick={handleClick} 
         >
             <div className={styles.eventCover}>
-                <img className={styles.eventCoverImage} src={eventCover} alt={`${eventTitle} Cover Image`}/>
+                <img className={styles.eventCoverImage} src={coverPhoto} alt={`${eventTitle} Cover Image`} 
+                onError={(e) => {
+                    console.log('Image failed to load:');
+                    e.target.src = 'https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png'
+                }}/>
             </div>
             <section className={styles.eventInfo}>
-                <h3 className={styles.eventTitle}>{eventTitle}</h3>
-                <p className={styles.eventOwner}>{eventOwner}</p>
-                <span className={styles.eventLocation}><MapPin className={styles.eventLocationIcon}/> {eventLocation}</span>
-                <time className={styles.eventDate}><Calendar className={styles.eventDateIcon}/> {formatDate(eventDate)}</time>
+                <header className={styles.eventHeader}>
+                    <h3 className={styles.eventTitle}>{eventTitle}</h3>
+                    <p className={styles.eventOwner}>{eventOwner?.name}</p>
+                </header>
+                <div className={styles.eventDetails}>
+                    <span className={styles.eventDetail}>
+                        <MapPin className={styles.eventIcon}/> 
+                        <span className={styles.eventDetailsText}>{eventLocation}</span>
+                    </span>
+                    <time className={styles.eventDetail}>
+                        <Calendar className={styles.eventIcon}/> 
+                        <span className={styles.eventDetailsText}>{displayDate}</span>
+                    </time>
+                    <time className={styles.eventDetail}>
+                        <Clock className={styles.eventIcon}/>
+                        <span className={styles.eventDetailsText}>{displayTime}</span>
+                    </time>
+                </div>
             </section>
         </article>
     )

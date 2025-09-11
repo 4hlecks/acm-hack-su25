@@ -11,6 +11,7 @@
 
         .carouselTitle {
             font-size: var(--font-size-heading);
+            font-weight: var(--font-weight-heading);
         }
         
         .carouselSeeAll {
@@ -38,7 +39,7 @@
     .carouselContent {
         display: flex;
         flex-direction: row;
-        overflow: hidden;
+        /* overflow: hidden; */
 
         .carouselSwiper {
             .carouselCard {
@@ -52,7 +53,7 @@
         align-items: center;
         justify-content: center;
         background-color: var(--button-primary-bg);
-        min-width: 30px;
+        min-width: 2.5rem;
         border: none;
         cursor: pointer;
 
@@ -77,3 +78,4 @@
         border-radius: 0 var(--border-radius) var(--border-radius) 0;
     }
 }
+

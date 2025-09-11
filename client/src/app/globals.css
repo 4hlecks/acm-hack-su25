@@ -1,20 +1,15 @@
-@font-face {
-  font-family: 'Onest';
-  src: url('/fonts/Onest-Regular.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
+@import "tailwindcss";
 
 :root {
   /* Base Color Scheme Variables */
-  --primary-color: #F2F2F2;
-  --secondary-color: #EAE4D5;
+  --primary-color: #ffffff;
+  --secondary-color: #F5F5F5;
   --tertiary-color: #B6B09F;
   --background-color: var(--primary-color);
   --text-color: #000000;
-  --text-muted-color: #ffffff;
-  --link-color: #ffffff;
-  --link-hover-color: #ffffff;
+  --text-muted-color: #bebebe;
+  --text-link-color: #008cff;
+  --text-link-hover-color: #225e8f;
 
   /* Dark Color Scheme Variables */
   --primary-color-dark: #ffffff;
@@ -24,39 +19,63 @@
   --text-color-dark: #ffffff;
 
   /* Button Variables */
-  --button-primary-bg: #57564F;
+  --button-primary-bg: #7A7A73;
   --button-primary-color: #ffffff;
-  --button-primary-hover: #7A7A73;
+  --button-primary-hover: #D7D7D7;
 
-  --button-secondary-bg: #B8001F;
+  --button-secondary-bg: #FFD05E;
   --button-secondary-color: #000000;
-  --button-secondary-hover: rgb(194, 70, 70);
+  --button-secondary-hover: #b7881a;
 
   /* Typography Variables */
-  --font-primary: 'Onest', 'Roboto Mono', monospace;
+  font-family: var(--font-onest), system-ui, sans-serif;
   --font-size-nav: 1rem;
   --font-size-navigation: 1.5rem;
   --font-weight-navigation: 600;
+  --font-weight-button: 600;
+  --font-weight-heading: 700;
+  --font-weight-subheading: 600;
+  --font-weight-body: 500;
   --font-size-title: 3rem;
   --font-size-heading: 2rem;
-  --font-size-subheading: 1rem;
+  --font-size-subheading: 1.5rem;
+  --font-size-subheading-2: 1.25rem;
+  --font-size-subheading-3: 1rem;
   --font-size-body: 1rem;
+  --font-size-medium: 0.875rem;
   --font-size-small: 0.75rem;
-  --line-padding: 4px;
+  --line-padding: .25rem;
 
   /* Border & Spacing Variables */
-  --border-radius: 10px;
+  --border-radius: 1rem;
   --navigation-item-padding: 2rem;
+  --event-info-padding: 1rem;
+  --event-info-padding-2: .5rem;
+  --searchbar-padding: 1rem;
 
   /* Icon Variables */
   --icon-size-large: 1.75rem;
   --icon-width-large: 0.125rem;
+  --icon-size-medium: 1rem;
   --icon-size-small: 0.875rem;
   --icon-width-small: 0.125rem;
 }
 
+/* Global resets */
 * {
   font-family: var(--font-primary);
+
+  /* Size Variables */
+  --navbar-height: 4rem;
+  --searchbar-height: 2.5rem;
+
+  /* Image Variables */
+  --image-thumb-size-large: 3rem;
+  --image-thumb-size-medium: 2rem;
+  --image-thumb-size-small: 1.125rem;
+}
+
+* {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
@@ -64,6 +83,10 @@
   body {
     background-color: var(--primary-color);
   }
+}
+
+.swiper, .swiper-wrapper, .swiper-slide {
+  overflow: visible !important;
 }
 /*
 @media (prefers-color-scheme: dark) {
