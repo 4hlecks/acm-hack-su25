@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('../../models/users_schema');
 
+const auth = require('../../middleware/auth');
+const clubAuth = require('../../middleware/clubAuth');
+const upload = require('../../middleware/upload');
+
 // List approved clubs
 // GET /api/findClub
 router.get('/', async (req, res) => {

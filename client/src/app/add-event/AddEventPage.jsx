@@ -122,7 +122,7 @@ export default function AddEventPage() {
     if (coverPhoto) formData.append("coverPhoto", coverPhoto);
   
     try {
-      const res = await fetch("http://localhost:5002/api/loadEvents/create", {
+      const res = await fetch("http://localhost:5000/api/loadEvents/create", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
