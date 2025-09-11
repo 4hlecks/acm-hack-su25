@@ -51,9 +51,10 @@ const createEvent_Schema = new mongoose.Schema({
         ],
         required: true
     },
-    
-    tags: [{ type: String }], 
-    // for uploading images
+    tags: {
+        type: [String],
+        default: [],
+      },
     coverPhoto: {
         type: String,
         required: false

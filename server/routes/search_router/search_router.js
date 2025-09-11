@@ -20,21 +20,22 @@ router.get('/all', async (req, res) => {
                 {eventCategory: {$regex: query, $options: 'i'}}
             ]
         })
-        .populate('eventOwner', 'name profilePic').sort({startDate: 1})
+        .populate('eventOwner', 'name profilePic').sort({date: 1})
         
         //look for clubs
-        const clubs = await Club.find({
+        const clubs = await User.find({
+            role: 'club',
             approved: true,
             name: {$regex: query, $options: 'i'}
-        });
+        }).select('name profilePic bio');
 
         res.json({events, clubs, 
             query, 
-            totalResults: events.length + clubs.length}) //Found #results for 'query'
+            totalResults: events.length + clubs.length}); //Found #results for 'query'
 
     } catch (error) {
         res.status(500).json({error: 'Server error'})
     }
-})
+});
 
 module.exports = router;

@@ -17,41 +17,23 @@ const EventPopup = ({ event, onClose, isOpen }) => {
 
     const {
         coverPhoto, eventTitle, eventOwner,
-        startDate, endDate, startTime, endTime, eventLocation, 
+        date, startTime, endTime, eventLocation, 
         eventDescription, tags
     } = event;
 
     function formatDisplayDate(){
-        const start = new Date(startDate);
-        const end = new Date(endDate);
+        const d = new Date(date);
 
-        if (isNaN(start.getTime()) || isNaN(end.getTime())){
-            return 'Date TBD';
+        if (isNaN(d.getTime())) {
+        return "Date TBD";
         }
 
-        //check if same day
-        const isSameDay = start.toDateString() === end.toDateString();
-
-        if (isSameDay){
-            return start.toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric"
-            });
-        } else{
-            const startFormatted = start.toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric"
-            })
-
-            const endFormatted = end.toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric"
-            })
-
-            return `${startFormatted} - ${endFormatted}`
-        } 
-    }
+        return d.toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          });
+        }
 
     function formatTimeRange() {
         if (!startTime || !endTime) return '';

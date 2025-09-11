@@ -71,6 +71,7 @@ router.get('/byOwner/me', auth, async (req, res) => {
   }
 });
 
+
 // Get events for any owner by id (public)
 router.get('/byOwner/:ownerId', async (req, res) => {
   try {
@@ -95,6 +96,17 @@ router.get('/category/:categoryChoice', async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Server error: Check Connections!' });
+  }
+});
+
+// Get events for a specific club
+router.get('/byClub/:clubId', async (req, res) => {
+  try {
+    const events = await Event.find({ eventOwner: req.params.clubId });
+    res.json(events);
+  } catch (err) {
+    console.error('Error fetching club events:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

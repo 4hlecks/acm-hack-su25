@@ -11,11 +11,10 @@
 
 .eventGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 2rem;
-  margin-top: 0.5rem;
-  margin-left: 10rem;
-  margin-right: 23.5rem;
+  grid-template-columns: repeat(5, 180px); /* exactly 5 cards per row */
+  gap: 2.4rem;                             
+  justify-content: center;                
+  margin-top: 1rem;
 }
 
 .eventsHeader {

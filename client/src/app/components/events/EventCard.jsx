@@ -6,40 +6,22 @@ const EventCard = ({ event, onEventClick } ) => {
     // Event should contain the following metadata
     const {
         coverPhoto, eventTitle, eventOwner,          
-        startDate, endDate, startTime, endTime, eventLocation, 
+        date, startTime, endTime, eventLocation, 
         tags      
     } = event;
 
     function formatDisplayDate(){
-        const start = new Date(startDate);
-        const end = new Date(endDate);
+        const d = new Date(date || event.Date);
 
-        if (isNaN(start.getTime()) || isNaN(end.getTime())){
+        if (isNaN(d.getTime())) {
             return 'Date TBD';
         }
 
-        //check if same day
-        const isSameDay = start.toDateString() === end.toDateString();
-
-        if (isSameDay){
-            return start.toLocaleDateString("en-US", {
-                weekday: "short",
-                month: "short",
-                day: "numeric"
-            });
-        } else{
-            const startFormatted = start.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric"
-            })
-
-            const endFormatted = end.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric"
-            })
-
-            return `${startFormatted} - ${endFormatted}`
-        } 
+        return d.toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+        });
     }
 
     function formatTimeRange(startTime, endTime) {
@@ -62,7 +44,7 @@ const EventCard = ({ event, onEventClick } ) => {
     //calls the parent component 
     function handleClick() {
         console.log('EventCard clicked!', eventTitle);
-        onEventClick(event);
+        if (onEventClick) onEventClick(event);
     }
     return (
         <article className={styles.eventCard}

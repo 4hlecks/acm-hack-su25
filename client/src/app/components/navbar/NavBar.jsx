@@ -78,9 +78,9 @@ export default function NavBar() {
                 </li>
                 <li>
                   <Link
-                    href="/profile_page"
+                    href="/profile-page"
                     className={`${styles.navItem} ${
-                      pathname === '/profile_page' ? styles.activeLink : ''
+                      pathname === '/profile-page' ? styles.activeLink : ''
                     }`}
                   >
                     <User className={styles.navIcon} /> Profile
