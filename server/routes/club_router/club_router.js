@@ -34,6 +34,7 @@ router.get('/search', async (req, res) => {
     }
 })
 
+
 // Get a single club by id
 // GET /api/findClub/:id
 router.get('/:id', async (req, res) => {
