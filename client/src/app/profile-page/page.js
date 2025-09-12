@@ -161,6 +161,7 @@ export default function Profile() {
             ))
           )}
         </section>
+        
 
         {selectedEvent && (
           <EventPopup
