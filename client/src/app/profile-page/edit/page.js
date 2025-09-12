@@ -14,7 +14,8 @@ export default function EditProfile() {
   const [club, setClub] = useState(null);
   const [orgEvents, setOrgEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [deleteEventId, setDeleteEventId] = useState(null); 
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [deleteEventId, setDeleteEventId] = useState(null); // 🔑 for delete confirmation
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -153,14 +154,14 @@ export default function EditProfile() {
               <div key={event._id}>
                 <EventCard event={event} />
                 <div className={styles.eventActions}>
+                <button
+                  onClick={() => router.push(`/events/${event._id}/edit`)}
+                  className={styles.actionBtn}
+                >
+                  Edit
+                </button>
                   <button
-                    onClick={() => router.push(`/events/${event._id}/edit`)}
-                    className={styles.actionBtn}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => setDeleteEventId(event._id)}
+                    onClick={() => setDeleteEventId(event._id)} // 🔑 open confirm popup
                     className={`${styles.actionBtn} ${styles.deleteBtn}`}
                   >
                     Delete
@@ -171,7 +172,62 @@ export default function EditProfile() {
           )}
         </section>
 
-        {/* Popup for delete confirmation */}
+        {/* Popup for editing event */}
+        {editingEvent && (
+          <div className={styles.popup}>
+            <h3>Edit Event</h3>
+            <input
+              value={editingEvent.eventTitle}
+              onChange={(e) =>
+                setEditingEvent({ ...editingEvent, eventTitle: e.target.value })
+              }
+            />
+            <textarea
+              value={editingEvent.eventDescription}
+              onChange={(e) =>
+                setEditingEvent({
+                  ...editingEvent,
+                  eventDescription: e.target.value,
+                })
+              }
+            />
+            <button
+              onClick={async () => {
+                const token = localStorage.getItem("token");
+                const res = await fetch(
+                  `${API_BASE}/api/loadEvents/${editingEvent._id}`,
+                  {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify(editingEvent),
+                  }
+                );
+                if (res.ok) {
+                  setOrgEvents((prev) =>
+                    prev.map((e) =>
+                      e._id === editingEvent._id ? editingEvent : e
+                    )
+                  );
+                  setEditingEvent(null);
+                }
+              }}
+              className={styles.actionBtn}
+            >
+              Save Event
+            </button>
+            <button
+              onClick={() => setEditingEvent(null)}
+              className={`${styles.actionBtn} ${styles.deleteBtn}`}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+        {/* 🔑 Popup for delete confirmation */}
         {deleteEventId && (
           <div className={styles.popup}>
             <h3>Are you sure you want to delete this event?</h3>

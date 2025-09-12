@@ -5,7 +5,7 @@ import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
 import styles from "./ProfileEventPopup.module.css";
 
-const ProfileEventPopup = ({ event, onClose }) => {
+const ProfileEventPopup = ({ event, clubId, onClose }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -20,12 +20,23 @@ const ProfileEventPopup = ({ event, onClose }) => {
     eventTitle,
     eventOwner,
     date,
-    Date: DateLegacy, // fallback if mismatch
+    Date: DateLegacy,
     startTime,
     endTime,
     eventLocation,
     eventDescription,
   } = event;
+
+  // Debug logging
+  console.log("DEBUG owner check →", {
+    eventOwner,
+    eventOwnerId: eventOwner?._id || eventOwner,
+    clubId,
+    match: String(eventOwner?._id || eventOwner) === String(clubId),
+  });
+
+  // Ownership check
+  const isOwner = String(eventOwner?._id || eventOwner) === String(clubId);
 
   function formatDisplayDate(value) {
     const d = new Date(value);
@@ -62,6 +73,7 @@ const ProfileEventPopup = ({ event, onClose }) => {
         <Dialog.Backdrop className={styles.backdrop} />
         <Dialog.Popup className={styles.popup}>
           <article className={styles.eventContent}>
+            {/* Mobile header */}
             <div className={styles.clubInfoMobile}>
               {eventOwner?.profilePic ? (
                 <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
@@ -76,6 +88,7 @@ const ProfileEventPopup = ({ event, onClose }) => {
               </button>
             </div>
 
+            {/* Flyer image */}
             <figure className={styles.imageSection}>
               <img
                 src={coverPhoto}
@@ -88,6 +101,7 @@ const ProfileEventPopup = ({ event, onClose }) => {
               />
             </figure>
 
+            {/* Event details */}
             <section className={styles.eventSection}>
               <div className={styles.clubInfo}>
                 {eventOwner?.profilePic ? (
@@ -127,9 +141,16 @@ const ProfileEventPopup = ({ event, onClose }) => {
               </div>
 
               <div className={styles.buttonContainer}>
-                <button onClick={onClose} className={styles.saveButton}>
-                  Save Event
-                </button>
+                {isOwner && (
+                  <button
+                    onClick={() =>
+                      (window.location.href = `/profile-page/edit?eventId=${event._id}`)
+                    }
+                    className={styles.saveButton}  
+                  >
+                    Edit Event
+                  </button>
+                )}
               </div>
             </section>
           </article>

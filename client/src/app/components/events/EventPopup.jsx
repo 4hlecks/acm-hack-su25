@@ -5,7 +5,7 @@ import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
 import styles from "./EventPopup.module.css";
 
-const EventPopup = ({ event, onClose, isOpen }) => {
+const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -20,18 +20,28 @@ const EventPopup = ({ event, onClose, isOpen }) => {
     eventTitle,
     eventOwner,
     date,
-    Date: DateLegacy, // fallback
+    Date: DateLegacy,
     startTime,
     endTime,
     eventLocation,
     eventDescription,
-    tags,
   } = event;
+
+  // Ownership check
+  const isOwner = String(eventOwner?._id || eventOwner) === String(clubId);
+
+  // Debug log
+  console.log("DEBUG EventPopup ownership check", {
+    eventOwner,
+    eventOwnerId: eventOwner?._id || eventOwner,
+    clubId,
+    userRole,
+    isOwner,
+  });
 
   function formatDisplayDate(dateValue) {
     const d = new Date(dateValue);
     if (isNaN(d.getTime())) return "Date TBD";
-
     return d.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
@@ -41,7 +51,6 @@ const EventPopup = ({ event, onClose, isOpen }) => {
 
   function formatTimeRange(startTime, endTime) {
     if (!startTime || !endTime) return "Time TBD";
-
     const options = { hour: "numeric", minute: "2-digit", hour12: true };
 
     const startDate = new Date(
@@ -50,22 +59,16 @@ const EventPopup = ({ event, onClose, isOpen }) => {
     const endDate = new Date(
       endTime.includes("T") ? endTime : `1970-01-01T${endTime}`
     );
-
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      return "Time TBD";
-    }
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return "Time TBD";
 
     const startStr = startDate.toLocaleTimeString([], options);
     const endStr = endDate.toLocaleTimeString([], options);
-
     const startAMPM = startStr.split(" ").pop();
     const endAMPM = endStr.split(" ").pop();
 
-    if (startAMPM === endAMPM) {
-      return `${startStr.replace(" " + startAMPM, "")} - ${endStr}`;
-    } else {
-      return `${startStr} - ${endStr}`;
-    }
+    return startAMPM === endAMPM
+      ? `${startStr.replace(" " + startAMPM, "")} - ${endStr}`
+      : `${startStr} - ${endStr}`;
   }
 
   const displayDate = formatDisplayDate(date || DateLegacy);
@@ -80,11 +83,7 @@ const EventPopup = ({ event, onClose, isOpen }) => {
             {/* Mobile header */}
             <div className={styles.clubInfoMobile}>
               {eventOwner?.profilePic ? (
-                <img
-                  src={eventOwner.profilePic}
-                  alt="Club Logo"
-                  className={styles.clubLogo}
-                />
+                <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
               ) : (
                 <canvas className={styles.clubLogo}></canvas>
               )}
@@ -96,7 +95,7 @@ const EventPopup = ({ event, onClose, isOpen }) => {
               </button>
             </div>
 
-
+            {/* Flyer */}
             <figure className={styles.imageSection}>
               <img
                 src={coverPhoto}
@@ -114,11 +113,7 @@ const EventPopup = ({ event, onClose, isOpen }) => {
             <section className={styles.eventSection}>
               <div className={styles.clubInfo}>
                 {eventOwner?.profilePic ? (
-                  <img
-                    src={eventOwner.profilePic}
-                    alt="Club Logo"
-                    className={styles.clubLogo}
-                  />
+                  <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
                 ) : (
                   <canvas className={styles.clubLogo}></canvas>
                 )}
@@ -126,17 +121,12 @@ const EventPopup = ({ event, onClose, isOpen }) => {
                   {eventOwner?.name || eventOwner || "Unknown Organizer"}
                 </h3>
                 <button onClick={onClose} className={styles.closeButton}>
-                  <X
-                    size={25}
-                    strokeWidth={2.5}
-                    className={styles.closeButtonIcon}
-                  />
+                  <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
                 </button>
               </div>
+
               <div className={styles.eventInfo}>
-                <Dialog.Title className={styles.eventTitle}>
-                  {eventTitle}
-                </Dialog.Title>
+                <Dialog.Title className={styles.eventTitle}>{eventTitle}</Dialog.Title>
 
                 <section className={styles.eventDetail}>
                   <MapPin className={styles.eventIcon} />
@@ -147,9 +137,7 @@ const EventPopup = ({ event, onClose, isOpen }) => {
 
                 <section className={styles.eventDetail}>
                   <Calendar className={styles.eventIcon} />
-                  <span className={styles.eventDetailText}>
-                    {displayDate}
-                  </span>
+                  <span className={styles.eventDetailText}>{displayDate}</span>
                 </section>
 
                 <section className={styles.eventDetail}>
@@ -162,10 +150,23 @@ const EventPopup = ({ event, onClose, isOpen }) => {
                 </Dialog.Description>
               </div>
 
+              {/* Conditional buttons */}
               <div className={styles.buttonContainer}>
-                <button onClick={onClose} className={styles.saveButton}>
-                  Save Event
-                </button>
+                {userRole === "club" && isOwner && (
+                  <button
+                    onClick={() =>
+                      (window.location.href = `/profile-page/edit?eventId=${event._id}`)
+                    }
+                    className={styles.saveButton}
+                  >
+                    Edit Event
+                  </button>
+                )}
+                {userRole === "user" && (
+                  <button onClick={onClose} className={styles.saveButton}>
+                    Save Event
+                  </button>
+                )}
               </div>
             </section>
           </article>
