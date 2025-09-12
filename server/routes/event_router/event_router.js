@@ -25,7 +25,9 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
     const eventDate = req.body.date;
     if (!eventDate) return res.status(400).json({ message: 'Date is required' });
 
-    const dateObj = new Date(eventDate);
+    const [year, month, day] = eventDate.split("-");
+    const dateObj = new Date(year, month - 1, day);
+
     if (isNaN(dateObj.getTime())) {
       return res.status(400).json({ message: 'Invalid Date value' });
     }
@@ -178,7 +180,12 @@ router.put('/:id', auth, clubAuth, upload.single('coverPhoto'), async (req, res)
     const updateData = {
       eventTitle: req.body.eventTitle,
       eventDescription: req.body.eventDescription,
-      date: req.body.date ? new Date(req.body.date) : event.date,
+      date: req.body.date
+        ? (() => {
+            const [y, m, d] = req.body.date.split("-");
+            return new Date(y, m - 1, d);
+          })()
+        : event.date,
       startTime: req.body.startTime,
       endTime: req.body.endTime,
       eventLocation: req.body.eventLocation,
