@@ -11,11 +11,11 @@ async function dropClubIdIndex() {
 
     // Drop the old clubId index
     await db.collection('users').dropIndex('clubId_1');
-    console.log('✅ Dropped index clubId_1');
+    console.log('Dropped index clubId_1');
 
     process.exit(0);
   } catch (err) {
-    console.error('❌ Error dropping index:', err.message);
+    console.error('Error dropping index:', err.message);
     process.exit(1);
   }
 }

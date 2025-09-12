@@ -1,5 +1,3 @@
-.navBar { isolation: isolate; }
-
 .siteLogo {
     display: flex;
     align-items: center;
@@ -40,6 +38,7 @@
     display: flex;
     justify-content: space-between;
     width: 50%;
+    align-items: center;
 }
 
 /* Icon Styles */
@@ -92,7 +91,7 @@
 .navBar .navLogOut,
 .navBar .navItem,
 .navBar .siteLogo {
-    font-size: var(--font-size-navigation);
+    font-size: 1.25rem;
     color: var(--text-color);
     cursor: pointer;
     transition: color 0.3s ease, background-color 0.3s ease;
@@ -121,3 +120,26 @@
         width: 100%;
     }
 }
+
+.navAuth {
+    display: flex;              
+    align-items: center;       
+    gap: 0.35rem;               
+    font-size: 0.9rem;          
+    font-weight: normal;       
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    color: #000000;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;    
+    text-decoration: none;     
+  }
+  
+  .navAuth:hover {
+    border-color: #ccc;
+    background: rgba(255, 255, 255, 0.1); 
+  }
+  
+  

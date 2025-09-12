@@ -22,7 +22,7 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
   try {
     const { eventTitle, eventDescription, startTime, endTime, tags, eventLocation } = req.body;
 
-    const eventDate = req.body.Date;
+    const eventDate = req.body.date;
     if (!eventDate) return res.status(400).json({ message: 'Date is required' });
 
     const dateObj = new Date(eventDate);
@@ -42,7 +42,7 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
       eventOwner: req.user.id,
       eventTitle,
       eventDescription,
-      Date: dateObj,
+      date: dateObj,
       startTime,
       endTime,
       eventLocation,
@@ -64,19 +64,20 @@ router.get('/byOwner/me', auth, async (req, res) => {
   try {
     const events = await Event.find({ eventOwner: req.user.id })
       .populate('eventOwner', 'name _id')
-      .sort({ Date: 1 });
+      .sort({ date: 1 });
     res.json({ events });
   } catch (e) {
     res.status(500).json({ message: 'Server error', error: e.message });
   }
 });
 
+
 // Get events for any owner by id (public)
 router.get('/byOwner/:ownerId', async (req, res) => {
   try {
     const events = await Event.find({ eventOwner: req.params.ownerId })
       .populate('eventOwner', 'name _id')
-      .sort({ Date: 1 });
+      .sort({ date: 1 });
     res.json({ events });
   } catch (e) {
     res.status(500).json({ message: 'Server error', error: e.message });
@@ -89,7 +90,7 @@ router.get('/category/:categoryChoice', async (req, res) => {
     const { categoryChoice } = req.params;
     const events = await Event.find({ eventCategory: categoryChoice })
       .populate('eventOwner', 'name _id')
-      .sort({ Date: 1 });
+      .sort({ date: 1 });
 
     res.json(events);
   } catch (err) {
@@ -97,5 +98,113 @@ router.get('/category/:categoryChoice', async (req, res) => {
     res.status(500).json({ error: 'Server error: Check Connections!' });
   }
 });
+
+// Get events for a specific club
+router.get('/byClub/:clubId', async (req, res) => {
+  try {
+    const events = await Event.find({ eventOwner: req.params.clubId });
+    res.json(events);
+  } catch (err) {
+    console.error('Error fetching club events:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete an event by ID (only owner can delete)
+router.delete('/:id', auth, clubAuth, async (req, res) => {
+  try {
+    console.log("DELETE route hit!");
+    console.log("User making request:", req.user);
+    console.log("Event ID param:", req.params.id);
+
+    const event = await Event.findById(req.params.id);
+    console.log("Event found:", event);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // ensure the logged-in user owns it
+    if (event.eventOwner.toString() !== req.user.id) {
+      console.log("Not authorized. Event owner:", event.eventOwner.toString(), "User:", req.user.id);
+      return res.status(403).json({ message: 'Not authorized to delete this event' });
+    }
+
+    await event.deleteOne();
+    console.log("Event deleted:", event._id);
+    res.json({ message: 'Event deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting event:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// Get single event by ID (owner only)
+router.get('/:id', auth, clubAuth, async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // ensure the logged-in user owns it
+    if (event.eventOwner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to view this event' });
+    }
+
+    res.json(event);
+  } catch (err) {
+    console.error('Error fetching event:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// Update event by ID (only owner can update)
+router.put('/:id', auth, clubAuth, upload.single('coverPhoto'), async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // ensure the logged-in user owns it
+    if (event.eventOwner.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'Not authorized to update this event' });
+    }
+
+    // build update data
+    const updateData = {
+      eventTitle: req.body.eventTitle,
+      eventDescription: req.body.eventDescription,
+      date: req.body.date ? new Date(req.body.date) : event.date,
+      startTime: req.body.startTime,
+      endTime: req.body.endTime,
+      eventLocation: req.body.eventLocation,
+      eventCategory: req.body.eventCategory,
+      tags: req.body.tags ? req.body.tags.split(',').map(t => t.trim()) : event.tags,
+    };
+
+    if (req.file) {
+      updateData.coverPhoto = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedEvent = await Event.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    res.json({ message: 'Event updated successfully', event: updatedEvent });
+  } catch (err) {
+    console.error('Error updating event:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+
+
+
 
 module.exports = router;
