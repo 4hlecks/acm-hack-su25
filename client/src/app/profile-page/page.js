@@ -50,27 +50,38 @@ function parseTimeHM(raw) {
 }
 
 function eventStartTimestamp(e) {
-  const rawDate = e.Date ?? e.date ?? null;
-  const rawStart = e.startTime ?? null;
+  const rawDate = e.date || e.Date;   // normalize
+  if (!rawDate) return Number.POSITIVE_INFINITY;
 
-  const dateOnly = parseDateOnly(rawDate);
-  if (!dateOnly) return Number.POSITIVE_INFINITY;
+  const baseDate = new Date(rawDate);
+  if (isNaN(baseDate.getTime())) return Number.POSITIVE_INFINITY;
 
-  const tm = parseTimeHM(rawStart) || { h: 0, m: 0 };
+  // default to midnight
+  let h = 0, m = 0;
 
-  const composed = new Date(
-    dateOnly.getFullYear(),
-    dateOnly.getMonth(),
-    dateOnly.getDate(),
-    tm.h,
-    tm.m,
+  if (e.startTime) {
+    const time = e.startTime.includes("T")
+      ? new Date(e.startTime)
+      : new Date(`1970-01-01T${e.startTime}`);
+    if (!isNaN(time.getTime())) {
+      h = time.getHours();
+      m = time.getMinutes();
+    }
+  }
+
+  return new Date(
+    baseDate.getFullYear(),
+    baseDate.getMonth(),
+    baseDate.getDate(),
+    h,
+    m,
     0,
     0
-  );
-
-  return composed.getTime();
+  ).getTime();
 }
 
+
+  
 export default function Profile() {
   const router = useRouter();
 
@@ -161,7 +172,7 @@ export default function Profile() {
             ))
           )}
         </section>
-        
+
 
         {selectedEvent && (
           <EventPopup
