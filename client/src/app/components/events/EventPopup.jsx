@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useSession } from "react";
 import { createPortal } from 'react-dom';
 import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from '@base-ui-components/react/dialog'; 
@@ -7,11 +7,18 @@ import styles from './EventPopup.module.css';
 
 const EventPopup = ({ event, onClose, isOpen }) => {
     const [mounted, setMounted] = useState(false);
-    
+    const [isSaved, setIsSaved] = useState(false);
+
     useEffect(() => {
         setMounted(true);
         return () => setMounted(false);
-    }, []);
+    }, [event, isOpen]);
+
+    useEffect(() => {
+        if (event && isOpen){
+            checkIfEventSaved()
+        }
+    })
 
     if (!mounted || !event || !isOpen) return null;
 
@@ -20,6 +27,59 @@ const EventPopup = ({ event, onClose, isOpen }) => {
         startDate, endDate, startTime, endTime, eventLocation, 
         eventDescription, tags
     } = event;
+
+    const checkIfEventSaved = async() => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const user = JSON.parse(localStorage.getItem('user') || {});
+            const userId = user.id;
+
+            const response = await fetch(`http://localhost:5000/api/users/${userId}/saved-events`, {
+                headers:{
+                    'Authorization': `Bearer${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            //Get the saved events array
+            const savedEvents = await response.json();
+
+            //Check if current event is in that array
+            const isEventSaved = savedEvents?.some(savedEvent => 
+                savedEvent._id === event._id || savedEvent === event._id
+            );
+            setIsSaved(isEventSaved);
+        } catch (error) {
+            console.error('Error checking if event is saved:', error);
+        }
+    }
+    
+    const handleSaveEvent = async() => {
+        try{
+            const token = localStorage.getItem('accessToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = user.id;
+            
+            const method = isSaved ? 'DELETE' : 'POST';
+            
+            const response = await fetch(`http://localhost:5000/api/users/${userId}/saved-events/${event._id}`, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok){
+                setIsSaved(!isSaved); 
+                console.log('Even saved successfully')
+            } else{
+                console.error('Error saving event')
+            }
+        } catch (error){
+            console.error('Network error:', error)
+        }
+    }
 
     function formatDisplayDate(){
         const start = new Date(startDate);
@@ -148,8 +208,8 @@ const EventPopup = ({ event, onClose, isOpen }) => {
                             </div>                              
 
                             <div className={styles.buttonContainer}>          
-                                <button onClick={onClose} className={styles.saveButton}>
-                                    Save Event
+                                <button onClick={handleSaveEvent} className={styles.saveButton}>
+                                    {isSaved ? 'Remove from Saved' : 'Save Event'}
                                 </button>                               
                             </div>
                         </section>

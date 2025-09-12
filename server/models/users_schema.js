@@ -11,7 +11,13 @@ const userSchema = new mongoose.Schema({
 
   // for resetting password
   resetPasswordToken: { type: String },
-  resetPasswordExpires: { type: Date }
+  resetPasswordExpires: { type: Date },
+
+  //Array of saved events
+  savedEvents: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event'
+  }]
 },
 {
   collection: 'users',
