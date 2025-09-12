@@ -39,57 +39,6 @@ router.get('/search', async (req, res) => {
     }
 })
 
-//Update club profile 
-router.put('/updateProfile', auth, clubAuth, upload.single('profilePic'), async (req, res) =>{
-    try {
-        const {bio} = req.body;
-        const clubId = req.user.id;
-
-        const updateData = {};
-        if (bio !== undefined){
-            updateData.bio = bio;
-            console.log('Added bio to updateData');
-        }
-
-        if (req.file) {
-            updateData.profilePic = req.file.path;
-            console.log('Added file to updateData:', req.file.path);
-            console.log('Full file object:', req.file);
-        } else {
-            console.log('No file received');
-        }
-
-        console.log('Final updateData:', updateData);
-
-        const updatedClub = await Club.findByIdAndUpdate(
-            clubId,
-            updateData,
-            {new: true, runValidators: true}
-        )
-
-        if (!updatedClub){
-            return res.status(404).json({message: 'Club not found'})
-        }
-
-        console.log('Updated club:', {
-            bio: updatedClub.bio,
-            profilePic: updatedClub.profilePic
-        });
-
-        res.json({
-            message: 'Profile updated successfully',
-            club: {
-                id: updatedClub._id,
-                name: updatedClub.name,
-                bio: updatedClub.bio,
-                profilePic: updatedClub.profilePic
-            }
-        })
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({message: 'Server error', error: error.message})
-    }
-})
 
 // Get a single club by id
 // GET /api/findClub/:id

@@ -9,7 +9,18 @@ import EventPopup from './components/events/EventPopup'
 export default function Home() {
   const [eventsByCategory, setEventsByCategory] = useState({});
 
-  const categories = ["Fundraiser", "FreeFood", "GBM"];
+  {/*Different categories for events! */}
+   const categories = [
+    "Fundraiser",
+    "Free Food", 
+    "GBM",
+    "Game Night",
+    "Networking",
+    "Panel",
+    "Social",
+    "Study Jam",
+    "Workshop"
+  ];
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -35,7 +46,7 @@ export default function Home() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const openEventPopup = (event) => {
-    console.log('Opening popup with event:', event); // Add this line
+    console.log('Opening popup with event:', event); 
     setSelectedEvent(event);
     setIsPopupOpen(true);
   };
@@ -50,7 +61,7 @@ export default function Home() {
       <NavBar />
       <main className={styles.pageContent}>
         <h1 className={styles.pageTitle}>Home</h1>
-          {categories.map(category => (
+          {categories.filter(category => eventsByCategory[category]?.length > 0).map(category => (
             <EventCarousel
               key={category}
               category={category}
