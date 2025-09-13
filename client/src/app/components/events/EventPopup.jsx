@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
 import styles from "./EventPopup.module.css";
+import Link from "next/link";
 
 const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   const [mounted, setMounted] = useState(false);
@@ -30,6 +31,9 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   // Ownership check
   const isOwner = String(eventOwner?._id || eventOwner) === String(clubId);
 
+  const ownerId = eventOwner?._id || eventOwner;
+  const profileHref = isOwner ? "/profile-page" : `/profile-page/${ownerId}`;
+
   // Debug log
   console.log("DEBUG EventPopup ownership check", {
     eventOwner,
@@ -37,6 +41,7 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
     clubId,
     userRole,
     isOwner,
+    profileHref,
   });
 
   function formatDisplayDate(dateValue) {
@@ -83,12 +88,18 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
             {/* Mobile header */}
             <div className={styles.clubInfoMobile}>
               {eventOwner?.profilePic ? (
-                <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
+                <Link href={profileHref}> 
+                  <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
+                </Link>
               ) : (
-                <canvas className={styles.clubLogo}></canvas>
+                <Link href={profileHref}> 
+                  <canvas className={styles.clubLogo}></canvas>
+                </Link>
               )}
               <h3 className={styles.clubOwner}>
-                {eventOwner?.name || eventOwner || "Unknown Organizer"}
+                <Link href={profileHref}> 
+                  {eventOwner?.name || eventOwner || "Unknown Organizer"}
+                </Link>
               </h3>
               <button onClick={onClose} className={styles.closeButton}>
                 <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
@@ -113,12 +124,18 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
             <section className={styles.eventSection}>
               <div className={styles.clubInfo}>
                 {eventOwner?.profilePic ? (
-                  <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
+                  <Link href={profileHref}> 
+                    <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
+                  </Link>
                 ) : (
-                  <canvas className={styles.clubLogo}></canvas>
+                  <Link href={profileHref}>
+                    <canvas className={styles.clubLogo}></canvas>
+                  </Link>
                 )}
                 <h3 className={styles.clubOwner}>
-                  {eventOwner?.name || eventOwner || "Unknown Organizer"}
+                  <Link href={profileHref}> 
+                    {eventOwner?.name || eventOwner || "Unknown Organizer"}
+                  </Link>
                 </h3>
                 <button onClick={onClose} className={styles.closeButton}>
                   <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />

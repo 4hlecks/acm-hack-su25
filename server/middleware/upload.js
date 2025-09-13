@@ -17,6 +17,7 @@ const storage = new CloudinaryStorage({
         folder: (req, file) => {
             if (req.originalUrl.includes('/api/loadEvents/')) return 'event_covers';
             if (req.originalUrl.includes('/api/findClub/')) return 'club_logos';
+            if (req.originalUrl.includes('/users/updateProfile')) return 'club_logos';
             return 'misc';
         },
         allowed_formats: ['jpg', 'jpeg', 'png'],
@@ -24,6 +25,7 @@ const storage = new CloudinaryStorage({
             const timestamp = Date.now();
             if (req.originalUrl.includes('/api/loadEvents/')) return `event_${timestamp}`; 
             if (req.originalUrl.includes('/api/findClub/')) return `club_${timestamp}`;
+            if (req.originalUrl.includes('/users/updateProfile')) return `club_${timestamp}`;
             return `upload_${timestamp}`;
         }
     }

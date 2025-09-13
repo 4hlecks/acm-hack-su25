@@ -95,3 +95,12 @@
     box-shadow: 0 0px 1rem var(--tertiary-color);
     z-index: 5;
 }
+
+.noHover {
+    pointer-events: none;
+  }
+  
+  .noHover:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }

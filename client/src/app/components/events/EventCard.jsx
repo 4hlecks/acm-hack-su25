@@ -2,8 +2,8 @@ import React from "react";
 import { Calendar, MapPin, Clock } from "react-feather";
 import styles from "./EventCard.module.css";
 
-const EventCard = ({ event, onEventClick }) => {
-  const {
+const EventCard = ({ event, onEventClick, disableHover = false }) => {
+    const {
     coverPhoto,
     eventTitle,
     eventOwner,
@@ -66,7 +66,10 @@ const EventCard = ({ event, onEventClick }) => {
   }
 
   return (
-    <article className={styles.eventCard} onClick={handleClick}>
+    <article
+        className={`${styles.eventCard} ${disableHover ? styles.noHover : ""}`}
+        onClick={handleClick}
+    >
       <div className={styles.eventCover}>
         <img
           className={styles.eventCoverImage}
