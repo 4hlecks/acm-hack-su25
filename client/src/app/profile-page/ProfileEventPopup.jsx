@@ -5,6 +5,15 @@ import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
 import styles from "./ProfileEventPopup.module.css";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001"; 
+ function normalizeImg(src) { 
+   if (!src) return null; 
+   if (typeof src === "string" && src.startsWith("/uploads")) { 
+     return `${API_BASE}${src}`; 
+   }    
+   return src; 
+ } 
+
 const ProfileEventPopup = ({ event, clubId, onClose }) => {
   const [mounted, setMounted] = useState(false);
 
@@ -75,11 +84,16 @@ const ProfileEventPopup = ({ event, clubId, onClose }) => {
           <article className={styles.eventContent}>
             {/* Mobile header */}
             <div className={styles.clubInfoMobile}>
-              {eventOwner?.profilePic ? (
-                <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
-              ) : (
-                <canvas className={styles.clubLogo}></canvas>
-              )}
+             {eventOwner?.profilePic ? (
+               <img
+                 src={normalizeImg(eventOwner.profilePic) || ""}
+                 alt="Club Logo"
+                 className={styles.clubLogo}
+                 onError={(e) => (e.currentTarget.style.visibility = "hidden")} 
+               />
+             ) : (
+               <canvas className={styles.clubLogo}></canvas>
+             )}
               <h3 className={styles.clubOwner}>
                 {eventOwner?.name || eventOwner || "Unknown Organizer"}
               </h3>
@@ -90,25 +104,30 @@ const ProfileEventPopup = ({ event, clubId, onClose }) => {
 
             {/* Flyer image */}
             <figure className={styles.imageSection}>
-              <img
-                src={coverPhoto}
-                alt="Event Flyer"
-                className={styles.eventImage}
-                onError={(e) => {
-                  e.target.src =
-                    "https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png";
-                }}
-              />
+            <img
+               src={normalizeImg(coverPhoto) || ""}
+               alt="Event Flyer"
+               className={styles.eventImage}
+               onError={(e) => {
+                 e.currentTarget.src =
+                   "https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png";
+               }}
+             />  
             </figure>
 
             {/* Event details */}
             <section className={styles.eventSection}>
               <div className={styles.clubInfo}>
-                {eventOwner?.profilePic ? (
-                  <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
-                ) : (
-                  <canvas className={styles.clubLogo}></canvas>
-                )}
+              {eventOwner?.profilePic ? (
+                 <img
+                   src={normalizeImg(eventOwner.profilePic) || ""}
+                   alt="Club Logo"
+                   className={styles.clubLogo}
+                   onError={(e) => (e.currentTarget.style.visibility = "hidden")} 
+                 />
+               ) : (
+                 <canvas className={styles.clubLogo}></canvas>
+               )}
                 <h3 className={styles.clubOwner}>
                   {eventOwner?.name || eventOwner || "Unknown Organizer"}
                 </h3>

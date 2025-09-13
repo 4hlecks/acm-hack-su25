@@ -4,14 +4,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import styles from "../page.module.css";
 import NavBar from "../../components/navbar/NavBar";
 import EventCard from "../../components/events/EventCard";
-import EventPopup from "../ProfileEventPopup"; // note: parent folder
+import EventPopup from "../ProfileEventPopup"; 
 import ProfileCard from "../../components/profile/ProfileCard";
 import TabBar from "../../components/navbar/TabBar";
 import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
-/** ----- helpers copied from /profile-page/page.js ----- */
 function parseDateOnly(raw) {
   if (!raw) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
@@ -58,10 +57,9 @@ function eventStartTimestamp(e) {
   );
   return composed.getTime();
 }
-/** ----------------------------------------------------- */
 
 export default function PublicProfile({ params }) {
-  const { id } = params; // organizer id from URL
+  const { id } = params;
   const router = useRouter();
 
   const [club, setClub] = useState(null);
@@ -74,16 +72,12 @@ export default function PublicProfile({ params }) {
 
     async function fetchAll() {
       try {
-        // 1) Events are publicly available by ownerId (your route)
         const evRes = await fetch(`${API_BASE}/api/loadEvents/byOwner/${id}`);
         if (!evRes.ok) throw new Error(`Events fetch failed: ${evRes.status}`);
         const evJson = await evRes.json();
-        const events = Array.isArray(evJson?.events) ? evJson.events : evJson; // your route sometimes returns {events}
+        const events = Array.isArray(evJson?.events) ? evJson.events : evJson; 
         if (isMounted) setOrgEvents(events ?? []);
 
-        // 2) Try to fetch public profile info for this id (adjust to your real route)
-        // If you already have one like /users/profile/:id or /users/public/:id, use it here.
-        // If not, we’ll fall back to whatever is populated on eventOwner.
         let clubData = null;
         try {
           const profileRes = await fetch(`${API_BASE}/users/profile/${id}`);
@@ -94,7 +88,6 @@ export default function PublicProfile({ params }) {
         } catch (_) {}
 
         if (!clubData) {
-          // Fallback from populated eventOwner (make sure backend populates desired fields)
           const owner =
             (events && events[0] && events[0].eventOwner) ? events[0].eventOwner : null;
           if (owner && typeof owner === "object") {
@@ -139,8 +132,8 @@ export default function PublicProfile({ params }) {
           name={club?.name}
           bio={club?.bio}
           profilePic={club?.profilePic}
-          onEdit={() => router.push("/profile-page/edit")} // edit remains for current user
-          isOwner={false} // visiting someone else’s profile
+          onEdit={() => router.push("/profile-page/edit")} 
+          isOwner={false} // visiting profile u dont own
         />
 
         <div className={styles.eventsHeader}>

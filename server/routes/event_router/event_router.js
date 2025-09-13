@@ -50,7 +50,7 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
       eventLocation,
       eventCategory,
       tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
-      coverPhoto: req.file ? `/uploads/${req.file.filename}` : null
+      coverPhoto: req.file ? req.file.path : null
     });
 
     await newEvent.save();
@@ -65,7 +65,7 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
 router.get('/byOwner/me', auth, async (req, res) => {
   try {
     const events = await Event.find({ eventOwner: req.user.id })
-      .populate('eventOwner', 'name _id')
+      .populate('eventOwner', 'name _id profilePic')
       .sort({ date: 1 });
     res.json({ events });
   } catch (e) {
@@ -78,7 +78,7 @@ router.get('/byOwner/me', auth, async (req, res) => {
 router.get('/byOwner/:ownerId', async (req, res) => {
   try {
     const events = await Event.find({ eventOwner: req.params.ownerId })
-      .populate('eventOwner', 'name _id')
+      .populate('eventOwner', 'name _id profilePic')
       .sort({ date: 1 });
     res.json({ events });
   } catch (e) {
@@ -91,7 +91,7 @@ router.get('/category/:categoryChoice', async (req, res) => {
   try {
     const { categoryChoice } = req.params;
     const events = await Event.find({ eventCategory: categoryChoice })
-      .populate('eventOwner', 'name _id')
+      .populate('eventOwner', 'name _id profilePic')
       .sort({ date: 1 });
 
     res.json(events);
@@ -104,7 +104,9 @@ router.get('/category/:categoryChoice', async (req, res) => {
 // Get events for a specific club
 router.get('/byClub/:clubId', async (req, res) => {
   try {
-    const events = await Event.find({ eventOwner: req.params.clubId });
+    const events = await Event.find({ eventOwner: req.params.clubId })
+      .populate('eventOwner', 'name _id profilePic')
+      .sort({ date: 1 });
     res.json(events);
   } catch (err) {
     console.error('Error fetching club events:', err);

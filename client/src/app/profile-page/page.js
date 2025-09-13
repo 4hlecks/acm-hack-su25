@@ -11,6 +11,16 @@ import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
+function normalizedPic(src, updatedAt) {
+     if (!src) return "";
+     const base =
+       src.startsWith?.("/uploads") ? `${API_BASE}${src}` : src;
+     // Add a stable, content-derived version (updatedAt) so browser refetches after edits
+     const ver = updatedAt ? new Date(updatedAt).getTime() : Date.now();
+     const sep = base.includes("?") ? "&" : "?";
+     return `${base}${sep}v=${ver}`;
+   }
+
 function parseDateOnly(raw) {
   if (!raw) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
@@ -90,42 +100,50 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
+  const fetchData = async () => {
+       const token = localStorage.getItem("token");
+       if (!token) {
+         router.push("/login");
+         return;
+       }
+       try {
+         const [profileRes, eventsRes] = await Promise.all([
+           fetch(`${API_BASE}/users/profile/me`, {
+             headers: { Authorization: `Bearer ${token}` },
+             // CHANGED: ensure browser doesn't cache this request
+             cache: "no-store",
+           }),
+           fetch(`${API_BASE}/api/loadEvents/byOwner/me`, {
+             headers: { Authorization: `Bearer ${token}` },
+             cache: "no-store", // CHANGED
+           }),
+         ]);
+    
+         if (!profileRes.ok) throw new Error(`Profile fetch failed: ${profileRes.status}`);
+         if (!eventsRes.ok) throw new Error(`Events fetch failed: ${eventsRes.status}`);
+    
+         const profileData = await profileRes.json();
+         const { events } = await eventsRes.json();
+    
+         setClub(profileData.club);
+         setOrgEvents(Array.isArray(events) ? events : []);
+       } catch (err) {
+         console.error(err);
+         setOrgEvents([]);
+       } finally {
+         setLoading(false);
+       }
+     };
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        const [profileRes, eventsRes] = await Promise.all([
-          fetch(`${API_BASE}/users/profile/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch(`${API_BASE}/api/loadEvents/byOwner/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
-        if (!profileRes.ok) throw new Error(`Profile fetch failed: ${profileRes.status}`);
-        if (!eventsRes.ok) throw new Error(`Events fetch failed: ${eventsRes.status}`);
-
-        const profileData = await profileRes.json();
-        const { events } = await eventsRes.json();
-
-        setClub(profileData.club);
-        setOrgEvents(Array.isArray(events) ? events : []);
-      } catch (err) {
-        console.error(err);
-        setOrgEvents([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, [router]);
+
+  useEffect(() => {
+       const onFocus = () => fetchData();
+       window.addEventListener("focus", onFocus);
+       return () => window.removeEventListener("focus", onFocus);
+     }, []);
 
   const sortedEvents = useMemo(() => {
     return [...orgEvents].sort((a, b) => {
@@ -148,7 +166,7 @@ export default function Profile() {
         <ProfileCard
           name={club?.name}
           bio={club?.bio}
-          profilePic={club?.profilePic}
+          profilePic={normalizedPic(club?.profilePic, club?.updatedAt)}
           onEdit={handleEdit}
           isOwner={true}
         />
