@@ -157,13 +157,6 @@
   .popup textarea:focus {
     border-color: #0070f3;
   }
-  
-  .saveBtn {
-    width: auto;              /* shrink to fit content */
-    align-self: flex-start;   /* keep it left-aligned under inputs */
-    padding: 0.5rem 1rem;     /* normal button padding */
-    font-size: 0.9rem;
-  }
 
   .popupOverlay {
     position: fixed;
@@ -210,8 +203,55 @@
     border-radius: 50%;
   }
   
-  .saveLogoBtn {
-    margin-top: 0.75rem;
-    align-self: center; 
+  .cropPopup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    z-index: 1000;
+    max-width: 400px;
+    width: 90%;
   }
+  
+  .cropActions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;              
+    margin-top: 1.5rem;
+  }
+  
+  .cropBtn {
+    flex: 1; 
+    max-width: 140px; 
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .saveBtn {
+    background: gold;
+    color: black;
+  }
+  
+  .saveBtn:hover {
+    background: rgb(225, 196, 32);
+  }
+  
+  .cancelBtn {
+    background: #ccc;
+    color: #333;
+  }
+  
+  .cancelBtn:hover {
+    background: #aaa;
+  }
+  
   

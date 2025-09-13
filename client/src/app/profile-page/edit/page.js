@@ -268,12 +268,21 @@ export default function EditProfile() {
                       onCropComplete={onCropComplete}
                     />
                   </div>
-                  <div style={{ marginTop: "1rem", display: "flex", gap: "1rem", justifyContent: "center" }}>
-                    <button className={styles.actionBtn} onClick={() => setShowCropper(false)}>Cancel</button>
-                    <button className={`${styles.actionBtn} ${styles.saveBtn}`} onClick={handleSaveProfilePic}>
-                      Save Logo
-                    </button>
-                  </div>
+                  <div className={styles.cropActions}>
+                  <button
+                    className={`${styles.cropBtn} ${styles.cancelBtn}`}
+                    onClick={() => setShowCropper(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className={`${styles.cropBtn} ${styles.saveBtn}`}
+                    onClick={handleSaveProfilePic}
+                  >
+                    Save Logo
+                  </button>
+                </div>
+
                 </div>
               </div>
             )}
@@ -325,6 +334,31 @@ export default function EditProfile() {
           )}
         </section>
       </main>
+      {deleteEventId && (
+  <div className={styles.popupOverlay}>
+    <div className={styles.popup}>
+      <h3>Are you sure you want to delete this event?</h3>
+      <div className={styles.cropActions}>
+        <button
+          className={`${styles.cropBtn} ${styles.cancelBtn}`}
+          onClick={() => setDeleteEventId(null)}
+        >
+          Cancel
+        </button>
+        <button
+          className={`${styles.cropBtn} ${styles.deleteBtn}`}
+          onClick={async () => {
+            await handleDeleteEvent(deleteEventId);
+            setDeleteEventId(null);
+          }}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
       <TabBar />
     </>
   );
