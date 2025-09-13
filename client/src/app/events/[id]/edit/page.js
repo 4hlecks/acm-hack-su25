@@ -1,7 +1,10 @@
 "use client";
+
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import styles from "./AddEventPage.module.css";
+import { useParams, useRouter } from "next/navigation";
+import styles from "../../../add-event/AddEventPage.module.css";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
 const CATEGORIES = [
   "Free Food",
@@ -15,8 +18,10 @@ const CATEGORIES = [
   "Workshop",
 ];
 
-export default function AddEventPage() {
-  const router = useRouter();   
+export default function EditEventPage() {
+  const { id } = useParams();
+  const router = useRouter();
+
   // Form state
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
@@ -24,7 +29,7 @@ export default function AddEventPage() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [eventLocation, setEventLocation] = useState("");
-  const [eventCategory, setEventCategory] = useState(""); 
+  const [eventCategory, setEventCategory] = useState("");
   const [coverPhoto, setCoverPhoto] = useState(null);
 
   // Category combobox UI state
@@ -37,12 +42,14 @@ export default function AddEventPage() {
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
 
+  const [loading, setLoading] = useState(true);
+
   const query = catInput.trim().toLowerCase();
   const filteredCategories = query
     ? CATEGORIES.filter((c) => c.toLowerCase().includes(query))
-    : CATEGORIES; 
+    : CATEGORIES;
 
-  // Close the dropdown on outside click
+  // Close category dropdown when clicking outside
   useEffect(() => {
     function onDocClick(e) {
       if (catBoxRef.current && !catBoxRef.current.contains(e.target)) {
@@ -69,7 +76,7 @@ export default function AddEventPage() {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       const next = Math.min(
-        (catActiveIndex === -1 ? 0 : catActiveIndex + 1),
+        catActiveIndex === -1 ? 0 : catActiveIndex + 1,
         filteredCategories.length - 1
       );
       setCatActiveIndex(next);
@@ -101,15 +108,49 @@ export default function AddEventPage() {
     setTags(tags.filter((t) => t !== tag));
   };
 
-  // Submit to backend
+  // Fetch event by ID
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const fetchEvent = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/loadEvents/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch event");
+        const data = await res.json();
+
+        // Pre-fill form
+        setEventTitle(data.eventTitle || "");
+        setEventDescription(data.eventDescription || "");
+        setEventDate(data.date ? data.date.split("T")[0] : "");
+        setStartTime(data.startTime || "");
+        setEndTime(data.endTime || "");
+        setEventLocation(data.eventLocation || "");
+        setEventCategory(data.eventCategory || "");
+        setCatInput(data.eventCategory || "");
+        setTags(data.tags || []);
+        setCoverPhoto(null);
+      } catch (err) {
+        console.error("Error fetching event:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+
+  // Save changes
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!CATEGORIES.includes(eventCategory)) {
       alert("Please select a category from the list.");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("eventTitle", eventTitle);
     formData.append("eventDescription", eventDescription);
@@ -120,17 +161,16 @@ export default function AddEventPage() {
     formData.append("eventCategory", eventCategory);
     formData.append("tags", tags.join(","));
     if (coverPhoto) formData.append("coverPhoto", coverPhoto);
-  
+
     try {
-      const res = await fetch("http://localhost:5001/api/loadEvents/create", {
-        method: "POST",
+      const res = await fetch(`${API_BASE}/api/loadEvents/${id}`, {
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: formData,
       });
-  
-      // handle expired/invalid token before parsing
+
       if (res.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -138,36 +178,25 @@ export default function AddEventPage() {
         router.push("/login");
         return;
       }
-  
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create event");
-  
-      alert("Event created successfully!");
-  
-      // optional: clear form
-      setEventTitle("");
-      setEventDescription("");
-      setEventDate("");
-      setStartTime("");
-      setEndTime("");
-      setEventLocation("");
-      setEventCategory("");
-      setCatInput("");
-      setCoverPhoto(null);
-      setTags([]);
-      setNewTag("");
+      if (!res.ok) throw new Error(data.message || "Failed to update event");
+
+      alert("Event updated successfully!");
+      router.push("/profile-page");
     } catch (err) {
-      console.error("Error creating event:", err);
+      console.error("Error updating event:", err);
       alert("Error: " + err.message);
     }
   };
-  
+
+  if (loading) return <div>Loading…</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
         <h2 className={styles.title}>
-          <strong>Add New Event</strong>
+          <strong>Edit Event</strong>
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -180,7 +209,7 @@ export default function AddEventPage() {
                 onChange={(e) => setCoverPhoto(e.target.files?.[0] || null)}
               />
               <p>
-                <strong>Upload a Cover Photo</strong>
+                <strong>Upload a New Cover Photo</strong>
               </p>
             </div>
 
@@ -262,7 +291,7 @@ export default function AddEventPage() {
             required
           ></textarea>
 
-          {/* Category (searchable combobox) */}
+          {/* Category */}
           <label>
             <b>Category</b>
           </label>
@@ -279,7 +308,7 @@ export default function AddEventPage() {
               value={catInput}
               onChange={(e) => {
                 setCatInput(e.target.value);
-                setEventCategory(""); // clear canonical until a selection is made
+                setEventCategory("");
                 setCatOpen(true);
                 setCatActiveIndex(-1);
               }}
@@ -361,7 +390,7 @@ export default function AddEventPage() {
           </div>
 
           <button type="submit" className={styles.postButton}>
-            Post
+            Save Changes
           </button>
         </form>
       </div>

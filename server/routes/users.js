@@ -196,40 +196,24 @@ router.get('/profile/me', auth, clubAuth, async (req, res) => {
 // Update club profile
 router.put('/updateProfile', auth, clubAuth, upload.single('profilePic'), async (req, res) => {
   try {
-    const { bio } = req.body;
+    const { bio, name } = req.body;
     const clubId = req.user.id;
 
     const updateData = {};
-    if (bio !== undefined) {
-      updateData.bio = bio;
-      console.log('Added bio to updateData');
-    }
+    if (bio !== undefined) updateData.bio = bio;
+    if (name !== undefined) updateData.name = name.trim();
 
     if (req.file) {
-      updateData.profilePic = `/uploads/${req.file.filename}`; // updated link
-      console.log('Added file to updateData:', updateData.profilePic);
-      console.log('Full file object:', req.file);
-    } else {
-      console.log('No file received');
+      updateData.profilePic = `/uploads/${req.file.filename}`;
     }
-
-    console.log('Final updateData:', updateData);
 
     const updatedClub = await User.findByIdAndUpdate(
       clubId,
       updateData,
       { new: true, runValidators: true }
-    )
-
-    if (!updatedClub) {
-      return res.status(404).json({ message: 'Club not found' });
-    }
-
-    console.log('Updated club:', {
-      bio: updatedClub.bio,
-      profilePic: updatedClub.profilePic
-    });
-
+    );
+    if (!updatedClub) return res.status(404).json({ message: 'Club not found' });
+    
     res.json({
       message: 'Profile updated successfully',
       club: {
@@ -240,24 +224,9 @@ router.put('/updateProfile', auth, clubAuth, upload.single('profilePic'), async 
       }
     });
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-// Get Club's own profile (when club clicks 'Profile' Nav)
-router.get('/profile/me', auth, clubAuth, async (req, res) => {
-  try {
-    const club = await User.findById(req.user.id).select('-password');
-    if (!club) {
-      return res.status(404).json({ message: 'Club not found.' });
-    }
-    res.json({ club });
-  } catch (error) {
-    console.error('Error:', error);
+    console.error('Update profile error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
 module.exports = router;
-

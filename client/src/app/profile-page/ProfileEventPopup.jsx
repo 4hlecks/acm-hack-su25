@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
-import styles from "./EventPopup.module.css";
+import styles from "./ProfileEventPopup.module.css";
 
-const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
+const ProfileEventPopup = ({ event, clubId, onClose }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -13,7 +13,7 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
     return () => setMounted(false);
   }, []);
 
-  if (!mounted || !event || !isOpen) return null;
+  if (!mounted || !event) return null;
 
   const {
     coverPhoto,
@@ -27,20 +27,19 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
     eventDescription,
   } = event;
 
-  // Ownership check
-  const isOwner = String(eventOwner?._id || eventOwner) === String(clubId);
-
-  // Debug log
-  console.log("DEBUG EventPopup ownership check", {
+  // Debug logging
+  console.log("DEBUG owner check →", {
     eventOwner,
     eventOwnerId: eventOwner?._id || eventOwner,
     clubId,
-    userRole,
-    isOwner,
+    match: String(eventOwner?._id || eventOwner) === String(clubId),
   });
 
-  function formatDisplayDate(dateValue) {
-    const d = new Date(dateValue);
+  // Ownership check
+  const isOwner = String(eventOwner?._id || eventOwner) === String(clubId);
+
+  function formatDisplayDate(value) {
+    const d = new Date(value);
     if (isNaN(d.getTime())) return "Date TBD";
     return d.toLocaleDateString("en-US", {
       weekday: "short",
@@ -49,23 +48,17 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
     });
   }
 
-  function formatTimeRange(startTime, endTime) {
-    if (!startTime || !endTime) return "Time TBD";
+  function formatTimeRange(start, end) {
+    if (!start || !end) return "Time TBD";
     const options = { hour: "numeric", minute: "2-digit", hour12: true };
-
-    const startDate = new Date(
-      startTime.includes("T") ? startTime : `1970-01-01T${startTime}`
-    );
-    const endDate = new Date(
-      endTime.includes("T") ? endTime : `1970-01-01T${endTime}`
-    );
+    const startDate = new Date(start.includes("T") ? start : `1970-01-01T${start}`);
+    const endDate = new Date(end.includes("T") ? end : `1970-01-01T${end}`);
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return "Time TBD";
 
     const startStr = startDate.toLocaleTimeString([], options);
     const endStr = endDate.toLocaleTimeString([], options);
     const startAMPM = startStr.split(" ").pop();
     const endAMPM = endStr.split(" ").pop();
-
     return startAMPM === endAMPM
       ? `${startStr.replace(" " + startAMPM, "")} - ${endStr}`
       : `${startStr} - ${endStr}`;
@@ -75,7 +68,7 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   const displayTime = formatTimeRange(startTime, endTime);
 
   const dialogContent = (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog.Root open={!!event} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal container={document.body}>
         <Dialog.Backdrop className={styles.backdrop} />
         <Dialog.Popup className={styles.popup}>
@@ -95,21 +88,20 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
               </button>
             </div>
 
-            {/* Flyer */}
+            {/* Flyer image */}
             <figure className={styles.imageSection}>
               <img
                 src={coverPhoto}
                 alt="Event Flyer"
                 className={styles.eventImage}
                 onError={(e) => {
-                  console.log("Image failed to load in Event Popup");
                   e.target.src =
                     "https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png";
                 }}
               />
             </figure>
 
-            {/* Event info */}
+            {/* Event details */}
             <section className={styles.eventSection}>
               <div className={styles.clubInfo}>
                 {eventOwner?.profilePic ? (
@@ -130,9 +122,7 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
 
                 <section className={styles.eventDetail}>
                   <MapPin className={styles.eventIcon} />
-                  <span className={styles.eventDetailText}>
-                    {eventLocation || "Location TBD"}
-                  </span>
+                  <span className={styles.eventDetailText}>{eventLocation || "Location TBD"}</span>
                 </section>
 
                 <section className={styles.eventDetail}>
@@ -150,21 +140,15 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
                 </Dialog.Description>
               </div>
 
-              {/* Conditional buttons */}
               <div className={styles.buttonContainer}>
-                {userRole === "club" && isOwner && (
+                {isOwner && (
                   <button
                     onClick={() =>
                       (window.location.href = `/profile-page/edit?eventId=${event._id}`)
                     }
-                    className={styles.saveButton}
+                    className={styles.saveButton}  
                   >
                     Edit Event
-                  </button>
-                )}
-                {userRole === "user" && (
-                  <button onClick={onClose} className={styles.saveButton}>
-                    Save Event
                   </button>
                 )}
               </div>
@@ -178,4 +162,4 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   return createPortal(dialogContent, document.body);
 };
 
-export default EventPopup;
+export default ProfileEventPopup;

@@ -97,8 +97,8 @@ export default function SearchResults({
     activeTab === 'events' ? `${eventCount} events` : `${clubCount} clubs`;
   const viewAllLabel =
     activeTab === 'events'
-      ? `View all "${query || 'all'}" events`
-      : `View all "${query || 'all'}" clubs`;
+      ? `View "${query || 'all'}" events`
+      : `View "${query || 'all'}" clubs`;
 
   return (
     <div
