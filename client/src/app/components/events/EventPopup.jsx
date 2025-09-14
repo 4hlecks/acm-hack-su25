@@ -109,16 +109,19 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
             {/* Flyer */}
             <figure className={styles.imageSection}>
               <img
-                src={coverPhoto}
+                src={
+                  coverPhoto && coverPhoto.trim() !== ""
+                    ? coverPhoto
+                    : "/images/ucsd-logo.png"
+                }
                 alt="Event Flyer"
                 className={styles.eventImage}
                 onError={(e) => {
-                  console.log("Image failed to load in Event Popup");
-                  e.target.src =
-                    "https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png";
+                  e.currentTarget.src = "/images/image.png";
                 }}
               />
             </figure>
+
 
             {/* Event info */}
             <section className={styles.eventSection}>
@@ -166,6 +169,21 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
                   {eventDescription || "No description available."}
                 </Dialog.Description>
               </div>
+
+
+{/* Tags */}
+{event.tags && event.tags.length > 0 && (
+  <div className={styles.tagList}>
+    {event.tags.slice(0, 6).map((tag, i) => (
+      <span
+        key={i}
+        className={`${styles.tag} ${styles[`tagColor${i % 6}`]}`}
+      >
+        {tag}
+      </span>
+    ))}
+  </div>
+)}
 
               {/* Conditional buttons */}
               <div className={styles.buttonContainer}>

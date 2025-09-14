@@ -102,20 +102,21 @@ const ProfileEventPopup = ({ event, clubId, onClose }) => {
               </button>
             </div>
 
-            {/* Flyer image */}
             <figure className={styles.imageSection}>
-            <img
-               src={normalizeImg(coverPhoto) || ""}
-               alt="Event Flyer"
-               className={styles.eventImage}
-               onError={(e) => {
-                 e.currentTarget.src =
-                   "https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png";
-               }}
-             />  
+              <img
+                src={
+                  coverPhoto && coverPhoto.trim() !== ""
+                    ? coverPhoto
+                    : "/images/ucsd-logo.png"
+                }
+                alt="Event Flyer"
+                className={styles.eventImage}
+                onError={(e) => {
+                  e.currentTarget.src = "/images/image.png";
+                }}
+              />
             </figure>
 
-            {/* Event details */}
             <section className={styles.eventSection}>
               <div className={styles.clubInfo}>
               {eventOwner?.profilePic ? (
@@ -157,6 +158,19 @@ const ProfileEventPopup = ({ event, clubId, onClose }) => {
                 <Dialog.Description className={styles.eventDescription}>
                   {eventDescription || "No description available."}
                 </Dialog.Description>
+
+                {event.tags && event.tags.length > 0 && (
+                  <div className={styles.tagList}>
+                    {event.tags.slice(0, 6).map((tag, i) => (
+                      <span
+                        key={i}
+                        className={`${styles.tag} ${styles[`tagColor${i % 6}`]}`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className={styles.buttonContainer}>

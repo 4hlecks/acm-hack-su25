@@ -90,7 +90,12 @@ router.get('/byOwner/:ownerId', async (req, res) => {
 router.get('/category/:categoryChoice', async (req, res) => {
   try {
     const { categoryChoice } = req.params;
-    const events = await Event.find({ eventCategory: categoryChoice })
+    const now = new Date();
+
+    const events = await Event.find({
+      eventCategory: categoryChoice,
+      endTime: { $gte: now }  
+    })
       .populate('eventOwner', 'name _id profilePic')
       .sort({ date: 1 });
 
@@ -196,8 +201,9 @@ router.put('/:id', auth, clubAuth, upload.single('coverPhoto'), async (req, res)
     };
 
     if (req.file) {
-      updateData.coverPhoto = `/uploads/${req.file.filename}`;
+      updateData.coverPhoto = req.file.path;
     }
+    
 
     const updatedEvent = await Event.findByIdAndUpdate(
       req.params.id,
@@ -211,9 +217,6 @@ router.put('/:id', auth, clubAuth, upload.single('coverPhoto'), async (req, res)
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
-
-
-
 
 
 module.exports = router;
