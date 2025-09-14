@@ -1,0 +1,25 @@
+.adminShell {
+    display: grid;
+    /* SideBar is --sidebar-width wide, rest of screen is 1fr */
+    grid-template-columns: var(--sidebar-width) 1fr;
+    height: 100dvh;
+
+    
+    overflow: hidden; /* Let children scroll, not the whole page */
+    background-color: var(--background-color);
+}
+
+.adminNavigation {
+    position: sticky; /* Keep the sidebar pinned while main content scrolls */
+    top: 0;
+    align-self: start;
+    height: 100dvh;
+    overflow: none;
+}
+
+.main {
+    min-width: 0;
+    overflow: auto; /* Let main content scroll if needed */
+    padding: var(--site-padding);
+    background-color: var(--background-color);
+}

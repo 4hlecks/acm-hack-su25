@@ -1,0 +1,106 @@
+.sideBar {
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    gap: var(--sidebar-padding);
+    box-sizing: border-box;
+    width: var(--sidebar-width);
+    background-color: var(--secondary-color);
+}
+
+.navList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sidebar-padding);
+    list-style: none;
+}
+
+.navIcon {
+    aspect-ratio: 1 / 1;
+    width: var(--icon-size-large);
+    stroke-width: 2.25px;
+    color: var(--text-color);
+    transition: color 160ms ease;
+}
+
+.siteLogo {
+    font-size: var(--font-size-heading);
+    font-weight: 700;
+    color: var(--text-color);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background-color 160ms ease,
+        color            160ms ease,
+}
+
+.siteLogo:hover {
+    color: var(--button-secondary-bg);
+}
+
+.profileCard {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
+
+.profilePic {
+    aspect-ratio: 1 / 1;
+    width: 3rem;
+    border-radius: 50%;
+    background-color: #28C6FF;
+    object-fit: cover;
+}
+
+.profileInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.profileName {
+    font-weight: var(--font-weight-subheading);
+    font-size: var(--font-size-subheading-2);
+    color: var(--text-color);
+}
+
+.profileRole {
+    font-weight: var(--font-weight-subheading);
+    font-size: var(--font-size-small);
+    color: var(--text-muted-color);
+}
+
+.editProfileButton {
+    margin-left: auto;
+}
+
+.editProfileButton > .navIcon:hover {
+    cursor: pointer;
+    color: var(--button-secondary-bg);
+}
+
+.navLink {
+    display: flex;
+    flex-direction: row;
+    gap: 0.625rem;
+    align-items: center;
+    padding: .5rem 0;
+    font-size: var(--font-size-subheading);
+    font-weight: var(--font-weight-navigation);
+    border-radius: var(--border-radius);
+    background-color: transparent;
+    transition:
+        background-color 160ms ease,
+        color            160ms ease,
+        padding          220ms ease;
+}
+
+.navLink:last-of-type {
+    margin-top: auto;
+}
+
+.navLink:hover {
+    padding: .5rem 1rem;
+    background-color: var(--button-primary-hover);
+    cursor: pointer;
+}

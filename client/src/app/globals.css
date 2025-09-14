@@ -7,7 +7,7 @@
   --tertiary-color: #B6B09F;
   --background-color: var(--primary-color);
   --text-color: #000000;
-  --text-muted-color: #bebebe;
+  --text-muted-color: #6C757D;
   --text-link-color: #008cff;
   --text-link-hover-color: #225e8f;
 
@@ -19,8 +19,8 @@
   --text-color-dark: #ffffff;
 
   /* Button Variables */
-  --button-primary-bg: #7A7A73;
-  --button-primary-color: #ffffff;
+  --button-primary-bg: #D9D9D9;
+  --button-primary-color: #000000;
   --button-primary-hover: #D7D7D7;
 
   --button-secondary-bg: #FFD05E;
@@ -52,6 +52,8 @@
   --event-info-padding: 1rem;
   --event-info-padding-2: .5rem;
   --searchbar-padding: 1rem;
+  --site-padding: 4rem;
+  --sidebar-padding: 1rem;
 
   /* Icon Variables */
   --icon-size-large: 1.75rem;
@@ -68,6 +70,7 @@
   /* Size Variables */
   --navbar-height: 4rem;
   --searchbar-height: 2.5rem;
+  --sidebar-width: 20rem;
 
   /* Image Variables */
   --image-thumb-size-large: 3rem;
