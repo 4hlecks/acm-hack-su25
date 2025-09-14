@@ -1,14 +1,21 @@
-import React, { useMemo, useRef, useState, useLayoutEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import { Search, X } from 'react-feather';
+import {useRouter} from 'next/router';
 import bar from './SearchBar.module.css';
 import resultsStyles from './SearchResults.module.css';
 import SearchResults from './SearchResults';
+import e from 'cors';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
-export default function SearchBar() {
+export default function SearchBar(onEventClick={onEventClick}) {
   const [value, setValue] = useState('');
   const [focused, setFocused] = useState(false);
   const [activeTab, setActiveTab] = useState('events'); // 'events' | 'clubs'
+  const [searchResults, setSearchResults] = useState({events : [], clubs: []});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
+  const router = useRouter();
   const inputRef = useRef(null);
   const barRef = useRef(null);
   const [dropdownHeight, setDropdownHeight] = useState(0); // for unified shadow
@@ -16,74 +23,44 @@ export default function SearchBar() {
   const onChange = (e) => setValue(e.target.value);
   const clear = () => {
     setValue('');
+    setSearchResults({events: [], clubs: []});
     inputRef.current?.focus();
   };
 
   // “Open” whenever focused (you can require non-empty value if you prefer)
   const open = focused;
 
-  // Demo data (replace with real results later)
-  const allResults = useMemo(() => {
-    const sample = [
-      {
-        type: 'event',
-        id: 'e1',
-        title: 'Triton Fest: Welcome Bash',
-        coverUrl: '/img/sample/event1.jpg',
-        owner: { name: 'AS Concerts & Events', avatarUrl: '/img/sample/asce.jpg' },
-      },
-      {
-        type: 'event',
-        id: 'e2',
-        title: 'ACM Hack Night',
-        coverUrl: '/img/sample/event2.jpg',
-        owner: { name: 'ACM @ UCSD', avatarUrl: '/img/sample/acm.jpg' },
-      },
-      {
-        type: 'club',
-        id: 'c1',
-        name: 'IEEE @ UCSD',
-        avatarUrl: '/img/sample/ieee.jpg',
-      },
-      {
-        type: 'club',
-        id: 'c2',
-        name: 'Triton Gaming',
-        avatarUrl: '/img/sample/tg.jpg',
-      },
-      {
-        type: 'event',
-        id: 'e3',
-        title: 'CSE Mentorship Mixer',
-        coverUrl: '/img/sample/event3.jpg',
-        owner: { name: 'CSES', avatarUrl: '/img/sample/cses.jpg' },
-      },
-      {
-        type: 'club',
-        id: 'c3',
-        name: 'Design Co',
-        avatarUrl: '/img/sample/dco.jpg',
-      },
-    ];
+  useEffect(() => {
+    if (!value.trim()){
+      setSearchResults({events: [], clubs: []})
+      return;
+    }
 
-    const q = value.trim().toLowerCase();
-    if (!q) return sample;
+    const timeoutId = setTimeout(async () => { //Runs and renders after user types in a value
+      setLoading(true);
+      setError(null);
+      try{
+        const response = await fetch(`${API_BASE}/api/search/all?query=${encodeURIComponent(value.trim())}`);
+        if (!response.ok){
+          throw new Error('Search failed');
+        }
 
-    return sample.filter((item) => {
-      const hay = (item.title || item.name || '').toLowerCase();
-      const owner = item.owner?.name?.toLowerCase() || '';
-      return hay.includes(q) || owner.includes(q);
-    });
+        const data = await response.json();
+        setSearchResults({
+          events: data.events || [],
+          clubs: data.clubs || []
+        });
+      } catch (err) {
+        console.error('Search error:', err);
+        setError('Search failed. Please try again.')
+        setSearchResults({events: [], clubs: []});
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+    return () => clearTimeout(timeoutId);
   }, [value]);
-
-  const eventResults = useMemo(
-    () => allResults.filter((r) => r.type === 'event').slice(0, 5),
-    [allResults]
-  );
-  const clubResults = useMemo(
-    () => allResults.filter((r) => r.type === 'club').slice(0, 5),
-    [allResults]
-  );
+  
 
   // Unified shadow height (bar height + current dropdown measured in child)
   useLayoutEffect(() => {
@@ -95,11 +72,23 @@ export default function SearchBar() {
     }
   }, [open, dropdownHeight]);
 
-  const handleSelect = (text) => {
-    setValue(text);
-    inputRef.current?.blur(); // close
-  };
+  const handleEventSelect = (event) => {
+    if (onEventClick) {
+      onEventClick(event);
+    }
+    inputRef.current?.blur();
+  }
 
+  const handleClubSelect = (club) => {
+    router.push(`/profile-page/${club._id}`);
+    inputRef.current?.blur();
+  }
+
+  const handleSearchSubmit = (e) => {}
+    e.preventDefault();
+    if (value.trim()){
+
+    }
   return (
     <form
       role="search"
@@ -147,11 +136,14 @@ export default function SearchBar() {
           query={value}
           activeTab={activeTab}
           onTabChange={setActiveTab}
-          events={eventResults}
-          clubs={clubResults}
-          onSelect={handleSelect}
+          events={searchResults.events}
+          clubs={searchResults.clubs}
+          onEventSelect={handleEventSelect}
+          onClubSelect={handleClubSelect}
           onHeightChange={setDropdownHeight}
           className={resultsStyles.searchResults}
+          loading={loading}
+          error={error}
         />
       )}
     </form>

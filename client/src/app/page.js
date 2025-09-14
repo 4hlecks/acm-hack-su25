@@ -86,7 +86,7 @@ export default function Home() {
 
   return (
     <>
-      <NavBar />
+      <NavBar onEventClick={openEventPopup}/>
       <main className={styles.pageContent}>
         <h1 className={styles.pageTitle}>Home</h1>
           {categories.filter(category => eventsByCategory[category]?.length > 0).map(category => (

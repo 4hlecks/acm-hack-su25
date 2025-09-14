@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 
-export default function NavBar() {
+export default function NavBar({ onEventClick }) {
     const router = useRouter();
     const pathname = usePathname();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -49,7 +49,7 @@ export default function NavBar() {
     <nav className={styles.navBar}>
         <div className={styles.leftSide}>
             <Link href="/" className={styles.siteLogo}>Current</Link>
-            <SearchBar />
+            <SearchBar onEventClick={onEventClick}/>
         </div>
 
         <div className={styles.rightSide}>

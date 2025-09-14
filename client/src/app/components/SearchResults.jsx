@@ -8,9 +8,12 @@ export default function SearchResults({
   onTabChange,
   events,
   clubs,
-  onSelect,
+  onEventSelect,
+  onClubSelect,
   onHeightChange,
   className,
+  loading,
+  error
 }) {
   const containerRef = useRef(null);
 
@@ -37,6 +40,26 @@ export default function SearchResults({
       onTabChange(activeTab === 'events' ? 'clubs' : 'events');
     }
   };
+
+  if (loading){
+    return (
+      <div id ={id} ref={containerRef} className={`${styles.searchResults} ${className || ''}`} role="region" aria-label='Search results'>
+        <div className={styles.loadingState}>
+          <p>Searching...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error){
+    return (
+      <div id ={id} ref={containerRef} className={`${styles.searchResults} ${className || ''}`} role="region" aria-label='Search results'>
+        <div className={styles.errorState}>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   const rendered = useMemo(() => {
     if (activeTab === 'events') {
