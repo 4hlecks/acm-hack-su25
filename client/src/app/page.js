@@ -13,8 +13,8 @@ export default function Home() {
   const [club, setClub] = useState(null);      
   const [userRole, setUserRole] = useState("user"); 
 
-  {/*Different categories for events! */}
-   const categories = [
+  // Different categories for events
+  const categories = [
     "Fundraiser",
     "Free Food", 
     "GBM",
@@ -29,11 +29,33 @@ export default function Home() {
   useEffect(() => {
     const fetchEvents = async () => {
       const newEventsByCategory = {};
+      const now = new Date();
+
       for (const category of categories) {
         try {
           const response = await fetch(`${API_BASE}/api/loadEvents/category/${category}`);
           const data = await response.json();
-          newEventsByCategory[category] = data;
+
+          // ✅ keep only upcoming events
+          newEventsByCategory[category] = (data || []).filter(event => {
+            const rawDate = event.date || event.Date;
+            if (!rawDate) return false;
+
+            const baseDate = new Date(rawDate);
+            if (isNaN(baseDate.getTime())) return false;
+
+            if (event.endTime) {
+              const [h, m] = event.endTime.split(":").map(Number);
+              baseDate.setHours(h, m || 0, 0, 0);
+            } else {
+              baseDate.setHours(23, 59, 59, 999);
+            }
+
+            return baseDate >= now;
+          });
+
+          console.log("Category:", category, "Events:", newEventsByCategory[category]);
+
         } catch (error) {
           console.error(`Error fetching events for category ${category}:`, error);
           newEventsByCategory[category] = [];
@@ -41,7 +63,7 @@ export default function Home() {
       }
       setEventsByCategory(newEventsByCategory);
     };
-
+  
     const fetchProfile = async () => {
       const token = localStorage.getItem("token");
       if (!token) return; // not logged in
@@ -62,19 +84,18 @@ export default function Home() {
         console.error("Error fetching profile:", err);
       }
     };
-
+  
     fetchEvents();
     fetchProfile();
   }, []);
+  
 
   // Popup state
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const openEventPopup = (event) => {
-
     console.log('Opening popup with event:', event); 
-
     setSelectedEvent(event);
     setIsPopupOpen(true);
   };
@@ -93,7 +114,7 @@ export default function Home() {
             <EventCarousel
               key={category}
               category={category}
-              events = {eventsByCategory[category] || []}
+              events={eventsByCategory[category] || []}
               onEventClick={openEventPopup} 
             /> 
           ))}

@@ -28,11 +28,12 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
     eventDescription,
   } = event;
 
-  // Ownership check
   const isOwner = String(eventOwner?._id || eventOwner) === String(clubId);
-
   const ownerId = eventOwner?._id || eventOwner;
-  const profileHref = isOwner ? "/profile-page" : `/profile-page/${ownerId}`;
+
+  const profileHref = isOwner
+    ? "/profile-page"
+    : `/profile-page/${ownerId}`;
 
   // Debug log
   console.log("DEBUG EventPopup ownership check", {
