@@ -17,9 +17,22 @@
     overflow: none;
 }
 
-.main {
+.adminContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--site-gap);
     min-width: 0;
     overflow: auto; /* Let main content scroll if needed */
     padding: var(--site-padding);
     background-color: var(--background-color);
+
+    h1 {
+        font-size: var(--font-size-title);
+        font-weight: var(--font-weight-heading);
+    }
+
+    h2 {
+        font-size: var(--font-size-heading);
+        font-weight: var(--font-weight-subheading);
+    }
 }
