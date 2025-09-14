@@ -6,5 +6,8 @@
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && npm start",
     "client": "cd client && npm run dev"
+  },
+  "dependencies": {
+    "react-easy-crop": "^5.5.0"
   }
 }
