@@ -13,10 +13,10 @@ export default function Home() {
   const [club, setClub] = useState(null);      
   const [userRole, setUserRole] = useState(null); 
 
-  const { selectedEvent, isPopupOpen, openEventPopup, closeEventPopup } = usePopup();
+  const { selectedEvent, isPopupOpen, closeEventPopup } = usePopup();
 
-  {/*Different categories for events! */}
-   const categories = [
+  // Different categories for events
+  const categories = [
     "Fundraiser",
     "Free Food", 
     "GBM",
@@ -80,8 +80,7 @@ export default function Home() {
             <EventCarousel
               key={category}
               category={category}
-              events = {eventsByCategory[category] || []}
-              onEventClick={openEventPopup} 
+              events={eventsByCategory[category] || []}
             /> 
           ))}
       </main>

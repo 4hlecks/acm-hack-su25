@@ -12,13 +12,38 @@ console.log('Event schema keys:', Object.keys(Event.schema.paths));
 console.log('Loaded Event model from:', require.resolve('../../models/event_schema'));
 console.log('Allowed categories:', Event.schema.path('eventCategory').enumValues);
 
+// helper: build full end datetime from date + endTime
+function buildEndDateTime(event) {
+  const baseDate = new Date(event.date);
+  
+  // Check if the base date is invalid 
+  if (isNaN(baseDate.getTime())) {
+    console.error(`Invalid base date for event ${event._id}: "${event.date}"`);
+    return new Date(); // Return current date as fallback
+  }
+  
+  const endTimeStr = event.endTime || "23:59";
+  
+  //Remove AM/PM
+  const cleanTime = endTimeStr.replace(/\s*(AM|PM)\s*/i, '');
+  
+  // Create the ISO string safely
+  const dateStr = baseDate.toISOString().split("T")[0];
+  const isoString = `${dateStr}T${cleanTime}`;
+  
+  const endDateTime = new Date(isoString);
+  
+  // If date is still invalid, fall back to end of day
+  if (isNaN(endDateTime.getTime())) {
+    console.warn(`Invalid endTime format for event ${event._id}: "${event.endTime}", using end of day`);
+    return new Date(`${dateStr}T23:59:59`);
+  }
+  
+  return endDateTime;
+}
+
 // create event route
 router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, res) => {
-  console.log("FRONTEND HIT THIS ROUTE");
-  console.log("BODY:", req.body);
-  console.log("FILE:", req.file);
-  console.log("USER:", req.user);
-
   try {
     const { eventTitle, eventDescription, startTime, endTime, tags, eventLocation } = req.body;
 
@@ -32,10 +57,8 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
       return res.status(400).json({ message: 'Invalid Date value' });
     }
 
-    // trim category then validate against enum
     const eventCategory = (req.body.eventCategory || '').trim();
     const allowedCategories = Event.schema.path('eventCategory').enumValues;
-    console.log('Incoming category:', JSON.stringify(eventCategory));
     if (!allowedCategories.includes(eventCategory)) {
       return res.status(400).json({ message: 'Invalid Event Category' });
     }
@@ -57,24 +80,40 @@ router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, 
     res.status(201).json({ message: 'Event created successfully', event: newEvent });
   } catch (error) {
     console.error('Error creating event:', error);
-    res.status(500).json({ message: 'Server error', error: error.message, stack: error.stack });
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// Get events for the logged-in club
+// /byOwner/me
 router.get('/byOwner/me', auth, async (req, res) => {
   try {
-    const events = await Event.find({ eventOwner: req.user.id })
+    const now = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
+    const allEvents = await Event.find({ eventOwner: req.user.id })
       .populate('eventOwner', 'name _id profilePic')
       .sort({ date: 1 });
-    res.json({ events });
+
+    const upcomingEvents = [];
+    const pastEvents = [];
+
+    allEvents.forEach(event => {
+      const endDateTime = buildEndDateTime(event);
+      if (endDateTime >= now) {
+        upcomingEvents.push(event);
+      } else if (endDateTime >= oneMonthAgo) {
+        pastEvents.push(event);
+      }
+    });
+
+    res.json({ upcomingEvents, pastEvents });
   } catch (e) {
     res.status(500).json({ message: 'Server error', error: e.message });
   }
 });
 
-
-// Get events for any owner by id (public)
+// byOwner/:ownerId (raw list, no split)
 router.get('/byOwner/:ownerId', async (req, res) => {
   try {
     const events = await Event.find({ eventOwner: req.params.ownerId })
@@ -86,56 +125,83 @@ router.get('/byOwner/:ownerId', async (req, res) => {
   }
 });
 
-// fetching events by category (make the path explicit to avoid conflicts)
+// /category/:categoryChoice
+// fetching events by category
 router.get('/category/:categoryChoice', async (req, res) => {
   try {
     const { categoryChoice } = req.params;
+    const now = new Date();
+
+    // fetch all events in this category
     const events = await Event.find({ eventCategory: categoryChoice })
       .populate('eventOwner', 'name _id profilePic')
       .sort({ date: 1 });
 
-    res.json(events);
+    // filter upcoming based on endDateTime
+    const upcomingEvents = events.filter(event => {
+      const baseDate = new Date(event.date);
+      if (isNaN(baseDate.getTime())) return false;
+
+      const endTimeStr = event.endTime || "23:59";
+      const endDateTime = new Date(
+        `${baseDate.toISOString().split("T")[0]}T${endTimeStr}`
+      );
+
+      return endDateTime >= now;
+    });
+
+    res.json(upcomingEvents);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: 'Server error: Check Connections!' });
+    console.error("Error fetching category events:", err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Get events for a specific club
+
+// /byClub/:clubId
 router.get('/byClub/:clubId', async (req, res) => {
   try {
-    const events = await Event.find({ eventOwner: req.params.clubId })
+    const { clubId } = req.params;
+    console.log('=== FETCHING EVENTS FOR CLUB:', clubId, '===');
+
+    const now = new Date();
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(now.getMonth() - 1);
+
+    const allEvents = await Event.find({ eventOwner: clubId })
       .populate('eventOwner', 'name _id profilePic')
       .sort({ date: 1 });
-    res.json(events);
+
+    const upcomingEvents = [];
+    const pastEvents = [];
+
+    allEvents.forEach(event => {
+      const endDateTime = buildEndDateTime(event);
+      if (endDateTime >= now) {
+        upcomingEvents.push(event);
+      } else if (endDateTime >= oneMonthAgo) {
+        pastEvents.push(event);
+      }
+    });
+
+    res.json({ upcomingEvents, pastEvents });
   } catch (err) {
     console.error('Error fetching club events:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Delete an event by ID (only owner can delete)
+// Delete event
 router.delete('/:id', auth, clubAuth, async (req, res) => {
   try {
-    console.log("DELETE route hit!");
-    console.log("User making request:", req.user);
-    console.log("Event ID param:", req.params.id);
-
     const event = await Event.findById(req.params.id);
-    console.log("Event found:", event);
+    if (!event) return res.status(404).json({ message: 'Event not found' });
 
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
-
-    // ensure the logged-in user owns it
     if (event.eventOwner.toString() !== req.user.id) {
-      console.log("Not authorized. Event owner:", event.eventOwner.toString(), "User:", req.user.id);
       return res.status(403).json({ message: 'Not authorized to delete this event' });
     }
 
     await event.deleteOne();
-    console.log("Event deleted:", event._id);
     res.json({ message: 'Event deleted successfully' });
   } catch (err) {
     console.error('Error deleting event:', err);
@@ -143,20 +209,14 @@ router.delete('/:id', auth, clubAuth, async (req, res) => {
   }
 });
 
-// Get single event by ID (owner only)
+// Get single event (owner only)
 router.get('/:id', auth, clubAuth, async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
-
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
-
-    // ensure the logged-in user owns it
+    if (!event) return res.status(404).json({ message: 'Event not found' });
     if (event.eventOwner.toString() !== req.user.id) {
-      return res.status(403).json({ message: 'Not authorized to view this event' });
+      return res.status(403).json({ message: 'Not authorized' });
     }
-
     res.json(event);
   } catch (err) {
     console.error('Error fetching event:', err);
@@ -164,21 +224,15 @@ router.get('/:id', auth, clubAuth, async (req, res) => {
   }
 });
 
-// Update event by ID (only owner can update)
+// Update event
 router.put('/:id', auth, clubAuth, upload.single('coverPhoto'), async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
-
-    if (!event) {
-      return res.status(404).json({ message: 'Event not found' });
-    }
-
-    // ensure the logged-in user owns it
+    if (!event) return res.status(404).json({ message: 'Event not found' });
     if (event.eventOwner.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Not authorized to update this event' });
     }
 
-    // build update data
     const updateData = {
       eventTitle: req.body.eventTitle,
       eventDescription: req.body.eventDescription,
@@ -196,7 +250,7 @@ router.put('/:id', auth, clubAuth, upload.single('coverPhoto'), async (req, res)
     };
 
     if (req.file) {
-      updateData.coverPhoto = `/uploads/${req.file.filename}`;
+      updateData.coverPhoto = req.file.path;
     }
 
     const updatedEvent = await Event.findByIdAndUpdate(
@@ -211,9 +265,5 @@ router.put('/:id', auth, clubAuth, upload.single('coverPhoto'), async (req, res)
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
-
-
-
-
 
 module.exports = router;

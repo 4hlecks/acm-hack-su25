@@ -67,3 +67,9 @@
   font-weight: 800; 
   font-size: 21px;
 }
+
+.subtext {
+  font-size: 0.8em;   
+  font-weight: normal; 
+  color: #666;      
+}
