@@ -104,3 +104,10 @@
     background-color: var(--button-primary-hover);
     cursor: pointer;
 }
+
+.navLink[aria-current="page"],
+.navLink.active {
+    padding: .5rem 1rem;
+    background-color: var(--button-primary-hover);
+    cursor: default;
+}

@@ -1,0 +1,34 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 20rem;
+    min-width: 20rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid var(--button-primary-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Top Bar */
+.card::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 2rem;
+    background-color: var(--accent);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.data {
+    font-size: 6rem !important;
+    font-weight: var(--font-weight-heading);
+}
+
+.dataLabel {
+    font-size: 1.5rem !important;
+    font-weight: var(--font-weight-heading);
+}
