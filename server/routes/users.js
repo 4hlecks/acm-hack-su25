@@ -238,4 +238,20 @@ router.put('/updateProfile', auth, clubAuth, upload.single('profilePic'), async 
   }
 });
 
+// Public profile by user/club ID (no auth needed)
+router.get('/profile/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select('name role bio profilePic approved updatedAt');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ club: user }); // ✅ same shape as /profile/me
+  } catch (err) {
+    console.error('Public profile error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+
+
+
 module.exports = router;

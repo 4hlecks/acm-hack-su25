@@ -10,6 +10,7 @@ import Cropper from "react-easy-crop";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
+// ---------- image cropping helpers ----------
 async function getCroppedImg(imageSrc, cropPixels) {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
@@ -45,7 +46,7 @@ function createImage(url) {
   });
 }
 
-// ---------- helpers ----------
+// ---------- date helpers ----------
 function parseDateOnly(raw) {
   if (!raw) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
@@ -55,6 +56,7 @@ function parseDateOnly(raw) {
   const d = new Date(raw);
   return isNaN(d.getTime()) ? null : d;
 }
+
 function parseTimeHM(raw) {
   if (!raw) return null;
   if (raw.includes("T")) {
@@ -78,6 +80,7 @@ function parseTimeHM(raw) {
   }
   return null;
 }
+
 function eventStartTimestamp(e) {
   const rawDate = e.Date ?? e.date ?? null;
   const rawStart = e.startTime ?? null;
@@ -102,6 +105,7 @@ export default function EditProfile() {
   const [loading, setLoading] = useState(true);
   const [deleteEventId, setDeleteEventId] = useState(null);
 
+  // cropping states
   const [image, setImage] = useState(null);
   const [rawFile, setRawFile] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -127,9 +131,9 @@ export default function EditProfile() {
         }),
       ]);
       const profileData = await profileRes.json();
-      const { events } = await eventsRes.json();
+      const { upcomingEvents } = await eventsRes.json();
       setClub(profileData.club);
-      setOrgEvents(Array.isArray(events) ? events : []);
+      setOrgEvents(Array.isArray(upcomingEvents) ? upcomingEvents : []);
     } catch (err) {
       console.error(err);
       setOrgEvents([]);
@@ -220,6 +224,7 @@ export default function EditProfile() {
       <NavBar />
       <main className={styles.pageContent}>
         <div className={styles.profileHeader}>
+          {/* Profile Picture with cropper */}
           <div className={styles.profilePicWrapper}>
             <div
               className={styles.profilePicContainer}
@@ -269,25 +274,25 @@ export default function EditProfile() {
                     />
                   </div>
                   <div className={styles.cropActions}>
-                  <button
-                    className={`${styles.cropBtn} ${styles.cancelBtn}`}
-                    onClick={() => setShowCropper(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className={`${styles.cropBtn} ${styles.saveBtn}`}
-                    onClick={handleSaveProfilePic}
-                  >
-                    Save Logo
-                  </button>
-                </div>
-
+                    <button
+                      className={`${styles.cropBtn} ${styles.cancelBtn}`}
+                      onClick={() => setShowCropper(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className={`${styles.cropBtn} ${styles.saveBtn}`}
+                      onClick={handleSaveProfilePic}
+                    >
+                      Save Logo
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
           </div>
 
+          {/* Profile form */}
           <div className={styles.profileForm}>
             <label className={styles.label}>Edit Name</label>
             <input
@@ -307,10 +312,10 @@ export default function EditProfile() {
           </div>
         </div>
 
+        {/* Events */}
         <div className={styles.eventsHeader}>
           <h2><strong>Manage Events</strong></h2>
         </div>
-
         <section className={styles.eventGrid}>
           {sortedEvents.length === 0 ? (
             <p>No events yet.</p>
@@ -334,30 +339,32 @@ export default function EditProfile() {
           )}
         </section>
       </main>
+
+      {/* Delete confirmation */}
       {deleteEventId && (
-  <div className={styles.popupOverlay}>
-    <div className={styles.popup}>
-      <h3>Are you sure you want to delete this event?</h3>
-      <div className={styles.cropActions}>
-        <button
-          className={`${styles.cropBtn} ${styles.cancelBtn}`}
-          onClick={() => setDeleteEventId(null)}
-        >
-          Cancel
-        </button>
-        <button
-          className={`${styles.cropBtn} ${styles.deleteBtn}`}
-          onClick={async () => {
-            await handleDeleteEvent(deleteEventId);
-            setDeleteEventId(null);
-          }}
-        >
-          Delete
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        <div className={styles.popupOverlay}>
+          <div className={styles.popup}>
+            <h3>Are you sure you want to delete this event?</h3>
+            <div className={styles.cropActions}>
+              <button
+                className={`${styles.cropBtn} ${styles.cancelBtn}`}
+                onClick={() => setDeleteEventId(null)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`${styles.cropBtn} ${styles.deleteBtn}`}
+                onClick={async () => {
+                  await handleDeleteEvent(deleteEventId);
+                  setDeleteEventId(null);
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <TabBar />
     </>
