@@ -6,13 +6,15 @@ import { LogOut, LogIn, Bookmark, PlusSquare, User, Calendar} from 'react-feathe
 import SearchBar from '../SearchBar'
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { usePopup } from '@/app/context/PopupContext';
 
-
-export default function NavBar({ onEventClick }) {
+export default function NavBar() {
     const router = useRouter();
     const pathname = usePathname();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isClub, setIsClub] = useState(false);
+    const { openEventPopup, handleClubSelect } = usePopup();
+
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -49,7 +51,7 @@ export default function NavBar({ onEventClick }) {
     <nav className={styles.navBar}>
         <div className={styles.leftSide}>
             <Link href="/" className={styles.siteLogo}>Current</Link>
-            <SearchBar onEventClick={onEventClick}/>
+            <SearchBar onEventClick={openEventPopup} onClubSelect={handleClubSelect}/>
         </div>
 
         <div className={styles.rightSide}>

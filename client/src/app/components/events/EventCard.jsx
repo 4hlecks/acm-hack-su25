@@ -1,6 +1,7 @@
 import React from "react";
 import { Calendar, MapPin, Clock } from "react-feather";
 import styles from "./EventCard.module.css";
+import { usePopup } from "@/app/context/PopupContext";
 
 const EventCard = ({ event, onEventClick, disableHover = false }) => {
     const {
@@ -14,6 +15,7 @@ const EventCard = ({ event, onEventClick, disableHover = false }) => {
     eventLocation,
     tags,
   } = event;
+  const { openEventPopup } = usePopup();
 
   console.log("EventCard event:", event);
 
@@ -62,7 +64,7 @@ const EventCard = ({ event, onEventClick, disableHover = false }) => {
 
   function handleClick() {
     console.log("EventCard clicked!", eventTitle);
-    if (onEventClick) onEventClick(event);
+    openEventPopup(event);
   }
 
   return (

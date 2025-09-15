@@ -9,6 +9,15 @@
   }
 }
 
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh; 
+  font-size: 1.2rem;
+  color: #666;
+}
+
 .eventGrid {
   display: grid;
   grid-template-columns: repeat(5, 180px);

@@ -22,6 +22,7 @@ router.get('/all', async (req, res) => {
         })
         .populate('eventOwner', 'name profilePic').sort({date: 1})
         
+        
         //look for clubs
         const clubs = await User.find({
             role: 'club',

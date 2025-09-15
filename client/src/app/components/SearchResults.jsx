@@ -41,7 +41,81 @@ export default function SearchResults({
     }
   };
 
-  if (loading){
+  const handleEventSelect = (event) => {
+    if (onEventSelect) {
+      onEventSelect(event);
+    }
+  }
+
+  const handleClubSelect = (club) => {
+    if (onClubSelect){
+      onClubSelect(club);
+    }
+  }
+
+  const rendered = useMemo(() => {
+    if (activeTab === 'events') {
+      return (
+        <ul className={styles.resultList} role="list">
+          {events.slice(0, 5).map((ev) => (
+            <li key={ev._id} className={`${styles.resultItem} ${styles.eventItem}`}>
+              <button
+                type="button"
+                className={styles.resultRow}
+                onClick={() => handleEventSelect(ev)}
+                aria-label={`Open event ${ev.eventTitle}`}
+              >
+                <figure className={`${styles.thumb} ${styles.eventThumb}`} aria-hidden="true">
+                  <img src={ev.coverPhoto} alt="Event Cover Image" />
+                </figure>
+                <div className={styles.eventMetadata}>
+                  <h3 className={styles.title}>{ev.eventTitle}</h3>
+                  <figure className={styles.ownerRow}>
+                    <img
+                      className={styles.ownerAvatar}
+                      src={ev.eventOwner?.profilePic}
+                      alt={ev.eventOwner?.name ? `${ev.eventOwner.name} profile` : 'Organizer profile'}
+                    />
+                    <figcaption className={styles.ownerName}>{ev.eventOwner?.name}</figcaption>
+                  </figure>
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return (
+      <ul className={styles.resultList} role="list">
+        {clubs.slice(0, 5).map((cl) => (
+          <li key={cl._id} className={`${styles.resultItem} ${styles.clubItem}`}>
+            <button
+              type="button"
+              className={styles.resultRow}
+              onClick={() => handleClubSelect(cl)}
+              aria-label={`Open club ${cl.name}`}
+            >
+              <figure className={`${styles.thumb} ${styles.clubThumb}`} aria-hidden="true">
+                <img src={cl.profilePic} alt="Club Profile Picture" />
+              </figure>
+              <div className={styles.eventMetadata}>
+                <h3 className={styles.title}>{cl.name}</h3>
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  }, [activeTab, events, clubs, handleClubSelect, handleEventSelect]);
+
+  const leftLabel =
+    activeTab === 'events' ? `${eventCount} events` : `${clubCount} clubs`;
+  const viewAllLabel =
+    activeTab === 'events'
+      ? `View "${query || 'all'}" events`
+      : `View "${query || 'all'}" clubs`;
+
+      if (loading){
     return (
       <div id ={id} ref={containerRef} className={`${styles.searchResults} ${className || ''}`} role="region" aria-label='Search results'>
         <div className={styles.loadingState}>
@@ -60,69 +134,6 @@ export default function SearchResults({
       </div>
     );
   }
-
-  const rendered = useMemo(() => {
-    if (activeTab === 'events') {
-      return (
-        <ul className={styles.resultList} role="list">
-          {events.slice(0, 5).map((ev) => (
-            <li key={ev.id} className={`${styles.resultItem} ${styles.eventItem}`}>
-              <button
-                type="button"
-                className={styles.resultRow}
-                onClick={() => onSelect?.(ev.title)}
-                aria-label={`Open event ${ev.title}`}
-              >
-                <figure className={`${styles.thumb} ${styles.eventThumb}`} aria-hidden="true">
-                  <img src={ev.coverUrl} alt="Event Cover Image" />
-                </figure>
-                <div className={styles.eventMetadata}>
-                  <h3 className={styles.title}>{ev.title}</h3>
-                  <figure className={styles.ownerRow}>
-                    <img
-                      className={styles.ownerAvatar}
-                      src={ev.owner?.avatarUrl}
-                      alt={ev.owner?.name ? `${ev.owner.name} profile` : 'Organizer profile'}
-                    />
-                    <figcaption className={styles.ownerName}>{ev.owner?.name}</figcaption>
-                  </figure>
-                </div>
-              </button>
-            </li>
-          ))}
-        </ul>
-      );
-    }
-    return (
-      <ul className={styles.resultList} role="list">
-        {clubs.slice(0, 5).map((cl) => (
-          <li key={cl.id} className={`${styles.resultItem} ${styles.clubItem}`}>
-            <button
-              type="button"
-              className={styles.resultRow}
-              onClick={() => onSelect?.(cl.name)}
-              aria-label={`Open club ${cl.name}`}
-            >
-              <figure className={`${styles.thumb} ${styles.clubThumb}`} aria-hidden="true">
-                <img src={cl.avatarUrl} alt="Club Profile Picture" />
-              </figure>
-              <div className={styles.eventMetadata}>
-                <h3 className={styles.title}>{cl.name}</h3>
-              </div>
-            </button>
-          </li>
-        ))}
-      </ul>
-    );
-  }, [activeTab, events, clubs, onSelect]);
-
-  const leftLabel =
-    activeTab === 'events' ? `${eventCount} events` : `${clubCount} clubs`;
-  const viewAllLabel =
-    activeTab === 'events'
-      ? `View "${query || 'all'}" events`
-      : `View "${query || 'all'}" clubs`;
-
   return (
     <div
       id={id}

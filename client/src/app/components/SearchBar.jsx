@@ -1,31 +1,21 @@
 import React, { useRef, useState, useLayoutEffect, useEffect } from 'react';
 import { Search, X } from 'react-feather';
-import {useRouter} from 'next/router';
 import bar from './SearchBar.module.css';
 import resultsStyles from './SearchResults.module.css';
 import SearchResults from './SearchResults';
-import e from 'cors';
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
-export default function SearchBar(onEventClick={onEventClick}) {
+export default function SearchBar({onEventClick, onClubSelect}) {
   const [value, setValue] = useState('');
   const [focused, setFocused] = useState(false);
   const [activeTab, setActiveTab] = useState('events'); // 'events' | 'clubs'
   const [searchResults, setSearchResults] = useState({events : [], clubs: []});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const router = useRouter();
-  const inputRef = useRef(null);
-  const barRef = useRef(null);
   const [dropdownHeight, setDropdownHeight] = useState(0); // for unified shadow
 
-  const onChange = (e) => setValue(e.target.value);
-  const clear = () => {
-    setValue('');
-    setSearchResults({events: [], clubs: []});
-    inputRef.current?.focus();
-  };
+  const inputRef = useRef(null);
+  const barRef = useRef(null);
 
   // “Open” whenever focused (you can require non-empty value if you prefer)
   const open = focused;
@@ -72,23 +62,18 @@ export default function SearchBar(onEventClick={onEventClick}) {
     }
   }, [open, dropdownHeight]);
 
-  const handleEventSelect = (event) => {
-    if (onEventClick) {
-      onEventClick(event);
-    }
-    inputRef.current?.blur();
-  }
+  const onChange = (e) => setValue(e.target.value);
+  const clear = () => {
+    setValue('');
+    setSearchResults({events: [], clubs: []});
+    inputRef.current?.focus();
+  };
 
-  const handleClubSelect = (club) => {
-    router.push(`/profile-page/${club._id}`);
-    inputRef.current?.blur();
-  }
+  // const handleSearchSubmit = (e) => {}
+  //   e.preventDefault();
+  //   if (value.trim()){
 
-  const handleSearchSubmit = (e) => {}
-    e.preventDefault();
-    if (value.trim()){
-
-    }
+  //   }
   return (
     <form
       role="search"
@@ -138,8 +123,8 @@ export default function SearchBar(onEventClick={onEventClick}) {
           onTabChange={setActiveTab}
           events={searchResults.events}
           clubs={searchResults.clubs}
-          onEventSelect={handleEventSelect}
-          onClubSelect={handleClubSelect}
+          onEventSelect={onEventClick}
+          onClubSelect={onClubSelect}
           onHeightChange={setDropdownHeight}
           className={resultsStyles.searchResults}
           loading={loading}

@@ -5,13 +5,15 @@ import NavBar from './components/navbar/NavBar'
 import TabBar from './components/navbar/TabBar'
 import EventCarousel from './components/events/EventCarousel'
 import EventPopup from './components/events/EventPopup'
-
+import { usePopup } from './context/PopupContext';
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
 export default function Home() {
   const [eventsByCategory, setEventsByCategory] = useState({});
   const [club, setClub] = useState(null);      
-  const [userRole, setUserRole] = useState("user"); 
+  const [userRole, setUserRole] = useState(null); 
+
+  const { selectedEvent, isPopupOpen, openEventPopup, closeEventPopup } = usePopup();
 
   {/*Different categories for events! */}
    const categories = [
@@ -67,26 +69,11 @@ export default function Home() {
     fetchProfile();
   }, []);
 
-  // Popup state
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  const openEventPopup = (event) => {
-
-    console.log('Opening popup with event:', event); 
-
-    setSelectedEvent(event);
-    setIsPopupOpen(true);
-  };
-
-  const closeEventPopup = () => {
-    setSelectedEvent(null);
-    setIsPopupOpen(false);
-  };
 
   return (
     <>
-      <NavBar onEventClick={openEventPopup}/>
+      <NavBar/>
       <main className={styles.pageContent}>
         <h1 className={styles.pageTitle}>Home</h1>
           {categories.filter(category => eventsByCategory[category]?.length > 0).map(category => (
