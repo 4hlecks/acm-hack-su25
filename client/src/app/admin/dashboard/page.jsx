@@ -1,5 +1,6 @@
 import styles from './page.module.css';
 import MetricCard from '../components/MetricCard';
+import AccountRequests from '../components/AccountRequests';
 
 export default function Dashboard() {
     const overviewItems = [
@@ -24,6 +25,7 @@ export default function Dashboard() {
             </div>
             <h2>Send Announcement</h2>
             <h2>Account Requests</h2>
+            <AccountRequests />
         </>
     );
 }

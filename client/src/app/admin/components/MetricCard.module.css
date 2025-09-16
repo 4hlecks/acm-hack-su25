@@ -7,7 +7,7 @@
     border-radius: 1rem;
     justify-content: center;
     align-items: center;
-    border: 2px solid var(--button-primary-bg);
+    border: 1px solid var(--button-primary-bg);
     position: relative;
     overflow: hidden;
 }
@@ -25,10 +25,10 @@
 
 .data {
     font-size: 6rem !important;
-    font-weight: var(--font-weight-heading);
+    font-weight: var(--font-weight-heading) !important;
 }
 
 .dataLabel {
     font-size: 1.5rem !important;
-    font-weight: var(--font-weight-heading);
+    font-weight: var(--font-weight-heading) !important;
 }
