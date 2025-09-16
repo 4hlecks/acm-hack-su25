@@ -1,0 +1,24 @@
+/* Hide the hourly gutter in week/day view */
+.rbc-time-gutter {
+  display: none !important;
+}
+
+.rbc-time-view .rbc-time-content {
+  border-left: none !important;
+}
+
+/* Event styling */
+.rbc-event {
+  background-color: #F0B323 !important;
+  color: #000 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 4px 6px !important;
+  font-size: 0.9rem !important;
+  white-space: normal !important;
+  line-height: 1.2em !important;
+}
+
+.rbc-event:hover {
+  background-color: #ffcc4d !important;
+}
