@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Cropper from "react-easy-crop";
 import styles from "./AddEventPage.module.css";
 
 const CATEGORIES = [
@@ -16,7 +17,8 @@ const CATEGORIES = [
 ];
 
 export default function AddEventPage() {
-  const router = useRouter();   
+  const router = useRouter();
+
   // Form state
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
@@ -24,8 +26,77 @@ export default function AddEventPage() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [eventLocation, setEventLocation] = useState("");
-  const [eventCategory, setEventCategory] = useState(""); 
+  const [eventCategory, setEventCategory] = useState("");
   const [coverPhoto, setCoverPhoto] = useState(null);
+
+  // image cropping state
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [rawFile, setRawFile] = useState(null);
+  const [image, setImage] = useState(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedPixels, setCroppedPixels] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+
+  const onCropComplete = useCallback((_, croppedAreaPixels) => {
+    setCroppedPixels(croppedAreaPixels);
+  }, []);
+
+  async function getCroppedImg(imageSrc, cropPixels) {
+    const img = await createImage(imageSrc);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = cropPixels.width;
+    canvas.height = cropPixels.height;
+
+    ctx.drawImage(
+      img,
+      cropPixels.x,
+      cropPixels.y,
+      cropPixels.width,
+      cropPixels.height,
+      0,
+      0,
+      cropPixels.width,
+      cropPixels.height
+    );
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), "image/jpeg");
+    });
+  }
+
+  function createImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.addEventListener("load", () => resolve(img));
+      img.addEventListener("error", (err) => reject(err));
+      img.setAttribute("crossOrigin", "anonymous");
+      img.src = url;
+    });
+  }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setRawFile(file);
+    setImage(URL.createObjectURL(file));
+    setShowCropper(true);
+  };
+
+  const handleSaveCroppedImage = async () => {
+    if (!rawFile || !croppedPixels) {
+      alert("Please crop the image first.");
+      return;
+    }
+    const croppedBlob = await getCroppedImg(image, croppedPixels);
+    const file = new File([croppedBlob], rawFile.name, { type: "image/jpeg" });
+
+    setCoverPhoto(file); // save for backend
+    setPreviewUrl(URL.createObjectURL(file)); // preview
+    setShowCropper(false);
+  };
 
   // Category combobox UI state
   const [catInput, setCatInput] = useState("");
@@ -40,7 +111,7 @@ export default function AddEventPage() {
   const query = catInput.trim().toLowerCase();
   const filteredCategories = query
     ? CATEGORIES.filter((c) => c.toLowerCase().includes(query))
-    : CATEGORIES; 
+    : CATEGORIES;
 
   // Close the dropdown on outside click
   useEffect(() => {
@@ -69,7 +140,7 @@ export default function AddEventPage() {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       const next = Math.min(
-        (catActiveIndex === -1 ? 0 : catActiveIndex + 1),
+        catActiveIndex === -1 ? 0 : catActiveIndex + 1,
         filteredCategories.length - 1
       );
       setCatActiveIndex(next);
@@ -91,7 +162,7 @@ export default function AddEventPage() {
   const handleAddTag = (e) => {
     e.preventDefault();
     const t = newTag.trim();
-    if (t && !tags.includes(t)) {
+    if (t && !tags.includes(t) && tags.length < 6) {
       setTags([...tags, t]);
       setNewTag("");
     }
@@ -104,12 +175,12 @@ export default function AddEventPage() {
   // Submit to backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!CATEGORIES.includes(eventCategory)) {
       alert("Please select a category from the list.");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("eventTitle", eventTitle);
     formData.append("eventDescription", eventDescription);
@@ -120,7 +191,7 @@ export default function AddEventPage() {
     formData.append("eventCategory", eventCategory);
     formData.append("tags", tags.join(","));
     if (coverPhoto) formData.append("coverPhoto", coverPhoto);
-  
+
     try {
       const res = await fetch("http://localhost:5001/api/loadEvents/create", {
         method: "POST",
@@ -129,8 +200,7 @@ export default function AddEventPage() {
         },
         body: formData,
       });
-  
-      // handle expired/invalid token before parsing
+
       if (res.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -138,30 +208,17 @@ export default function AddEventPage() {
         router.push("/login");
         return;
       }
-  
+
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to create event");
-  
+
       alert("Event created successfully!");
-  
-      // optional: clear form
-      setEventTitle("");
-      setEventDescription("");
-      setEventDate("");
-      setStartTime("");
-      setEndTime("");
-      setEventLocation("");
-      setEventCategory("");
-      setCatInput("");
-      setCoverPhoto(null);
-      setTags([]);
-      setNewTag("");
+      router.push("/profile-page");
     } catch (err) {
       console.error("Error creating event:", err);
       alert("Error: " + err.message);
     }
   };
-  
 
   return (
     <div className={styles.container}>
@@ -173,33 +230,42 @@ export default function AddEventPage() {
         <form onSubmit={handleSubmit}>
           {/* Upload */}
           <div className={styles.topRow}>
-            <div className={styles.uploadBox}>
+            <div
+              className={styles.uploadBox}
+              onClick={() => document.getElementById("fileInput").click()}
+            >
+              {previewUrl && previewUrl.trim() !== "" ? (
+                <img
+                  src={previewUrl}
+                  alt="Cover"
+                  className={styles.coverPreview}
+                  onError={(e) => (e.currentTarget.style.display = "none")}
+                />
+              ) : null}
+              <div className={styles.overlay}>Click to Change</div>
               <input
+                id="fileInput"
                 type="file"
                 accept="image/*"
-                onChange={(e) => setCoverPhoto(e.target.files?.[0] || null)}
+                hidden
+                onChange={handleFileChange}
               />
-              <p>
-                <strong>Upload a Cover Photo</strong>
-              </p>
             </div>
 
             <div className={styles.inputs}>
-              <label>
-                <b>Event Name</b>
-              </label>
+              <label><b>Event Name</b></label>
               <input
                 type="text"
                 className={styles.inputBox}
                 placeholder="The event name..."
                 value={eventTitle}
-                onChange={(e) => setEventTitle(e.target.value)}
+                onChange={(e) => {
+                  if (e.target.value.length <= 80) setEventTitle(e.target.value);
+                }}
                 required
               />
 
-              <label>
-                <b>Date</b>
-              </label>
+              <label><b>Date</b></label>
               <input
                 type="date"
                 className={styles.inputBox}
@@ -210,9 +276,7 @@ export default function AddEventPage() {
 
               <div className={styles.timeRow}>
                 <div>
-                  <label>
-                    <b>Start Time</b>
-                  </label>
+                  <label><b>Start Time</b></label>
                   <input
                     type="time"
                     className={styles.inputBox}
@@ -222,9 +286,7 @@ export default function AddEventPage() {
                   />
                 </div>
                 <div>
-                  <label>
-                    <b>End Time</b>
-                  </label>
+                  <label><b>End Time</b></label>
                   <input
                     type="time"
                     className={styles.inputBox}
@@ -238,34 +300,33 @@ export default function AddEventPage() {
           </div>
 
           {/* Location */}
-          <label>
-            <b>Location</b>
-          </label>
+          <label><b>Location</b></label>
           <input
             type="text"
             placeholder="The location of the event..."
             className={styles.inputBox}
             value={eventLocation}
-            onChange={(e) => setEventLocation(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 100) setEventLocation(e.target.value);
+            }}
             required
           />
 
           {/* Description */}
-          <label>
-            <b>Description</b>
-          </label>
+          <label><b>Description</b></label>
           <textarea
             placeholder="A description of the event..."
             className={styles.textarea}
             value={eventDescription}
-            onChange={(e) => setEventDescription(e.target.value)}
+            onChange={(e) => {
+              const words = e.target.value.trim().split(/\s+/);
+              if (words.length <= 120) setEventDescription(e.target.value);
+            }}          
             required
           ></textarea>
 
           {/* Category (searchable combobox) */}
-          <label>
-            <b>Category</b>
-          </label>
+          <label><b>Category</b></label>
           <div
             ref={catBoxRef}
             className={styles.comboWrapper}
@@ -279,7 +340,7 @@ export default function AddEventPage() {
               value={catInput}
               onChange={(e) => {
                 setCatInput(e.target.value);
-                setEventCategory(""); // clear canonical until a selection is made
+                setEventCategory("");
                 setCatOpen(true);
                 setCatActiveIndex(-1);
               }}
@@ -323,9 +384,7 @@ export default function AddEventPage() {
           </div>
 
           {/* Tags */}
-          <label>
-            <b>Tags</b>
-          </label>
+          <label><b>Tags</b></label>
           <div className={styles.tagContainer}>
             {tags.map((tag) => (
               <span key={tag} className={styles.tag}>
@@ -359,6 +418,42 @@ export default function AddEventPage() {
               </button>
             </div>
           </div>
+
+          {/* Crop popup */}
+          {showCropper && (
+            <div className={styles.popupOverlay}>
+              <div className={styles.popup}>
+                <div style={{ position: "relative", width: 300, height: 300 }}>
+                  <Cropper
+                    image={image}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    cropShape="rect"
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </div>
+                <div className={styles.cropActions}>
+                  <button
+                    type="button"
+                    className={`${styles.cropBtn} ${styles.cancelBtn}`}
+                    onClick={() => setShowCropper(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.cropBtn} ${styles.saveBtn}`}
+                    onClick={handleSaveCroppedImage}
+                  >
+                    Save Cover
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <button type="submit" className={styles.postButton}>
             Post

@@ -26,17 +26,6 @@
   position: relative;
 }
 
-.uploadBox {
-  flex: 1;
-  border: 2px dashed #ccc;
-  border-radius: 12px;
-  height: 300px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: gray;
-}
 
 .inputs {
   flex: 2;
@@ -184,4 +173,94 @@
   cursor: pointer;
   font-size: 1.2rem;
   font-weight: bold;
+}
+
+.uploadBox {
+  position: relative;
+  width: 300px;          
+  height: 300px;        
+  border: 2px dashed #ccc;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  color: gray;
+}
+
+.coverPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    
+  border-radius: 12px;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  color: rgba(0, 0, 0, 0.438);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  opacity: 1;  
+  border-radius: 12px;
+  transition: background 0.3s;
+}
+
+
+
+.uploadBox:hover .overlay {
+  background: rgba(0, 0, 0, 0.302); 
+}
+
+
+
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.popup {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  max-width: 400px;
+  width: 90%;
+}
+
+.cropActions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cropBtn {
+  flex: 1;
+  max-width: 140px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.saveBtn {
+  background: gold;
+  color: black;
+}
+
+.cancelBtn {
+  background: #ccc;
+  color: #333;
 }

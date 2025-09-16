@@ -66,35 +66,37 @@
     outline: none;
 }
 
-.eventContent {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    min-height: 0;
-    height: auto;
-}
 
 /* Mobile Query Club Bar */
 .clubInfoMobile {
     display: none;
 }
 
-.imageSection {
-    flex: 0 1 auto;
-    background-color: #000000;
+.eventContent {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    min-height: 0;
+    height: auto;
+  }
+  
+  .imageSection {
+    flex: 1 1 50%;          
+    aspect-ratio: 1 / 1;   
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    .eventImage {
-        max-width: 100%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-        object-position: center;
-    }
-}
+  }
+  
+  .eventImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;    
+    object-position: center;
+    display: block;
+  }
+  
 
 .eventSection{
     flex: 1 1 clamp(24rem, 10vw, 32rem);
@@ -273,6 +275,7 @@
         display: flex;
         flex-direction: column;
         min-height: 0;
+    }
 
         .eventInfo {
             overflow-y: auto;
@@ -283,5 +286,35 @@
             gap: var(--event-info-padding-2);
             flex: 1 1 auto;
         }
-    }
+    
 }
+
+.tagList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    max-width: 90%;
+    margin-bottom: 1rem;
+    justify-content: flex-start;
+    margin-left: 1rem;
+    width: 100%;
+  }
+  
+  .tag {
+    padding: 0.3rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: white;
+    display: inline-block;
+  }
+  
+  /* Tag color variations */
+  .tagColor0 { background-color: #6c5ce7; } 
+  .tagColor1 { background-color: #00b894; } 
+  .tagColor2 { background-color: #0984e3; }
+  .tagColor3 { background-color: #d63031; } 
+  .tagColor4 { background-color: #fdcb6e; color: black; } 
+  .tagColor5 { background-color: #e17055; } 
+  
