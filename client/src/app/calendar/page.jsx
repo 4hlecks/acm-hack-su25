@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay } from 'date-fns';
+import { format, parse, startOfWeek, getDay, add, sub } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -26,8 +26,79 @@ function CustomEvent({ event }) {
   );
 }
 
+function CustomToolbar({ label, onNavigate, onView, view }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1rem',
+      }}
+    >
+      <div>
+        <button
+          onClick={() => onNavigate('PREV')}
+          style={{
+            marginRight: '0.5rem',
+            padding: '0.4rem 0.8rem',
+            background: '#001f3f',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+          }}
+        >
+          ‹ Prev
+        </button>
+        <button
+          onClick={() => onNavigate('TODAY')}
+          style={{
+            marginRight: '0.5rem',
+            padding: '0.4rem 0.8rem',
+            background: '#F0B323',
+            border: 'none',
+            borderRadius: '4px',
+          }}
+        >
+          Today
+        </button>
+        <button
+          onClick={() => onNavigate('NEXT')}
+          style={{
+            padding: '0.4rem 0.8rem',
+            background: '#001f3f',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+          }}
+        >
+          Next ›
+        </button>
+      </div>
+      <h2 style={{ margin: 0, color: '#001f3f' }}>{label}</h2>
+      <select
+        value={view}
+        onChange={(e) => onView(e.target.value)}
+        style={{
+          padding: '0.4rem',
+          borderRadius: '6px',
+          border: '1px solid #F0B323',
+          fontSize: '1rem',
+          backgroundColor: '#FFFFFF',
+          color: '#001f3f',
+        }}
+      >
+        <option value={Views.MONTH}>Month</option>
+        <option value={Views.WEEK}>Week</option>
+        <option value={Views.DAY}>Day</option>
+      </select>
+    </div>
+  );
+}
+
 export default function CalendarPage() {
   const [view, setView] = useState(Views.MONTH);
+  const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [accountType, setAccountType] = useState(null);
 
@@ -37,21 +108,15 @@ export default function CalendarPage() {
         const token = localStorage.getItem('accessToken');
         const type = localStorage.getItem('accountType');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const userId = user.id;
         setAccountType(type);
 
+        if (!userId || !token) return;
 
-        if (!token) {
-          console.error('No token found, cannot fetch events');
-          return;
-        }
-
-        let url;
-        if (type === 'student') {
-          if (!user.id) return;
-          url = `http://localhost:5000/api/users/${user.id}/saved-events`;
-        } else {
-          url = 'http://localhost:5000/events/byOwner/me';
-        }
+        let url =
+          type === 'student'
+            ? `http://localhost:5001/api/users/${userId}/saved-events`
+            : 'http://localhost:5001/events/byOwner/me';
 
         const res = await fetch(url, {
           headers: {
@@ -86,6 +151,20 @@ export default function CalendarPage() {
     fetchEvents();
   }, []);
 
+  const handleNavigate = (action) => {
+    if (action === 'TODAY') {
+      setDate(new Date());
+    } else if (action === 'PREV') {
+      if (view === Views.MONTH) setDate(sub(date, { months: 1 }));
+      if (view === Views.WEEK) setDate(sub(date, { weeks: 1 }));
+      if (view === Views.DAY) setDate(sub(date, { days: 1 }));
+    } else if (action === 'NEXT') {
+      if (view === Views.MONTH) setDate(add(date, { months: 1 }));
+      if (view === Views.WEEK) setDate(add(date, { weeks: 1 }));
+      if (view === Views.DAY) setDate(add(date, { days: 1 }));
+    }
+  };
+
   const HEADER_H = 40;
 
   return (
@@ -119,29 +198,15 @@ export default function CalendarPage() {
           overflow: 'hidden',
         }}
       >
-        <h1 style={{ textAlign: 'center', margin: '0.6rem 0', color: '#001f3f' }}>
+        <h1
+          style={{
+            textAlign: 'center',
+            margin: '0.6rem 0',
+            color: '#001f3f',
+          }}
+        >
           {accountType === 'student' ? 'My Saved Events' : 'My Club’s Events'}
         </h1>
-
-        <div style={{ margin: '0 1rem 0.6rem', textAlign: 'left' }}>
-          <label style={{ fontWeight: 'bold', marginRight: '0.5rem' }}>View:</label>
-          <select
-            value={view}
-            onChange={(e) => setView(e.target.value)}
-            style={{
-              padding: '0.4rem',
-              borderRadius: '6px',
-              border: '1px solid #F0B323',
-              fontSize: '1rem',
-              backgroundColor: '#FFFFFF',
-              color: '#001f3f',
-            }}
-          >
-            <option value={Views.MONTH}>Month</option>
-            <option value={Views.WEEK}>Week</option>
-            <option value={Views.DAY}>Day</option>
-          </select>
-        </div>
 
         <div
           style={{
@@ -151,9 +216,17 @@ export default function CalendarPage() {
             borderRadius: '10px',
             padding: '12px',
             margin: '0 1rem 1rem',
+            boxShadow: '0 6px 16px rgba(0,0,0,0.25)',
           }}
         >
-          <div style={{ background: '#FFFFFF', borderRadius: '8px', height: '100%' }}>
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '8px',
+              height: '100%',
+              padding: '1rem',
+            }}
+          >
             <Calendar
               localizer={localizer}
               events={events}
@@ -161,10 +234,21 @@ export default function CalendarPage() {
               endAccessor="end"
               defaultView={Views.MONTH}
               view={view}
+              date={date}
               onView={setView}
+              onNavigate={() => {}}
               style={{ height: '100%' }}
-              toolbar={false}
-              components={{ event: CustomEvent }}
+              components={{
+                event: CustomEvent,
+                toolbar: (props) => (
+                  <CustomToolbar
+                    {...props}
+                    onNavigate={handleNavigate}
+                    onView={setView}
+                    view={view}
+                  />
+                ),
+              }}
               popup
             />
           </div>
