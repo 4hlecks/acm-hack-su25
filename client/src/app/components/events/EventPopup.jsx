@@ -5,16 +5,18 @@ import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
 import styles from "./EventPopup.module.css";
 import Link from "next/link";
+import {useRouter} from 'next/navigation';
 
 const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   const [mounted, setMounted] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     setMounted(true);
     return () => setMounted(false);
   }, []);
 
   if (!mounted || !event || !isOpen) return null;
+  
 
   const {
     coverPhoto,
@@ -172,19 +174,19 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
               </div>
 
 
-{/* Tags */}
-{event.tags && event.tags.length > 0 && (
-  <div className={styles.tagList}>
-    {event.tags.slice(0, 6).map((tag, i) => (
-      <span
-        key={i}
-        className={`${styles.tag} ${styles[`tagColor${i % 6}`]}`}
-      >
-        {tag}
-      </span>
-    ))}
-  </div>
-)}
+              {/* Tags */}
+              {event.tags && event.tags.length > 0 && (
+              <div className={styles.tagList}>
+              {event.tags.slice(0, 6).map((tag, i) => (
+              <span
+                key={i}
+                className={`${styles.tag} ${styles[`tagColor${i % 6}`]}`}
+              >
+                {tag}
+              </span>
+              ))}
+              </div>
+              )}
 
               {/* Conditional buttons */}
               <div className={styles.buttonContainer}>
@@ -201,6 +203,11 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
                 {userRole === "user" && (
                   <button onClick={onClose} className={styles.saveButton}>
                     Save Event
+                  </button>
+                )}
+                {userRole === null  && (
+                  <button onClick={() => router.push('/login')} className={styles.saveButton}>
+                    Login to Save Event
                   </button>
                 )}
               </div>

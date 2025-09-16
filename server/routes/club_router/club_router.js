@@ -15,25 +15,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-//Search clubs by name
-router.get('/search', async (req, res) => {
-    try {
-        const {query} = req.query;
-        if (!query){
-            return res.status(400).json({error: "Search query is required"});
-        }
-        
-        const clubs = await Club.find({
-            approved: true,
-            name: {$regex: query, $options: 'i'}
-        });
-
-        res.json(clubs)
-    } catch (error) {
-        res.status(500).json({error: 'Server error'})
-    }
-})
-
 
 // Get a single club by id
 // GET /api/findClub/:id

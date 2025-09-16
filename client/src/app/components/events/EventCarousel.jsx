@@ -7,11 +7,8 @@ import EventCard from "./EventCard";
 import "swiper/css";
 import styles from './EventCarousel.module.css'
 
-const EventCarousel = ({ category, events = [], onEventClick }) => {
+const EventCarousel = ({ category, events = [] }) => {
     const categoryID = category.replace(/\s+/g, "-").toLowerCase(); // e.g. "free-food"
-    const prevRef = useRef(null);
-    const nextRef = useRef(null);
-
     return (
         <section className={styles.carouselSection}>
             <header className={styles.carouselHeader}>
@@ -36,7 +33,7 @@ const EventCarousel = ({ category, events = [], onEventClick }) => {
                 >
                     {events.map((event, index) => (
                         <SwiperSlide key={index} className={styles.carouselCard}>
-                            <EventCard event={event} onEventClick={onEventClick} />
+                            <EventCard event={event} />
                         </SwiperSlide>
                     ))}
                 </Swiper>
