@@ -58,7 +58,6 @@ app.use('/api/loadEvents', eventsRouter);
 app.use('/api/findClub', clubsRouter);
 app.use('/api/search', searchRouter);
 
-app.use('/users', usersRouter);
 app.use('/uploads', express.static('uploads'));
 
 mongoose.connect(process.env.DB_URL).then(() => {

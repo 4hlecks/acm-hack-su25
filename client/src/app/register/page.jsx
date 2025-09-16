@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from 'next/link'; 
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function RegisterPage() {
 
     setSubmitting(true);
     try {
-      const res = await fetch('http://localhost:5000/users/register', {
+      const res = await fetch('http://localhost:5001/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -67,13 +68,13 @@ export default function RegisterPage() {
       <header style={{
         backgroundColor: '#ffffff',
         borderBottom: '1px solid #ccc',
-        padding: '0.8rem 1.5rem',
+        padding: '1rem 2rem',
         display: 'flex',
         alignItems: 'center'
       }}>
-        {/* If /logo.png is 404, either add the file under /public or remove this <img> */}
-        <img src="/logo.png" alt="App Logo" style={{ height: '30px', marginRight: '0.75rem' }} />
-        <h2 style={{ margin: 0, fontSize: '1.3rem' }}>EventConnect</h2>
+        <Link href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: 'black' }}>
+          current
+        </Link>
       </header>
 
       {/* Main Content */}
@@ -163,7 +164,7 @@ export default function RegisterPage() {
                 value="Club"
                 checked={accountType === 'Club'}
                 onChange={(e) => setAccountType(e.target.value)}
-              /> Club <span style={{ fontSize: '0.9rem' }}>(Must use school email)</span>
+              /> Club <span style={{ fontSize: '0.9rem' }}>(Must use club email)</span>
             </label>
           </fieldset>
 

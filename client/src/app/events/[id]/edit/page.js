@@ -1,8 +1,11 @@
 "use client";
+
 import { useEffect, useRef, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import styles from "../../../add-event/AddEventPage.module.css";
 import Cropper from "react-easy-crop";
-import styles from "./AddEventPage.module.css";
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
 const CATEGORIES = [
   "Free Food",
@@ -16,10 +19,10 @@ const CATEGORIES = [
   "Workshop",
 ];
 
-export default function AddEventPage() {
+export default function EditEventPage() {
+  const { id } = useParams();
   const router = useRouter();
 
-  // Form state
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
@@ -29,7 +32,6 @@ export default function AddEventPage() {
   const [eventCategory, setEventCategory] = useState("");
   const [coverPhoto, setCoverPhoto] = useState(null);
 
-  // image cropping state
   const [previewUrl, setPreviewUrl] = useState(null);
   const [rawFile, setRawFile] = useState(null);
   const [image, setImage] = useState(null);
@@ -77,43 +79,67 @@ export default function AddEventPage() {
     });
   }
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setRawFile(file);
-    setImage(URL.createObjectURL(file));
-    setShowCropper(true);
-  };
-
-  const handleSaveCroppedImage = async () => {
-    if (!rawFile || !croppedPixels) {
-      alert("Please crop the image first.");
-      return;
-    }
-    const croppedBlob = await getCroppedImg(image, croppedPixels);
-    const file = new File([croppedBlob], rawFile.name, { type: "image/jpeg" });
-
-    setCoverPhoto(file); // save for backend
-    setPreviewUrl(URL.createObjectURL(file)); // preview
-    setShowCropper(false);
-  };
-
-  // Category combobox UI state
   const [catInput, setCatInput] = useState("");
   const [catOpen, setCatOpen] = useState(false);
   const [catActiveIndex, setCatActiveIndex] = useState(-1);
   const catBoxRef = useRef(null);
-
-  // Tags
-  const [tags, setTags] = useState([]);
-  const [newTag, setNewTag] = useState("");
 
   const query = catInput.trim().toLowerCase();
   const filteredCategories = query
     ? CATEGORIES.filter((c) => c.toLowerCase().includes(query))
     : CATEGORIES;
 
-  // Close the dropdown on outside click
+  const [tags, setTags] = useState([]);
+  const [newTag, setNewTag] = useState("");
+
+  const handleAddTag = (e) => {
+    e.preventDefault();
+    const t = newTag.trim();
+    if (t && !tags.includes(t)) {
+      setTags([...tags, t]);
+      setNewTag("");
+    }
+  };
+
+  const handleRemoveTag = (tag) => {
+    setTags(tags.filter((t) => t !== tag));
+  };
+
+  // ---------- fetch event data ----------
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const fetchEvent = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/loadEvents/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch event");
+        const data = await res.json();
+
+        setEventTitle(data.eventTitle || "");
+        setEventDescription(data.eventDescription || "");
+        setEventDate(data.date ? data.date.split("T")[0] : "");
+        setStartTime(data.startTime || "");
+        setEndTime(data.endTime || "");
+        setEventLocation(data.eventLocation || "");
+        setEventCategory(data.eventCategory || "");
+        setCatInput(data.eventCategory || "");
+        setTags(data.tags || []);
+        if (data.coverPhoto) setPreviewUrl(data.coverPhoto);
+      } catch (err) {
+        console.error("Error fetching event:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id]);
+
   useEffect(() => {
     function onDocClick(e) {
       if (catBoxRef.current && !catBoxRef.current.contains(e.target)) {
@@ -159,20 +185,7 @@ export default function AddEventPage() {
     }
   };
 
-  const handleAddTag = (e) => {
-    e.preventDefault();
-    const t = newTag.trim();
-    if (t && !tags.includes(t) && tags.length < 6) {
-      setTags([...tags, t]);
-      setNewTag("");
-    }
-  };
-
-  const handleRemoveTag = (tag) => {
-    setTags(tags.filter((t) => t !== tag));
-  };
-
-  // Submit to backend
+  // ---------- submit ----------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -193,11 +206,9 @@ export default function AddEventPage() {
     if (coverPhoto) formData.append("coverPhoto", coverPhoto);
 
     try {
-      const res = await fetch("http://localhost:5001/api/loadEvents/create", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const res = await fetch(`${API_BASE}/api/loadEvents/${id}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         body: formData,
       });
 
@@ -210,21 +221,23 @@ export default function AddEventPage() {
       }
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create event");
+      if (!res.ok) throw new Error(data.message || "Failed to update event");
 
-      alert("Event created successfully!");
+      alert("Event updated successfully!");
       router.push("/profile-page");
     } catch (err) {
-      console.error("Error creating event:", err);
+      console.error("Error updating event:", err);
       alert("Error: " + err.message);
     }
   };
+
+  if (loading) return <div>Loading…</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
         <h2 className={styles.title}>
-          <strong>Add New Event</strong>
+          <strong>Edit Event</strong>
         </h2>
 
         <form onSubmit={handleSubmit}>
@@ -234,7 +247,7 @@ export default function AddEventPage() {
               className={styles.uploadBox}
               onClick={() => document.getElementById("fileInput").click()}
             >
-              {previewUrl && previewUrl.trim() !== "" ? (
+              {previewUrl ? (
                 <img
                   src={previewUrl}
                   alt="Cover"
@@ -243,12 +256,23 @@ export default function AddEventPage() {
                 />
               ) : null}
               <div className={styles.overlay}>Click to Change</div>
+
               <input
                 id="fileInput"
                 type="file"
                 accept="image/*"
                 hidden
-                onChange={handleFileChange}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                
+                  setRawFile(file);
+                  setImage(URL.createObjectURL(file));
+                  setPreviewUrl(URL.createObjectURL(file)); 
+                  setCoverPhoto(file); 
+                  setShowCropper(true);
+                }}
+                
               />
             </div>
 
@@ -259,9 +283,7 @@ export default function AddEventPage() {
                 className={styles.inputBox}
                 placeholder="The event name..."
                 value={eventTitle}
-                onChange={(e) => {
-                  if (e.target.value.length <= 80) setEventTitle(e.target.value);
-                }}
+                onChange={(e) => setEventTitle(e.target.value)}
                 required
               />
 
@@ -306,9 +328,7 @@ export default function AddEventPage() {
             placeholder="The location of the event..."
             className={styles.inputBox}
             value={eventLocation}
-            onChange={(e) => {
-              if (e.target.value.length <= 100) setEventLocation(e.target.value);
-            }}
+            onChange={(e) => setEventLocation(e.target.value)}
             required
           />
 
@@ -318,14 +338,11 @@ export default function AddEventPage() {
             placeholder="A description of the event..."
             className={styles.textarea}
             value={eventDescription}
-            onChange={(e) => {
-              const words = e.target.value.trim().split(/\s+/);
-              if (words.length <= 120) setEventDescription(e.target.value);
-            }}          
+            onChange={(e) => setEventDescription(e.target.value)}
             required
           ></textarea>
 
-          {/* Category (searchable combobox) */}
+          {/* Category */}
           <label><b>Category</b></label>
           <div
             ref={catBoxRef}
@@ -399,7 +416,6 @@ export default function AddEventPage() {
                 </button>
               </span>
             ))}
-
             <div className={styles.addTagForm}>
               <input
                 type="text"
@@ -419,47 +435,60 @@ export default function AddEventPage() {
             </div>
           </div>
 
-          {/* Crop popup */}
-          {showCropper && (
-            <div className={styles.popupOverlay}>
-              <div className={styles.popup}>
-                <div style={{ position: "relative", width: 300, height: 300 }}>
-                  <Cropper
-                    image={image}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={1}
-                    cropShape="rect"
-                    onCropChange={setCrop}
-                    onZoomChange={setZoom}
-                    onCropComplete={onCropComplete}
-                  />
-                </div>
-                <div className={styles.cropActions}>
-                  <button
-                    type="button"
-                    className={`${styles.cropBtn} ${styles.cancelBtn}`}
-                    onClick={() => setShowCropper(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className={`${styles.cropBtn} ${styles.saveBtn}`}
-                    onClick={handleSaveCroppedImage}
-                  >
-                    Save Cover
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           <button type="submit" className={styles.postButton}>
-            Post
+            Save Changes
           </button>
         </form>
       </div>
+
+      {/* Crop popup */}
+      {showCropper && (
+        <div className={styles.popupOverlay}>
+          <div className={styles.popup}>
+            <div style={{ position: "relative", width: 300, height: 300 }}>
+              <Cropper
+                image={image}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="rect"
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+            <div className={styles.cropActions}>
+              <button
+                type="button"
+                className={`${styles.cropBtn} ${styles.cancelBtn}`}
+                onClick={() => setShowCropper(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={`${styles.cropBtn} ${styles.saveBtn}`}
+                onClick={async () => {
+                  if (!rawFile || !croppedPixels) {
+                    alert("Please crop the image first.");
+                    return;
+                  }
+                  const croppedBlob = await getCroppedImg(image, croppedPixels);
+                  const file = new File([croppedBlob], rawFile.name, {
+                    type: "image/jpeg",
+                  });
+
+                  setCoverPhoto(file);
+                  setPreviewUrl(URL.createObjectURL(file));
+                  setShowCropper(false);
+                }}
+              >
+                Save Cover
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

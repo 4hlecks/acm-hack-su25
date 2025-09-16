@@ -3,20 +3,26 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
-import styles from "./EventPopup.module.css";
-import Link from "next/link";
-import {useRouter} from 'next/navigation';
+import styles from "./ProfileEventPopup.module.css";
 
-const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001"; 
+ function normalizeImg(src) { 
+   if (!src) return null; 
+   if (typeof src === "string" && src.startsWith("/uploads")) { 
+     return `${API_BASE}${src}`; 
+   }    
+   return src; 
+ } 
+
+const ProfileEventPopup = ({ event, clubId, onClose }) => {
   const [mounted, setMounted] = useState(false);
-  const router = useRouter();
+
   useEffect(() => {
     setMounted(true);
     return () => setMounted(false);
   }, []);
 
-  if (!mounted || !event || !isOpen) return null;
-  
+  if (!mounted || !event) return null;
 
   const {
     coverPhoto,
@@ -30,25 +36,19 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
     eventDescription,
   } = event;
 
-  const isOwner = String(eventOwner?._id || eventOwner) === String(clubId);
-  const ownerId = eventOwner?._id || eventOwner;
-
-  const profileHref = isOwner
-    ? "/profile-page"
-    : `/profile-page/${ownerId}`;
-
-  // Debug log
-  console.log("DEBUG EventPopup ownership check", {
+  // Debug logging
+  console.log("DEBUG owner check →", {
     eventOwner,
     eventOwnerId: eventOwner?._id || eventOwner,
     clubId,
-    userRole,
-    isOwner,
-    profileHref,
+    match: String(eventOwner?._id || eventOwner) === String(clubId),
   });
 
-  function formatDisplayDate(dateValue) {
-    const d = new Date(dateValue);
+  // Ownership check
+  const isOwner = String(eventOwner?._id || eventOwner) === String(clubId);
+
+  function formatDisplayDate(value) {
+    const d = new Date(value);
     if (isNaN(d.getTime())) return "Date TBD";
     return d.toLocaleDateString("en-US", {
       weekday: "short",
@@ -57,23 +57,17 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
     });
   }
 
-  function formatTimeRange(startTime, endTime) {
-    if (!startTime || !endTime) return "Time TBD";
+  function formatTimeRange(start, end) {
+    if (!start || !end) return "Time TBD";
     const options = { hour: "numeric", minute: "2-digit", hour12: true };
-
-    const startDate = new Date(
-      startTime.includes("T") ? startTime : `1970-01-01T${startTime}`
-    );
-    const endDate = new Date(
-      endTime.includes("T") ? endTime : `1970-01-01T${endTime}`
-    );
+    const startDate = new Date(start.includes("T") ? start : `1970-01-01T${start}`);
+    const endDate = new Date(end.includes("T") ? end : `1970-01-01T${end}`);
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return "Time TBD";
 
     const startStr = startDate.toLocaleTimeString([], options);
     const endStr = endDate.toLocaleTimeString([], options);
     const startAMPM = startStr.split(" ").pop();
     const endAMPM = endStr.split(" ").pop();
-
     return startAMPM === endAMPM
       ? `${startStr.replace(" " + startAMPM, "")} - ${endStr}`
       : `${startStr} - ${endStr}`;
@@ -83,33 +77,31 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   const displayTime = formatTimeRange(startTime, endTime);
 
   const dialogContent = (
-    <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog.Root open={!!event} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal container={document.body}>
         <Dialog.Backdrop className={styles.backdrop} />
         <Dialog.Popup className={styles.popup}>
           <article className={styles.eventContent}>
             {/* Mobile header */}
             <div className={styles.clubInfoMobile}>
-              {eventOwner?.profilePic ? (
-                <Link href={profileHref}> 
-                  <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
-                </Link>
-              ) : (
-                <Link href={profileHref}> 
-                  <canvas className={styles.clubLogo}></canvas>
-                </Link>
-              )}
+             {eventOwner?.profilePic ? (
+               <img
+                 src={normalizeImg(eventOwner.profilePic) || ""}
+                 alt="Club Logo"
+                 className={styles.clubLogo}
+                 onError={(e) => (e.currentTarget.style.visibility = "hidden")} 
+               />
+             ) : (
+               <canvas className={styles.clubLogo}></canvas>
+             )}
               <h3 className={styles.clubOwner}>
-                <Link href={profileHref}> 
-                  {eventOwner?.name || eventOwner || "Unknown Organizer"}
-                </Link>
+                {eventOwner?.name || eventOwner || "Unknown Organizer"}
               </h3>
               <button onClick={onClose} className={styles.closeButton}>
                 <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
               </button>
             </div>
 
-            {/* Flyer */}
             <figure className={styles.imageSection}>
               <img
                 src={
@@ -125,23 +117,20 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
               />
             </figure>
 
-
-            {/* Event info */}
             <section className={styles.eventSection}>
               <div className={styles.clubInfo}>
-                {eventOwner?.profilePic ? (
-                  <Link href={profileHref}> 
-                    <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
-                  </Link>
-                ) : (
-                  <Link href={profileHref}>
-                    <canvas className={styles.clubLogo}></canvas>
-                  </Link>
-                )}
+              {eventOwner?.profilePic ? (
+                 <img
+                   src={normalizeImg(eventOwner.profilePic) || ""}
+                   alt="Club Logo"
+                   className={styles.clubLogo}
+                   onError={(e) => (e.currentTarget.style.visibility = "hidden")} 
+                 />
+               ) : (
+                 <canvas className={styles.clubLogo}></canvas>
+               )}
                 <h3 className={styles.clubOwner}>
-                  <Link href={profileHref}> 
-                    {eventOwner?.name || eventOwner || "Unknown Organizer"}
-                  </Link>
+                  {eventOwner?.name || eventOwner || "Unknown Organizer"}
                 </h3>
                 <button onClick={onClose} className={styles.closeButton}>
                   <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
@@ -153,9 +142,7 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
 
                 <section className={styles.eventDetail}>
                   <MapPin className={styles.eventIcon} />
-                  <span className={styles.eventDetailText}>
-                    {eventLocation || "Location TBD"}
-                  </span>
+                  <span className={styles.eventDetailText}>{eventLocation || "Location TBD"}</span>
                 </section>
 
                 <section className={styles.eventDetail}>
@@ -171,43 +158,30 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
                 <Dialog.Description className={styles.eventDescription}>
                   {eventDescription || "No description available."}
                 </Dialog.Description>
+
+                {event.tags && event.tags.length > 0 && (
+                  <div className={styles.tagList}>
+                    {event.tags.slice(0, 6).map((tag, i) => (
+                      <span
+                        key={i}
+                        className={`${styles.tag} ${styles[`tagColor${i % 6}`]}`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
-
-              {/* Tags */}
-              {event.tags && event.tags.length > 0 && (
-              <div className={styles.tagList}>
-              {event.tags.slice(0, 6).map((tag, i) => (
-              <span
-                key={i}
-                className={`${styles.tag} ${styles[`tagColor${i % 6}`]}`}
-              >
-                {tag}
-              </span>
-              ))}
-              </div>
-              )}
-
-              {/* Conditional buttons */}
               <div className={styles.buttonContainer}>
-                {userRole === "club" && isOwner && (
+                {isOwner && (
                   <button
                     onClick={() =>
                       (window.location.href = `/profile-page/edit?eventId=${event._id}`)
                     }
-                    className={styles.saveButton}
+                    className={styles.saveButton}  
                   >
                     Edit Event
-                  </button>
-                )}
-                {userRole === "user" && (
-                  <button onClick={onClose} className={styles.saveButton}>
-                    Save Event
-                  </button>
-                )}
-                {userRole === null  && (
-                  <button onClick={() => router.push('/login')} className={styles.saveButton}>
-                    Login to Save Event
                   </button>
                 )}
               </div>
@@ -221,4 +195,4 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   return createPortal(dialogContent, document.body);
 };
 
-export default EventPopup;
+export default ProfileEventPopup;

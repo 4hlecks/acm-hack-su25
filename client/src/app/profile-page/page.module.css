@@ -9,21 +9,30 @@
   }
 }
 
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh; 
+  font-size: 1.2rem;
+  color: #666;
+}
+
 .eventGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(5, 180px);
+  gap: 2.4rem;
+  justify-content: center;
   margin-top: 1rem;
-  margin-left: 23.5rem;
-  margin-right: 23.5rem;
+  grid-auto-flow: row;
 }
 
 .eventsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 2rem;
-  margin-left: 23.5rem;
+  margin-top: 0rem;
+  margin-left: 10rem;
 }
 
 .sortDropdown {
@@ -52,4 +61,15 @@
 }
 
 @keyframes rotate {
+}
+
+.eventsHeader h2 {
+  font-weight: 800; 
+  font-size: 21px;
+}
+
+.subtext {
+  font-size: 0.8em;   
+  font-weight: normal; 
+  color: #666;      
 }

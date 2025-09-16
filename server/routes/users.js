@@ -183,8 +183,9 @@ router.post('/reset-password', async (req, res) => {
 // Get own club profile 
 router.get('/profile/me', auth, clubAuth, async (req, res) => {
   try {
+    res.set('Cache-Control', 'no-store');
     const club = await User.findById(req.user.id)
-      .select('name email role bio profilePic approved');
+      .select('name email role bio profilePic approved updatedAt');
     if (!club) return res.status(404).json({ message: 'Club not found.' });
     res.json({ club });
   } catch (err) {
@@ -196,66 +197,57 @@ router.get('/profile/me', auth, clubAuth, async (req, res) => {
 // Update club profile
 router.put('/updateProfile', auth, clubAuth, upload.single('profilePic'), async (req, res) => {
   try {
-    const { bio } = req.body;
+    console.log("REQ FILE FULL:", req.file);
+    console.log("REQ BODY:", req.body);
+
+    const { bio, name } = req.body;
     const clubId = req.user.id;
 
     const updateData = {};
-    if (bio !== undefined) {
-      updateData.bio = bio;
-      console.log('Added bio to updateData');
-    }
+    if (bio !== undefined) updateData.bio = bio;
+    if (name !== undefined) updateData.name = name.trim();
 
+    let message = "Profile updated successfully";
     if (req.file) {
-      updateData.profilePic = `/uploads/${req.file.filename}`; // updated link
-      console.log('Added file to updateData:', updateData.profilePic);
-      console.log('Full file object:', req.file);
-    } else {
-      console.log('No file received');
+      updateData.profilePic = req.file.path || req.file.secure_url || req.file.url;
+      message = "Profile Picture Updated!"; 
+    } else if (bio !== undefined || name !== undefined) {
+      message = "Profile Info Updated!"; 
     }
-
-    console.log('Final updateData:', updateData);
 
     const updatedClub = await User.findByIdAndUpdate(
       clubId,
       updateData,
       { new: true, runValidators: true }
-    )
-
-    if (!updatedClub) {
-      return res.status(404).json({ message: 'Club not found' });
-    }
-
-    console.log('Updated club:', {
-      bio: updatedClub.bio,
-      profilePic: updatedClub.profilePic
-    });
-
+    );
+    if (!updatedClub) return res.status(404).json({ message: 'Club not found' });
+    
     res.json({
-      message: 'Profile updated successfully',
+      message, 
       club: {
         id: updatedClub._id,
         name: updatedClub.name,
         bio: updatedClub.bio,
-        profilePic: updatedClub.profilePic
+        profilePic: updatedClub.profilePic,
+        updatedAt: updatedClub.updatedAt
       }
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Update profile error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
-// Get Club's own profile (when club clicks 'Profile' Nav)
-router.get('/profile/me', auth, clubAuth, async (req, res) => {
+// Public profile by user/club ID (no auth needed)
+router.get('/profile/:id', async (req, res) => {
   try {
-    const club = await User.findById(req.user.id).select('-password');
-    if (!club) {
-      return res.status(404).json({ message: 'Club not found.' });
-    }
-    res.json({ club });
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    const user = await User.findById(req.params.id)
+      .select('name role bio profilePic approved updatedAt');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json({ club: user }); // ✅ same shape as /profile/me
+  } catch (err) {
+    console.error('Public profile error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
 
@@ -350,4 +342,3 @@ router.delete('/:userId/saved-events/:eventId', auth, async (req, res) => {
 });
 
 module.exports = router;
-

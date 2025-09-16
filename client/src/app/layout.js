@@ -1,5 +1,6 @@
 import './globals.css'
 import { Onest } from 'next/font/google'
+import {PopupProvider} from '@/app/context/PopupContext';
 
 const onest = Onest({
   subsets: ["latin"],
@@ -16,7 +17,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={onest.className}>{children}</body>
+      <body className={onest.className}>
+        <PopupProvider>{children}</PopupProvider>
+      </body>
     </html>
   )
 }
