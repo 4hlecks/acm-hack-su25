@@ -2,8 +2,8 @@ import React from "react";
 import { Calendar, MapPin, Clock } from "react-feather";
 import styles from "./EventCard.module.css";
 
-const EventCard = ({ event, onEventClick }) => {
-  const {
+const EventCard = ({ event, onEventClick, disableHover = false }) => {
+    const {
     coverPhoto,
     eventTitle,
     eventOwner,
@@ -66,18 +66,19 @@ const EventCard = ({ event, onEventClick }) => {
   }
 
   return (
-    <article className={styles.eventCard} onClick={handleClick}>
+    <article
+        className={`${styles.eventCard} ${disableHover ? styles.noHover : ""}`}
+        onClick={handleClick}
+    >
       <div className={styles.eventCover}>
-        <img
-          className={styles.eventCoverImage}
-          src={coverPhoto}
-          alt={`${eventTitle} Cover Image`}
-          onError={(e) => {
-            console.log("Image failed to load:");
-            e.target.src =
-              "https://res.cloudinary.com/dl6v3drqo/image/upload/v1755808273/ucsandiego_pxvdhh.png";
-          }}
-        />
+      <img
+        className={styles.eventCoverImage}
+        src={coverPhoto && coverPhoto.trim() !== "" ? coverPhoto : "/images/ucsd-logo.png"}
+  alt={`${eventTitle} Cover Image`}
+  onError={(e) => {
+    e.currentTarget.src = "/images/image.png";
+  }}
+/>
       </div>
       <section className={styles.eventInfo}>
         <header className={styles.eventHeader}>
