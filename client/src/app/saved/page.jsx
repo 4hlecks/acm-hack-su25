@@ -6,18 +6,28 @@ import styles from '../page.module.css';
 
 export default function SavedEventsPage() {
   const [savedEvents, setSavedEvents] = useState([]);
-  const myId = "YOUR_USER_OR_ORG_ID"; // Replace with your actual user/org ID
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'),'{}');
+  const userId = user.id;
 
   useEffect(() => {
     const fetchSavedEvents = async () => {
-      // Adjust the endpoint to match backend for saved events
-      const response = await fetch(`http://localhost:5000/api/users/${myId}/saved-events`);
+      const response = await fetch(`http://localhost:5000/api/users/${userId}/saved-events`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
       const data = await response.json();
       setSavedEvents(data); 
     };
     fetchSavedEvents();
   }, []);
 
+  if (!token) {
+    return <p>Invalid or missing token. Please use the link from your email.</p>;
+  }
+  
   return (
     <>
       <NavBar />
