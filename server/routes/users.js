@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const User = require('../models/users_schema'); // ONLY users model now
+const Event = require('../models/event_schema')
 const auth = require('../middleware/auth');
 const clubAuth = require('../middleware/clubAuth');
 const upload = require('../middleware/upload');
@@ -284,12 +285,15 @@ router.get('/:userId/saved-events', auth, async (req, res) => {
 router.post('/:userId/saved-events/:eventId', auth, async (req, res) => {
   try{
     const {userId, eventId} = req.params;
+    console.log("Save event - userId:", userId, "eventId:", eventId);
+    console.log("Authenticated user ID:", req.user.id);
 
     if (req.user.id !== userId){
       return res.status(403).json({error: 'Unauthorized'})
     }
 
     //Check if event exists
+    console.log("Looking for event with ID:", eventId);
     const event = await Event.findById(eventId);
     if (!event){
       return res.status(404).json({error: 'Event not found'})
