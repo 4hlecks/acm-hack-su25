@@ -29,10 +29,12 @@
     h1 {
         font-size: var(--font-size-title);
         font-weight: var(--font-weight-heading);
+        white-space: nowrap;
     }
 
     h2 {
         font-size: var(--font-size-heading);
         font-weight: var(--font-weight-subheading);
+        white-space: nowrap;
     }
 }

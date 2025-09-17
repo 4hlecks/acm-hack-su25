@@ -82,6 +82,7 @@
     font-weight: var(--font-weight-subheading);
     width: 100%;
     height: 100%;
+    white-space: nowrap;
 }
 
 .thContent[data-sortable] {

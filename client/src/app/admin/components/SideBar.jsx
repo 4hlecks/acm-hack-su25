@@ -2,8 +2,10 @@
 
 import styles from './SideBar.module.css';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Home, Users, Calendar, Flag, FileText, MoreVertical, Settings } from 'react-feather';
+import SettingsDrawer from './SettingsDrawer';
 
 export default function SideBar() {
     const navItems = [
@@ -16,6 +18,8 @@ export default function SideBar() {
 
     const profilePic = false;
     const pathname = usePathname();
+
+    const [openSettings, setOpenSettings ] = useState(false);
 
     return (
         <nav className={styles.sideBar}>
@@ -55,7 +59,13 @@ export default function SideBar() {
                 })}
             </ul>
 
-            <button className={styles.navLink}><Settings className={styles.navIcon}/> Settings</button>
+            <button 
+                className={styles.navLink}
+                onClick={() => setOpenSettings(true)}
+            >
+                <Settings className={styles.navIcon}/> Settings
+            </button>
+            <SettingsDrawer open={openSettings} onOpenChange={setOpenSettings} />
         </nav>
     );
 }

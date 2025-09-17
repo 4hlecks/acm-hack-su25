@@ -1,0 +1,57 @@
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 1000;
+}
+
+@keyframes slideIn {
+    to { transform: translateX(0); }
+}
+
+.drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 32rem;
+    padding: 2rem;
+    background-color: var(--primary-color);
+    display: flex;
+    flex-direction: column;
+    gap: var(--site-gap);
+    box-shadow: -1rem 0 2rem rgba(0,0,0,.25);
+    z-index: 1000;
+
+    /* slide-in from right */
+    transform: translateX(100%);
+    animation: slideIn 220ms ease-out forwards;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0;
+    align-items: center;
+}
+
+.title {
+    font-size: var(--font-size-heading);
+    font-weight: var(--font-weight-subheading);
+}
+
+.closeIcon {
+    aspect-ratio: 1 / 1;
+    width: 2rem;
+    stroke-width: 3px;
+    cursor: pointer;
+    transition: color 160ms ease;
+}
+
+.closeIcon:hover {
+    color: var(--button-secondary-bg);
+}
