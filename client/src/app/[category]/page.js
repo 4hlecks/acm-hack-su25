@@ -50,7 +50,7 @@ export default function CategoryEventsPage() {
     useEffect(() => {
         const fetchCategoryEvents = async () => {
             try{
-                const response = await fetch(`http://localhost:5000/api/loadEvents/category/${categoryDisplayName}`);
+                const response = await fetch(`http://localhost:5001/api/loadEvents/category/${categoryDisplayName}`);
                 const data = await response.json();
                 setEvents(data);
             } catch (error){

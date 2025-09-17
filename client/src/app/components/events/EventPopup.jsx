@@ -9,11 +9,52 @@ import {useRouter} from 'next/navigation';
 
 const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
   const [mounted, setMounted] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+
   const router = useRouter();
+
   useEffect(() => {
     setMounted(true);
     return () => setMounted(false);
-  }, []);
+  }, [event, isOpen]);
+
+const checkIfEventSaved = async() => {
+    try {
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.id;
+
+      const response = await fetch(`http://localhost:5001/api/users/${userId}/saved-events`, {
+          headers:{
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+          }
+      });
+
+      //Get the saved events array
+      if (response.ok){
+        const savedEvents = await response.json();
+        const isEventSaved = savedEvents?.some(savedEvent => 
+        savedEvent._id === event._id || savedEvent === event._id
+        );
+        setIsSaved(isEventSaved);
+      } else{
+        return;
+      }
+      
+      //Check if current event is in that array
+      
+    } catch (error) {
+        console.error('Error checking if event is saved:', error);
+    }
+  }
+  useEffect(() => {
+    if (event && isOpen){
+        checkIfEventSaved()
+    }
+  } , [event, isOpen])
+
+
 
   if (!mounted || !event || !isOpen) return null;
   
@@ -46,6 +87,35 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
     isOwner,
     profileHref,
   });
+
+  
+
+  const handleSaveEvent = async() => {
+    try{
+      const token = localStorage.getItem('token');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.id;
+
+      const method = isSaved ? 'DELETE' : 'POST';
+
+      const response = await fetch(`http://localhost:5001/api/users/${userId}/saved-events/${event._id}`, {
+          method: method,
+          headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+          }
+      });
+
+      if (response.ok){
+        setIsSaved(!isSaved); 
+        console.log('Event saved successfully')
+      } else{
+        console.error('Error saving event')
+      }
+    } catch (error){
+      console.error('Network error:', error)
+    }
+  }
 
   function formatDisplayDate(dateValue) {
     const d = new Date(dateValue);
@@ -201,9 +271,9 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
                   </button>
                 )}
                 {userRole === "user" && (
-                  <button onClick={onClose} className={styles.saveButton}>
-                    Save Event
-                  </button>
+                  <button onClick={handleSaveEvent} className={styles.saveButton}>
+                    {isSaved ? 'Remove from Saved' : 'Save Event'}
+                  </button>                               
                 )}
                 {userRole === null  && (
                   <button onClick={() => router.push('/login')} className={styles.saveButton}>
