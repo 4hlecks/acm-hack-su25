@@ -181,13 +181,18 @@ router.post('/reset-password', async (req, res) => {
 });
 
 // Get own club profile 
-router.get('/profile/me', auth, clubAuth, async (req, res) => {
+router.get('/profile/me', auth, async (req, res) => {
   try {
     res.set('Cache-Control', 'no-store');
-    const club = await User.findById(req.user.id)
+    const user = await User.findById(req.user.id)
       .select('name email role bio profilePic approved updatedAt');
-    if (!club) return res.status(404).json({ message: 'Club not found.' });
-    res.json({ club });
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+    
+    if (user.role === 'club') {
+      res.json({ club: user });
+    } else {
+      res.json({ user: user });
+    }
   } catch (err) {
     console.error('Get profile error:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
