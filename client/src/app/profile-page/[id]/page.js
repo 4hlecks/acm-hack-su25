@@ -4,22 +4,54 @@ import React, { useEffect, useState, use } from "react";
 import styles from "../page.module.css";
 import NavBar from "../../components/navbar/NavBar";
 import EventCard from "../../components/events/EventCard";
-import EventPopup from "../ProfileEventPopup"; 
+import EventPopup from "@/app/components/events/EventPopup";
 import ProfileCard from "../../components/profile/ProfileCard";
 import TabBar from "../../components/navbar/TabBar";
 import { useRouter } from "next/navigation";
-
+import { usePopup } from "@/app/context/PopupContext";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
 export default function PublicProfile({ params }) {
   // 👇 unwrap the promise
   const { id } = use(params);
-  const router = useRouter();
 
   const [club, setClub] = useState(null);
   const [orgEvents, setOrgEvents] = useState({ upcoming: [], past: [] });
   const [loading, setLoading] = useState(true);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState(null);
+  const {selectedEvent, openEventPopup, isPopupOpen, closeEventPopup} = usePopup();
+
+  useEffect(() => {
+      const fetchCurrentUser = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+      
+      try {
+        const res = await fetch(`${API_BASE}/users/profile/me`, {
+          headers: {Authorization: `Bearer ${token}`},
+        });
+        
+        if (res.ok) {
+          const profileData = await res.json();
+          console.log("Profile data:", profileData);
+          if (profileData.club) {
+            setCurrentUser(profileData.club);
+            setCurrentUserRole("club");
+          } else if (profileData.user) {
+            setCurrentUser(profileData.user);
+            setCurrentUserRole("user");
+          } 
+        } 
+      } catch (err) {
+        console.error("Error fetching current user profile:", err);
+        setCurrentUser(null);
+        setCurrentUserRole(null);
+      }
+    }
+    fetchCurrentUser();
+  }, []);
+
 
   useEffect(() => {
     let isMounted = true;
@@ -58,8 +90,19 @@ export default function PublicProfile({ params }) {
     return () => { isMounted = false; };
   }, [id]);
 
-  if (loading) return <div>Loading…</div>;
 
+  if (loading) {
+    return (
+    <div className={styles.loadingContainer}>
+      <div>Loading…</div>
+    </div>
+    )
+  };
+
+  const handleEventClick = (event) =>{
+    openEventPopup(event);
+  }
+    
   return (
     <>
       <NavBar />
@@ -82,7 +125,7 @@ export default function PublicProfile({ params }) {
             orgEvents.upcoming.map((event) => (
               <div
                 key={event._id}
-                onClick={() => setSelectedEvent(event)}
+                onClick={() => handleEventClick(event)}
                 style={{ cursor: "pointer" }}
               >
                 <EventCard event={event} />
@@ -106,7 +149,7 @@ export default function PublicProfile({ params }) {
             orgEvents.past.map((event) => (
               <div
                 key={event._id}
-                onClick={() => setSelectedEvent(event)}
+                onClick={() => handleEventClick(event)}
                 style={{ cursor: "pointer" }}
               >
                 <EventCard event={event} />
@@ -114,12 +157,12 @@ export default function PublicProfile({ params }) {
             ))
           )}
         </section>
-
-        {selectedEvent && (
-          <EventPopup
-            event={selectedEvent}
-            clubId={club?._id}
-            onClose={() => setSelectedEvent(null)}
+        {isPopupOpen && (
+          <EventPopup event={selectedEvent}
+          onClose={closeEventPopup}
+          isOpen={isPopupOpen}
+          clubId={currentUser?._id}
+          userRole={currentUserRole}
           />
         )}
       </main>

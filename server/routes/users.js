@@ -252,6 +252,93 @@ router.get('/profile/:id', async (req, res) => {
 });
 
 
+//GET user's saved events
+router.get('/:userId/saved-events', auth, async (req, res) => {
+  try{
+    const {userId} = req.params;
 
+    if (req.user.id !== userId){
+      return res.status(403).json({error : 'Unauthorized to access this data'});
+    }
+
+    //Find user and populate saved events
+    const user = await User.findById(userId).populate('savedEvents');
+
+    if (!user){
+      return res.status(404).json({error: 'User not found'});
+    }
+
+    res.json(user.savedEvents);
+  } catch (error){
+    console.error('Error fetching saved events:', error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+})
+
+//POST - Save an event
+router.post('/:userId/saved-events/:eventId', auth, async (req, res) => {
+  try{
+    const {userId, eventId} = req.params;
+
+    if (req.user.id !== userId){
+      return res.status(403).json({error: 'Unauthorized'})
+    }
+
+    //Check if event exists
+    const event = await Event.findById(eventId);
+    if (!event){
+      return res.status(404).json({error: 'Event not found'})
+    }
+
+    //Add event to user's saved events 
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {$addToSet: {savedEvents: eventId}},
+      {new: true}
+    ).populate('savedEvents');
+
+    if (!user){
+      return res.status(404).json({error: 'User not found'});
+    }
+
+    res.json({
+      message: 'Event saved successfully.',
+      savedEvents: user.savedEvents
+    });
+  } catch (error){
+    console.error('Error saving event:', error);
+    res.status(500).json({error: 'Internal server error'})
+  }
+})
+
+//DELETE saved events
+router.delete('/:userId/saved-events/:eventId', auth, async (req, res) => {
+  try{
+    const {userId, eventId} = req.params;
+
+    if (req.user.id !== userId){
+      return res.status(403).json({error: 'Unauthorized'});
+    }
+
+    //Remove event from user's saved events
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {$pull: {savedEvents: eventId}},
+      {new: true}
+    ).populate('savedEvents');
+
+    if (!user){
+      return res.status(404).json({error: 'User not found'})
+    }
+
+    res.json({
+      message: 'Event removed from saved events',
+      savedEvents: user.savedEvents
+    });
+  } catch (error){
+    console.error('Error removing saved event:', error);
+    res.status(500).json({error: 'Internal server error'})
+  }
+});
 
 module.exports = router;

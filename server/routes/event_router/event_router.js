@@ -15,8 +15,31 @@ console.log('Allowed categories:', Event.schema.path('eventCategory').enumValues
 // helper: build full end datetime from date + endTime
 function buildEndDateTime(event) {
   const baseDate = new Date(event.date);
+  
+  // Check if the base date is invalid 
+  if (isNaN(baseDate.getTime())) {
+    console.error(`Invalid base date for event ${event._id}: "${event.date}"`);
+    return new Date(); // Return current date as fallback
+  }
+  
   const endTimeStr = event.endTime || "23:59";
-  return new Date(`${baseDate.toISOString().split("T")[0]}T${endTimeStr}`);
+  
+  //Remove AM/PM
+  const cleanTime = endTimeStr.replace(/\s*(AM|PM)\s*/i, '');
+  
+  // Create the ISO string safely
+  const dateStr = baseDate.toISOString().split("T")[0];
+  const isoString = `${dateStr}T${cleanTime}`;
+  
+  const endDateTime = new Date(isoString);
+  
+  // If date is still invalid, fall back to end of day
+  if (isNaN(endDateTime.getTime())) {
+    console.warn(`Invalid endTime format for event ${event._id}: "${event.endTime}", using end of day`);
+    return new Date(`${dateStr}T23:59:59`);
+  }
+  
+  return endDateTime;
 }
 
 // create event route
@@ -139,6 +162,8 @@ router.get('/category/:categoryChoice', async (req, res) => {
 router.get('/byClub/:clubId', async (req, res) => {
   try {
     const { clubId } = req.params;
+    console.log('=== FETCHING EVENTS FOR CLUB:', clubId, '===');
+
     const now = new Date();
     const oneMonthAgo = new Date();
     oneMonthAgo.setMonth(now.getMonth() - 1);

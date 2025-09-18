@@ -77,6 +77,27 @@
   padding: 0.25rem 0;
 }
 
+.loadingState{
+  padding: 2rem var(--searchbar-padding);
+  text-align:center;
+  color: var(--text-muted-color);
+}
+
+.loadingState p{
+  margin: 0;
+}
+
+.errorState {
+  padding: 2rem var(--searchbar-padding);
+  text-align: center;
+  color: var(--error-color, #dc3545); /* fallback color if CSS var not defined */
+}
+
+.errorState p {
+  margin: 0;
+}
+
+
 /* Each row wraps a full-width button for easy click/tap target */
 .resultItem { }
 

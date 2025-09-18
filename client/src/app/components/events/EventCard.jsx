@@ -1,8 +1,9 @@
 import React from "react";
 import { Calendar, MapPin, Clock } from "react-feather";
 import styles from "./EventCard.module.css";
+import { usePopup } from "@/app/context/PopupContext";
 
-const EventCard = ({ event, onEventClick, disableHover = false }) => {
+const EventCard = ({ event, disableHover = false }) => {
     const {
     coverPhoto,
     eventTitle,
@@ -14,6 +15,7 @@ const EventCard = ({ event, onEventClick, disableHover = false }) => {
     eventLocation,
     tags,
   } = event;
+  const { openEventPopup } = usePopup();
 
   console.log("EventCard event:", event);
 
@@ -62,7 +64,7 @@ const EventCard = ({ event, onEventClick, disableHover = false }) => {
 
   function handleClick() {
     console.log("EventCard clicked!", eventTitle);
-    if (onEventClick) onEventClick(event);
+    openEventPopup(event);
   }
 
   return (
@@ -74,11 +76,11 @@ const EventCard = ({ event, onEventClick, disableHover = false }) => {
       <img
         className={styles.eventCoverImage}
         src={coverPhoto && coverPhoto.trim() !== "" ? coverPhoto : "/images/ucsd-logo.png"}
-  alt={`${eventTitle} Cover Image`}
-  onError={(e) => {
-    e.currentTarget.src = "/images/image.png";
-  }}
-/>
+        alt={`${eventTitle} Cover Image`}
+        onError={(e) => {
+          e.currentTarget.src = "/images/image.png";
+        }}
+      />
       </div>
       <section className={styles.eventInfo}>
         <header className={styles.eventHeader}>
