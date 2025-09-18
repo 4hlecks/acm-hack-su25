@@ -1,13 +1,16 @@
 .tableWrapper {
     border: 1px solid var(--tertiary-color);
     border-radius: var(--border-radius);
-    overflow: auto;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    min-width: 0;
 }
 
 /* Root <table> element. Set layout, width, border-collapse, etc. */
 .table {
     width: 100%;
-    height: auto;
+    height: 100%;
     border-collapse: separate;
     border-spacing: 0;
 }

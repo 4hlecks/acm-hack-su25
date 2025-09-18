@@ -74,6 +74,7 @@
     font-weight: 500;
     align-items: center;
     width: 100%;
+    white-space: nowrap;
 }
 .filterChoice { color: #000; font-weight: 700; }
 
