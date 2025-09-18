@@ -7,6 +7,10 @@ import styles from './CategoryEvents.module.css'
 import { ArrowLeft } from "react-feather";
 import NavBar from '../components/navbar/NavBar'
 import EventPopup from '../components/events/EventPopup';
+import { usePopup } from '../context/PopupContext';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
+
 export default function CategoryEventsPage() {
     const params = useParams();
     const router = useRouter();
@@ -24,6 +28,9 @@ export default function CategoryEventsPage() {
         'study-jam': 'Study Jam',
         'workshop': 'Workshop'
     };
+    
+    const { selectedEvent, isPopupOpen, openEventPopup, closeEventPopup } = usePopup();
+
 
     //Capitalizes the first letter and removes the '-'if there is a gap
     const categoryDisplayName = categoryMapping[category] || 
@@ -31,26 +38,13 @@ export default function CategoryEventsPage() {
 
     const [events, setEvents] = useState([]);
     const [loading , setLoading] = useState(true);
-
-    //Popup Feature
-    const [selectedEvent, setSelectedEvent] = useState(null);
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
-
-    const openEventPopup = (event) => {
-    console.log('Opening popup with event:', event); 
-    setSelectedEvent(event);
-    setIsPopupOpen(true);
-  };
-
-  const closeEventPopup = () => {
-    setSelectedEvent(null);
-    setIsPopupOpen(false);
-  };
+    const [club, setClub] = useState(null);
+    const [userRole, setUserRole] = useState(null);
 
     useEffect(() => {
         const fetchCategoryEvents = async () => {
             try{
-                const response = await fetch(`http://localhost:5001/api/loadEvents/category/${categoryDisplayName}`);
+                const response = await fetch(`${API_BASE}/api/loadEvents/category/${categoryDisplayName}`);
                 const data = await response.json();
                 setEvents(data);
             } catch (error){
@@ -58,10 +52,33 @@ export default function CategoryEventsPage() {
             } finally{
                 setLoading(false);
             }
-        }
+        };
+
+        const fetchProfile = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) return;
+            try {
+                const res = await fetch(`${API_BASE}/users/profile/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+                });
+                if (res.ok) {
+                const profileData = await res.json();
+                if (profileData.club) {
+                    setClub(profileData.club);
+                    setUserRole("club");
+                } else if (profileData.user) {
+                    setClub(null);
+                    setUserRole("user");
+                }
+                }
+            } catch (err) {
+                console.error("Error fetching profile:", err);
+            }
+        };
         if (category){
             fetchCategoryEvents();
         }
+        fetchProfile();
     }, [categoryDisplayName])
 
     if (loading){
@@ -102,7 +119,13 @@ export default function CategoryEventsPage() {
             </div>
 
             {isPopupOpen && (
-                <EventPopup event={selectedEvent} onClose={closeEventPopup} isOpen={isPopupOpen} />
+                <EventPopup
+                event={selectedEvent}
+                onClose={closeEventPopup}
+                isOpen={isPopupOpen}
+                clubId={club?._id}
+                userRole={userRole}
+                />
             )}
         </>
     );
