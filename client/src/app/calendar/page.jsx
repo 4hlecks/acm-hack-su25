@@ -19,9 +19,13 @@ function CustomEvent({ event }) {
     hour: 'numeric',
     minute: '2-digit',
   });
+  const endTime = event.end.toLocaleTimeString([], {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
   return (
     <span>
-      {startTime} – <strong>{event.title}</strong>
+      {startTime} – {endTime} | <strong>{event.title}</strong>
     </span>
   );
 }
@@ -106,15 +110,15 @@ export default function CalendarPage() {
     async function fetchEvents() {
       try {
         const token = localStorage.getItem('accessToken');
-        const type = localStorage.getItem('accountType');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const type = user.role;
         const userId = user.id;
         setAccountType(type);
 
         if (!userId || !token) return;
 
         let url =
-          type === 'student'
+          type === 'user'
             ? `http://localhost:5001/api/users/${userId}/saved-events`
             : 'http://localhost:5001/events/byOwner/me';
 
@@ -128,12 +132,19 @@ export default function CalendarPage() {
         if (!res.ok) return;
 
         const data = await res.json();
-        const rawEvents = Array.isArray(data) ? data : data.events || [];
+        let rawEvents = [];
+
+        if (type === 'user') {
+          rawEvents = Array.isArray(data) ? data : [];
+        } else if (type === 'club') {
+          rawEvents = [...(data.upcomingEvents || []), ...(data.pastEvents || [])];
+        }
 
         const formatted = rawEvents.map((ev) => {
-          const start = new Date(ev.Date);
-          const end = new Date(ev.Date);
-          end.setHours(start.getHours() + 1);
+          const baseDate = new Date(ev.date);
+          const dateStr = baseDate.toISOString().split('T')[0];
+          const start = new Date(`${dateStr}T${ev.startTime}`);
+          const end = new Date(`${dateStr}T${ev.endTime}`);
           return {
             title: ev.eventTitle,
             start,
@@ -205,7 +216,7 @@ export default function CalendarPage() {
             color: '#001f3f',
           }}
         >
-          {accountType === 'student' ? 'My Saved Events' : 'My Club’s Events'}
+          {accountType === 'user' ? 'My Saved Events' : 'My Club’s Events'}
         </h1>
 
         <div
