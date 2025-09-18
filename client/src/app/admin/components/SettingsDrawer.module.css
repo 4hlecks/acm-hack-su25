@@ -1,0 +1,12 @@
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    
+}
+
+.label {
+    font-size: var(--font-size-subheading);
+    font-weight: var(--font-weight-subheading);
+    white-space: nowrap;
+}

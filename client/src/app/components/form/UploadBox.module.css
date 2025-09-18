@@ -43,7 +43,8 @@
   line-height: 1.2;
 }
 
-.emptyPrimary { margin-bottom: .25rem; }
+.emptyPrimary { margin-bottom: .25rem; font-weight: 700; }
+.emptySecondary { font-weight: 600; }
 
 /* ========== Preview state ========== */
 .previewStack {

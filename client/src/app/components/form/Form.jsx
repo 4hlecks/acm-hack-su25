@@ -146,3 +146,190 @@ export function SelectField({
 /** Date & Time reuse TextField with type override (overlay method for the icon) */
 export function DateField(props) { return <TextField {...props} type="date" />; }
 export function TimeField(props) { return <TextField {...props} type="time" />; }
+
+/** TextArea Field (multiline descriptions) */
+export function TextAreaField({
+  id, label, layout, fieldWidth, help, error, required, rows = 4, ...rest
+}) {
+  const describedBy = [
+    help ? `${id}-help` : null,
+    error ? `${id}-error` : null,
+  ].filter(Boolean).join(' ') || undefined;
+
+  return (
+    <FormField
+      id={id}
+      label={label}
+      layout={layout}
+      fieldWidth={fieldWidth}
+      help={help}
+      error={error}
+      required={required}
+    >
+      <div className={styles.controlBox}>
+        <textarea
+          id={id}
+          className={styles.textarea}
+          rows={rows}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
+          {...rest}
+        />
+      </div>
+    </FormField>
+  );
+}
+
+/**
+ * ComboBoxField - type-to-filter + dropdown list of options.
+ * Minimal ARIA: role=combobox + listbox + options
+ * options: Array<{ value: string, label: string }>
+ */
+// replace your ComboBoxField with this version (only the component body changed)
+export function ComboBoxField({
+    id,
+    label,
+    options = [],
+    value = '',
+    onChange,
+    onSelect,
+    placeholder = '',
+    layout,
+    fieldWidth,
+    help,
+    error,
+    required,
+}) {
+    const [open, setOpen] = React.useState(false);
+    const [activeIdx, setActiveIdx] = React.useState(-1);
+    const inputRef = React.useRef(null);
+    const wrapRef = React.useRef(null);
+    const listRef = React.useRef(null);
+    const listId = `${id}-listbox`;
+
+    // Pointer-intent guard: only open on pointer focus (not label-induced focus)
+    const pointerIntent = React.useRef(false);
+    const armPointerIntent = () => { pointerIntent.current = true; };
+    const disarmPointerIntentSoon = () => { setTimeout(() => { pointerIntent.current = false; }, 0); };
+
+    const filtered = React.useMemo(() => {
+        const q = (value || '').toLowerCase().trim();
+        if (!q) return options;
+        return options.filter(o => o.label.toLowerCase().includes(q));
+    }, [options, value]);
+
+    // No wrapper height animation anymore; measuring kept in case you want it
+    React.useLayoutEffect(() => {
+        if (!wrapRef.current) return;
+        const barH = wrapRef.current.offsetHeight || 0;
+        const listH = open && listRef.current ? listRef.current.offsetHeight : 0;
+        wrapRef.current.style.setProperty('--combo-shadow-h', `${barH + listH}px`);
+    }, [open, filtered.length]);
+
+    function commitOption(opt) {
+        onSelect?.(opt);
+        onChange?.(opt.label);
+        setOpen(false);
+        inputRef.current?.blur();
+    }
+
+    function handleKeyDown(e) {
+        if (!open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+            e.preventDefault();
+            setOpen(true);
+            setActiveIdx(0);
+            return;
+        }
+        if (!open) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setActiveIdx(i => Math.min(i + 1, filtered.length - 1));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setActiveIdx(i => Math.max(i - 1, 0));
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const opt = filtered[activeIdx];
+            if (opt) commitOption(opt);
+        } else if (e.key === 'Escape') {
+            setOpen(false);
+        }
+    }
+
+    return (
+        <FormField
+            id={id}
+            label={label}
+            layout={layout}
+            fieldWidth={fieldWidth}
+            help={help}
+            error={error}
+            required={required}
+        >
+            <div
+                ref={wrapRef}
+                className={`${styles.combo} ${open ? styles.comboOpen : ''}`}
+                // ❌ remove onFocus here
+                onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false);
+                }}
+            >
+                <div
+                    className={styles.comboBar}
+                    onPointerDown={armPointerIntent}
+                    onPointerUp={disarmPointerIntentSoon}
+                >
+                    <input
+                        ref={inputRef}
+                        id={id}
+                        className={styles.input}
+                        type="text"
+                        value={value}
+                        placeholder={placeholder}
+                        onFocus={() => {
+                            // Only open if focus came from a pointer inside the bar
+                            if (pointerIntent.current) setOpen(true);
+                        }}
+                        onChange={(e) => {
+                            onChange?.(e.target.value);
+                            setOpen(true);            // typing should open
+                            setActiveIdx(0);
+                        }}
+                        onKeyDown={handleKeyDown}      // arrows open
+                        role="combobox"
+                        aria-expanded={open}
+                        aria-controls={listId}
+                        aria-autocomplete="list"
+                        aria-invalid={!!error}
+                    />
+                </div>
+
+                <ul
+                    ref={listRef}
+                    id={listId}
+                    role="listbox"
+                    className={styles.comboList}
+                    data-open={open ? 'true' : undefined}
+                >
+                    {filtered.map((opt, i) => (
+                        <li
+                            key={opt.value}
+                            role="option"
+                            aria-selected={i === activeIdx}
+                            className={`${styles.comboOption} ${i === activeIdx ? styles.comboOptionActive : ''}`}
+                            onMouseDown={(e) => { e.preventDefault(); commitOption(opt); }}
+                        >
+                            {opt.label}
+                        </li>
+                    ))}
+                    {filtered.length === 0 && (
+                        <li className={`${styles.comboOption} ${styles.comboEmpty}`} aria-disabled="true">
+                            No matches
+                        </li>
+                    )}
+                </ul>
+            </div>
+        </FormField>
+    );
+}

@@ -37,4 +37,10 @@
         font-weight: var(--font-weight-subheading);
         white-space: nowrap;
     }
+
+    h3 {
+        font-size: var(--font-size-subheading);
+        font-weight: var(--font-weight-subheading);
+        white-space: nowrap;
+    }
 }
