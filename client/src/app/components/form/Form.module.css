@@ -1,0 +1,110 @@
+/* Form.module.css — overlay method for date/time; replace arrow for select */
+
+/* ===== Wrapper & Layout ===== */
+.field {
+  display: grid;
+  gap: 0.5rem; /* gap between label and field */
+}
+
+.field[data-layout="column"] {}
+
+.field[data-layout="row"] {
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  column-gap: 0.5rem;
+}
+
+.hasError {}
+
+/* ===== Label & assist ===== */
+.label {
+  font-size: var(--font-size-form-label);
+  font-weight: 600;
+}
+.req { margin-left: 0.125rem; }
+
+.help {}
+.error {}
+
+/* ===== Control container (holds the input/select and the end icon) ===== */
+.controlBox {
+  position: relative;
+  width: var(--field-w, auto); /* override per-field via prop */
+}
+
+/* When an end icon is present, add right padding so text doesn't overlap it */
+.controlBox[data-has-icon="true"] .input,
+.controlBox[data-has-icon="true"] .select {
+  padding-right: calc(1rem + var(--icon-size-medium) + 0.25rem);
+}
+
+/* ===== Fields (inputs & selects) – shared look ===== */
+.input,
+.select {
+  width: 100%;
+  height: 2.5rem;
+  font-size: var(--font-size-form-field);
+  padding: 0 1rem;
+  background: var(--primary-color);
+  border: 1px solid var(--tertiary-color);
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+  color: var(--text-muted-color);
+}
+
+/* ===== Select: remove native arrow, rely on custom icon ===== */
+.select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* ===== Date/Time: overlay method =====
+   Hide native picker indicator VISUALLY but keep it clickable under the custom icon */
+.input[type="date"]::-webkit-calendar-picker-indicator,
+.input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0; /* invisible but clickable; your icon sits on top */
+}
+
+/* Optional cleanups for time pseudo-buttons */
+.input[type="time"]::-webkit-clear-button,
+.input[type="time"]::-webkit-inner-spin-button,
+.input[type="time"]::-webkit-outer-spin-button {
+  display: none;
+}
+
+/* ===== Inside-field end icon (far right) ===== */
+.icon,
+.iconBtn {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--icon-size-medium);
+  height: var(--icon-size-medium);
+  line-height: 0;
+  color: black;
+}
+
+/* Non-interactive icon (e.g., select) should not intercept clicks */
+.icon { pointer-events: none; }
+
+/* Interactive icon for date/time to open picker */
+.iconBtn { pointer-events: auto; cursor: pointer; }
+
+.icon > svg,
+.iconBtn > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  stroke: currentColor;
+}
+
+/* ===== Focus states (optional) ===== */
+/*
+.input:focus-visible,
+.select:focus-visible {
+  outline: 2px solid var(--focus-ring, #5b9cff);
+  outline-offset: 2px;
+}
+*/

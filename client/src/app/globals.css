@@ -41,6 +41,10 @@
   --font-size-button-medium: 1rem;
   --font-size-button-small: 1rem;
 
+  /* Form Variables */
+  --font-size-form-label: 1.5rem;
+  --font-size-form-field: 1rem;
+
   /* Typography Variables */
   font-family: var(--font-onest), system-ui, sans-serif;
   --font-size-nav: 1rem;

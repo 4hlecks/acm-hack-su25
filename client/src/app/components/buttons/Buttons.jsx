@@ -5,6 +5,7 @@ import { useState } from 'react';
 export function Button({
     children,               // children inside button
     size = 'medium',        // 'small' | 'medium' | 'large'
+    width = 'auto',         // 'auto'  | 'fill' for drawers
     variant = 'primary',    // 'primary' | 'secondary' | 'success' | 'danger'
     iconLeft,
     iconRight,
@@ -14,6 +15,7 @@ export function Button({
         <button
             type="button"
             data-size={size}
+            data-width={width}
             data-variant={variant}
             className={styles.button}
             {...props}

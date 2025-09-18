@@ -25,6 +25,7 @@
     gap: var(--site-gap);
     box-shadow: -1rem 0 2rem rgba(0,0,0,.25);
     z-index: 1000;
+    overflow-y: auto;
 
     /* slide-in from right */
     transform: translateX(100%);
@@ -41,7 +42,7 @@
 
 .title {
     font-size: var(--font-size-heading);
-    font-weight: var(--font-weight-subheading);
+    font-weight: var(--font-weight-heading);
 }
 
 .closeIcon {
