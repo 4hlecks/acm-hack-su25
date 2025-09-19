@@ -1,27 +1,59 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from 'next/link'; 
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [accountType, setAccountType] = useState('');
-  const [password, setPassword] = useState('');           
-  const [confirmPassword, setConfirmPassword] = useState(''); 
 
-  const handleSubmit = (e) => {
+  // form state
+  const [username, setUsername] = useState(''); // (optional) not sent to backend yet
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [accountType, setAccountType] = useState(''); // "Student" or "Club"
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!accountType) {
       alert('Please select an account type.');
       return;
     }
-
     if (password !== confirmPassword) {
-      alert('Passwords do not match!');
+      alert('Passwords do not match.');
       return;
     }
 
-    alert(`Account created as ${accountType}!`);
+    // Map UI selection -> backend role
+    const role = accountType === 'Club' ? 'club' : 'user';
+
+    setSubmitting(true);
+    try {
+      const res = await fetch('http://localhost:5001/users/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fullName,  // backend expects "name"
+          email,
+          password,
+          role,            // "user" or "club"
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
+
+      alert(` ${data.message}`);
+      router.push('/login');
+    } catch (err) {
+      console.error(' Registration error:', err);
+      alert('Error: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -29,169 +61,139 @@ export default function RegisterPage() {
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      backgroundImage: `url('/background.jpg')`,  
-      backgroundSize: 'cover',                
-      backgroundPosition: 'center',               
-      backgroundRepeat: 'no-repeat',              
+      backgroundColor: 'white',
       fontFamily: 'sans-serif'
     }}>
       {/* Header */}
       <header style={{
-        backgroundColor: '#001f3f',
-        //borderBottom: '1px solid #ccc',
-        padding: '0.6rem 1.5rem',
+        backgroundColor: '#ffffff',
+        borderBottom: '1px solid #ccc',
+        padding: '1rem 2rem',
         display: 'flex',
         alignItems: 'center'
       }}>
-        <img src="/logo.png" alt="App Logo" style={{ height: '30px', marginRight: '0.75rem' }} />
-        <h2 style={{ 
-          margin: 0, 
-          fontSize: '1.5rem',
-          fontWeight: '550',
-          color: '#f0f0f0'
-        }}>
-          EventConnect
-        </h2>
+        <Link href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: 'black' }}>
+          current
+        </Link>
       </header>
 
       {/* Main Content */}
       <main style={{
         flex: '1',
-        display: 'flex',                      
-        justifyContent: 'center',             
-        alignItems: 'center',                
-        padding: '1.5rem'
+        maxWidth: '400px',
+        margin: 'auto',
+        padding: '1.5rem',
+        textAlign: 'center'
       }}>
-        <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-          borderRadius: '10px',                      
-          padding: '2rem',                             
-          width: '100%',
-          maxWidth: '400px',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'    
-        }}>
-          <h1 style={{ fontSize: '1.7rem', fontWeight: 'bold', textAlign: 'center' }}>Sign Up</h1>
-          <form onSubmit={handleSubmit} style={{ marginTop: '1rem' }}>
-            <label>
-              Username:
+        <h1 style={{ fontSize: '1.7rem', fontWeight: 'bold' }}>Sign Up</h1>
+        <form onSubmit={handleSubmit} style={{ marginTop: '1rem', textAlign: 'left' }}>
+          <label>
+            Username:
+            <input
+              type="text"
+              placeholder="Create a username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', marginBottom: '0.8rem' }}
+            />
+          </label>
+
+          <label>
+            Full Name:
+            <input
+              type="text"
+              placeholder="Full Name"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', marginBottom: '0.8rem' }}
+            />
+          </label>
+
+          <label>
+            Email:
+            <input
+              type="email"
+              placeholder="Email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', marginBottom: '0.8rem' }}
+            />
+          </label>
+
+          <label>
+            Password:
+            <input
+              type="password"
+              placeholder="Password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', marginBottom: '0.8rem' }}
+            />
+          </label>
+
+          <label>
+            Confirm Password:
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+            />
+          </label>
+
+          <fieldset style={{ marginBottom: '1.2rem' }}>
+            <legend style={{ fontWeight: 'bold' }}>Account Type:</legend>
+            <label style={{ display: 'block', marginBottom: '0.5rem' }}>
               <input
-                type="text"
-                placeholder="Create a username or enter full name"
-                required
-                style={{
-                  backgroundColor: '#f0f0f0',       
-                  width: '100%',
-                  padding: '0.5rem',
-                  marginBottom: '0.8rem',
-                  border: '1px solid #ccc',           
-                  borderRadius: '4px'                
-                }}
-              />
+                type="radio"
+                name="accountType"
+                value="Student"
+                checked={accountType === 'Student'}
+                onChange={(e) => setAccountType(e.target.value)}
+              /> Student
             </label>
-
-            <label>
-              Email:
+            <label style={{ display: 'block' }}>
               <input
-                type="email"
-                placeholder="Email"
-                required
-                style={{
-                  backgroundColor: '#f0f0f0',
-                  width: '100%',
-                  padding: '0.5rem',
-                  marginBottom: '0.8rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
+                type="radio"
+                name="accountType"
+                value="Club"
+                checked={accountType === 'Club'}
+                onChange={(e) => setAccountType(e.target.value)}
+              /> Club <span style={{ fontSize: '0.9rem' }}>(Must use club email)</span>
             </label>
+          </fieldset>
 
-            <label>
-              Password:
-              <input
-                type="password"
-                placeholder="Password"
-                required
-                value={password}                      
-                onChange={(e) => setPassword(e.target.value)}  
-                style={{
-                  backgroundColor: '#f0f0f0',
-                  width: '100%',
-                  padding: '0.5rem',
-                  marginBottom: '0.8rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </label>
+          <button
+            type="submit"
+            disabled={submitting}
+            style={{
+              width: '100%',
+              padding: '0.5rem',
+              backgroundColor: submitting ? '#d6d6d6' : '#F0B323',
+              border: 'none',
+              cursor: submitting ? 'not-allowed' : 'pointer'
+            }}>
+            {submitting ? 'Creating Account...' : 'Create Account'}
+          </button>
+        </form>
 
-            <label>
-              Confirm Password:
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                required
-                value={confirmPassword}                 // ✅ for matching
-                onChange={(e) => setConfirmPassword(e.target.value)} // ✅ update confirm state
-                style={{
-                  backgroundColor: '#f0f0f0',
-                  width: '100%',
-                  padding: '0.5rem',
-                  marginBottom: '1rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px'
-                }}
-              />
-            </label>
-
-            <fieldset style={{ marginBottom: '1.2rem' }}>
-              <legend style={{ fontWeight: 'bold' }}>Account Type:</legend>
-              <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-                <input
-                  type="radio"
-                  name="accountType"
-                  value="Student"
-                  onChange={(e) => setAccountType(e.target.value)}
-                /> Student
-              </label>
-              <label style={{ display: 'block' }}>
-                <input
-                  type="radio"
-                  name="accountType"
-                  value="Club"
-                  onChange={(e) => setAccountType(e.target.value)}
-                /> Club <span style={{ fontSize: '0.9rem' }}>(Must use school email)</span>
-              </label>
-            </fieldset>
-
-            <button
-              type="submit"
-              style={{
-                width: '100%',
-                padding: '0.5rem',
-                backgroundColor: '#F0B323',
-                border: 'none',
-                cursor: 'pointer'
-              }}>
-              Create Account
-            </button>
-
-
-          </form>
-
-          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-            <p>Already have an account?</p>
-            <button
-              onClick={() => router.push('/login')}
-              style={{
-                padding: '0.5rem 1rem',
-                backgroundColor: '#F0B323',
-                border: 'none',
-                cursor: 'pointer'
-              }}>
-              Go to Login
-            </button>
-          </div>
+        <div style={{ marginTop: '1.5rem' }}>
+          <p>Already have an account?</p>
+          <button
+            onClick={() => router.push('/login')}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#F0B323',
+              border: 'none',
+              cursor: 'pointer'
+            }}>
+            Go to Login
+          </button>
         </div>
       </main>
 

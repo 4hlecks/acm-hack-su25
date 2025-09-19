@@ -1,7 +1,13 @@
 import './globals.css'
-import { Inter } from 'next/font/google'
+import { Onest } from 'next/font/google'
+import {PopupProvider} from '@/app/context/PopupContext';
 
-const inter = Inter({ subsets: ['latin'] })
+const onest = Onest({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  display: "swap",
+  variable: "--font-onest",
+});
 
 export const metadata = {
   title: 'Create Next App',
@@ -11,7 +17,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={onest.className}>
+        <PopupProvider>{children}</PopupProvider>
+      </body>
     </html>
   )
 }

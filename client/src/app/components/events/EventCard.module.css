@@ -1,0 +1,106 @@
+.eventCard {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--tertiary-color);
+    width: 200px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    z-index: 1;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    
+    .eventCover {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        background-color: var(--secondary-color);
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        flex-shrink: 0;
+        overflow: hidden;
+
+        .eventCoverImage {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--border-radius) var(--border-radius) 0 0; /* Match parent radius */
+
+        }
+    }
+
+    .eventIcon {
+        color: var(--text-color);
+        height: var(--icon-size-small);
+        width: var(--icon-size-small);
+        stroke-width: var(--icon-width-small);
+        flex-shrink: 0;
+    }
+
+    .eventInfo {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: space-evenly;
+        padding: 12px 14px;
+        gap: var(--line-padding);
+
+        .eventHeader {
+            display: flex;
+            flex-direction: column;
+            .eventTitle {
+                font-weight: 600;
+                font-size: var(--font-size-subheading-3);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .eventOwner {
+                font-size: var(--font-size-body);
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        }
+
+        .eventDetails {
+            display: flex;
+            flex-direction: column;
+            gap: var(--line-padding);
+
+            .eventDetail {
+                display: flex;
+                align-items: center;
+                gap: var(--line-padding);
+            }
+
+            .eventDetailsText {
+                font-weight: 500;
+                font-size: var(--font-size-small);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+                line-height: normal; 
+            }
+        }
+    }
+}
+
+.eventCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0px 1rem var(--tertiary-color);
+    z-index: 5;
+}
+
+.noHover {
+    pointer-events: none;
+  }
+  
+  .noHover:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }

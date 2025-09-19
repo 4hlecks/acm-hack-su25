@@ -1,0 +1,179 @@
+/* Container sits absolutely under the bar; unified background + shadow come from SearchBar::before */
+.searchResults {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  background: transparent;                /* ::before (parent) paints the bg */
+  border-top: 1px solid var(--tertiary-color); /* seam between bar and results */
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  max-height: 18rem;                       /* keep in sync with JS */
+  overflow: auto;
+  overscroll-behavior: contain;
+  z-index: 2;
+  font-size: var(--font-size-body);
+}
+
+/* Tabs header: "Events | Clubs" */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    padding: 0.5rem var(--searchbar-padding) 0;
+}
+
+.tab {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font: inherit;
+    font-weight: var(--font-weight-subheading);
+    color: var(--text-muted-color);
+    position: relative;
+    outline-offset: 2px;
+}
+
+.tabActive {
+    border-bottom: 2px solid var(--text-color); /* solid underline for active */
+    color: var(--text-color);
+}
+
+.tab:hover {
+    color: var(--text-color);
+}
+
+/* Section header under tabs */
+.resultCountSection {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.5rem var(--searchbar-padding);
+}
+
+.resultCount {
+  font-size: var(--font-size-medium);
+  font-weight: var(--font-weight-subheading);
+}
+
+.viewAllButton {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: var(--font-size-medium);
+  color: var(--text-link-color);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.viewAllButton:hover {
+    color: var(--text-link-hover-color);
+}
+
+/* Lists */
+.resultList {
+  list-style: none;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.loadingState{
+  padding: 2rem var(--searchbar-padding);
+  text-align:center;
+  color: var(--text-muted-color);
+}
+
+.loadingState p{
+  margin: 0;
+}
+
+.errorState {
+  padding: 2rem var(--searchbar-padding);
+  text-align: center;
+  color: var(--error-color, #dc3545); /* fallback color if CSS var not defined */
+}
+
+.errorState p {
+  margin: 0;
+}
+
+
+/* Each row wraps a full-width button for easy click/tap target */
+.resultItem { }
+
+.resultRow {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem var(--searchbar-padding);
+  text-align: left;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.resultRow:hover,
+.resultRow:focus-visible {
+  background: color-mix(in srgb, var(--tertiary-color), transparent 75%);
+  outline: none;
+}
+
+/* Thumbnails */
+.thumb {
+  flex: 0 0 auto;
+  width: var(--image-thumb-size-large);
+  height: var(--image-thumb-size-large);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--tertiary-color), transparent 75%);
+}
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.eventThumb { border-radius: var(--border-radius); }
+.clubThumb  { border-radius: 50%; }
+
+/* Meta text */
+.eventMetadata {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.title {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-subheading);
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ownerRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.ownerAvatar {
+  width: var(--image-thumb-size-small);
+  height: var(--image-thumb-size-small);
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.ownerName {
+  font-size: var(--font-size-small);
+  color: var(--text-muted-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
