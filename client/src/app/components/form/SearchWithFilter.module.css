@@ -1,0 +1,87 @@
+.searchBar {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+/* Left Side */
+.left {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: var(--searchbar-height);
+    background: #fff;
+    border: 1px solid var(--tertiary-color);
+    border-right: none;
+    border-top-left-radius: var(--border-radius);
+    border-bottom-left-radius: var(--border-radius);
+    padding: var(--searchbar-padding);
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.icon {
+    flex: 0 0 auto;
+    width: var(--icon-size-medium, 1.5rem);
+    height: var(--icon-size-medium, 1.5rem);
+    stroke: currentColor; color: #000;
+}
+
+.input {
+    flex: 1 1 auto; min-width: 4rem;
+    height: calc(var(--searchbar-height) - 2px);
+    border: none; outline: none; font: inherit;
+    background: transparent; color: inherit;
+}
+
+/* Hide native WebKit “x” on type=search */
+.input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+}
+
+.clearButton {
+    margin-left: auto;
+    display: inline-grid; place-items: center;
+    width: 2rem; height: 2rem;
+    border: none; background: transparent; color: inherit; cursor: pointer;
+}
+
+/* Right Side */
+.right {
+    position: relative;
+    display: inline-flex; align-items: center; gap: .5rem;
+    height: var(--searchbar-height);
+    padding: 0.625rem 1rem;
+    background: var(--button-primary-bg, #E5E7EB);
+    color: var(--button-primary-fg, #111827);
+    border: 1px solid var(--button-primary-border, #D1D5DB);
+    border-top-right-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    transition: background-color 160ms ease;
+}
+
+.right:hover {
+    background-color: var(--button-primary-hover);
+}
+
+.filterText {
+    display: flex;
+    flex-direction: row;
+    color: inherit;
+    font-weight: 500;
+    align-items: center;
+    width: 100%;
+    white-space: nowrap;
+}
+.filterChoice { color: #000; font-weight: 700; }
+
+/* Transparent, full-cover native select (keeps a11y & OS picker) */
+.filterSelect {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer;
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    border: none; background: transparent; color: inherit; font: inherit;
+}

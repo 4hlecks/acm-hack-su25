@@ -18,7 +18,7 @@
   top: 0; left: 0; right: 0;
   height: var(--searchbar-height);
   border-radius: var(--border-radius);
-  background: var(--button-primary-color);
+  background: var(--primary-color);
   border: 1px solid var(--tertiary-color);
   box-shadow: none;
   transition: box-shadow 100ms ease, border-color 100ms ease, height 100ms ease;

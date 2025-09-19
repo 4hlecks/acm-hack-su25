@@ -4,10 +4,10 @@
   /* Base Color Scheme Variables */
   --primary-color: #ffffff;
   --secondary-color: #F5F5F5;
-  --tertiary-color: #B6B09F;
+  --tertiary-color: #D9D9D9;
   --background-color: var(--primary-color);
   --text-color: #000000;
-  --text-muted-color: #bebebe;
+  --text-muted-color: #6C757D;
   --text-link-color: #008cff;
   --text-link-hover-color: #225e8f;
 
@@ -19,13 +19,31 @@
   --text-color-dark: #ffffff;
 
   /* Button Variables */
-  --button-primary-bg: #7A7A73;
-  --button-primary-color: #ffffff;
-  --button-primary-hover: #D7D7D7;
+  --button-border-radius: 2rem;
+  --button-primary-bg: #F5F5F5;
+  --button-primary-color: var(--text-color);
+  --button-primary-hover: #D9D9D9;
 
   --button-secondary-bg: #FFD05E;
-  --button-secondary-color: #000000;
+  --button-secondary-color: var(--button-primary-color);
   --button-secondary-hover: #b7881a;
+
+  --button-success-bg: #61C861;
+  --button-success-color: var(--button-primary-color);
+  --button-success-hover: #50b050;
+
+  --button-danger-bg: #F76B6B;
+  --button-danger-color: var(--button-primary-color);
+  --button-danger-hover: #cb2f2f;
+
+  --font-weight-button: 600;
+  --font-size-button-large: 1.25rem;
+  --font-size-button-medium: 1rem;
+  --font-size-button-small: 1rem;
+
+  /* Form Variables */
+  --font-size-form-label: 1.5rem;
+  --font-size-form-field: 1rem;
 
   /* Typography Variables */
   font-family: var(--font-onest), system-ui, sans-serif;
@@ -52,6 +70,9 @@
   --event-info-padding: 1rem;
   --event-info-padding-2: .5rem;
   --searchbar-padding: 1rem;
+  --site-padding: 4rem;
+  --site-gap: 1rem;
+  --sidebar-padding: 1rem;
 
   /* Icon Variables */
   --icon-size-large: 1.75rem;
@@ -68,6 +89,7 @@
   /* Size Variables */
   --navbar-height: 4rem;
   --searchbar-height: 2.5rem;
+  --sidebar-width: 20rem;
 
   /* Image Variables */
   --image-thumb-size-large: 3rem;

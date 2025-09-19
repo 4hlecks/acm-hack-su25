@@ -1,0 +1,183 @@
+/* Base Button */
+.button {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  width: auto;
+  color: var(--button-primary-color);
+  font-weight: var(--font-weight-button);
+  border-radius: var(--button-border-radius);
+  border-width: 1px;
+  border-style: solid;
+  align-items: center;
+  cursor: pointer;
+  justify-content: center;
+  white-space: nowrap;
+  transition:
+        background-color 160ms ease,
+        color            160ms ease;
+}
+
+/* Icon Wrapper */
+.icon {
+    display: inline-block;
+    line-height: 0; /* remove extra whitespace */
+    vertical-align: middle;
+    aspect-ratio: 1 / 1;
+}
+
+/* Child icon takes up all the space of wrapper */
+.icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    stroke: currentColor; /* inherit colors */
+    stroke-width: 2px;
+}
+
+/* Width */
+.button[data-width="auto"] {
+    width: auto;
+}
+
+.button[data-width="fill"] {
+    width: 100%;
+}
+
+/* Sizes */
+.button[data-size="small"]  {
+    font-size: var(--font-size-button-small);
+    height: 2rem;
+    padding: 0 1rem;
+
+    .icon {
+        width: 1rem;
+    }
+}
+.button[data-size="medium"] {
+    font-size: var(--font-size-button-medium);
+    height: 2.5rem;
+    padding: 0.625rem 1rem;
+
+    .icon {
+        width: 1rem;
+    }
+}
+.button[data-size="large"]  {
+    font-size: var(--font-size-button-large);
+    height: 3rem;
+    padding: 1rem 1rem;
+
+    .icon {
+        width: 1.5rem;
+    }
+}
+
+/* Variants */
+.button[data-variant="primary"] {
+    background-color: var(--button-primary-bg);
+    border-color: var(--button-primary-hover);
+}
+.button[data-variant="primary"]:hover {
+    background-color: var(--button-primary-hover);
+}
+.button[data-variant="secondary"] {
+    background-color: var(--button-secondary-bg);
+    border-color: var(--button-secondary-hover);
+}
+.button[data-variant="secondary"]:hover {
+    background-color: var(--button-secondary-hover);
+}
+.button[data-variant="success"] {
+    background-color: var(--button-success-bg);
+    border-color: var(--button-success-hover);
+}
+.button[data-variant="success"]:hover {
+    background-color: var(--button-success-hover);
+}
+.button[data-variant="danger"] {
+    background-color: var(--button-danger-bg);
+    border-color: var(--button-danger-hover);
+}
+.button[data-variant="danger"]:hover {
+    background-color: var(--button-danger-hover);
+}
+
+/* States */
+.button:hover { /* TODO */ }
+.button:active { /* TODO */ }
+.button:focus-visible { /* TODO */ }
+.button:disabled { /* TODO */ }
+
+/* ===== Toggle (track button) ===== */
+.toggle {
+    --toggle-width: 5rem;
+    --toggle-height: 2.5rem;
+    --toggle-padding: 0.5rem;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: var(--toggle-width);
+    height: var(--toggle-height);
+    padding: var(--toggle-padding);
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-color);
+    font-weight: var(--font-weight-button);
+    border-radius: var(--button-border-radius);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--button-primary-hover);
+    align-items: center;
+    cursor: pointer;
+    transition:
+        background-color 160ms ease,
+        color            160ms ease;
+}
+
+.toggle:hover {
+    background-color: var(--button-primary-hover);
+}
+
+/* Toggle sizes */
+.toggle[data-size="small"]  {
+    --toggle-width: 4rem;
+    --toggle-height: 2rem;
+}
+.toggle[data-size="medium"] {
+    --toggle-width: 5rem;
+    --toggle-height: 2.5rem;
+}
+.toggle[data-size="large"]  {
+    --toggle-width: 6rem;
+    --toggle-height: 3rem;
+}
+
+/* Toggle states (either aria-checked or data-state) */
+.toggle[aria-checked="true"], .toggle[data-state="on"] {
+    background-color: var(--button-success-bg);
+    border-color: var(--button-success-hover);
+}
+
+.toggle[aria-checked="true"]:hover, .toggle[data-state="on"]:hover {
+    background-color: var(--button-success-hover);
+}
+
+.toggle[aria-checked="true"] .thumb, .toggle[data-state="on"] .thumb {
+    transform: translateX(calc(var(--toggle-height) - var(--toggle-padding) - 2px));
+}
+.toggle:focus-visible        { /* TODO */ }
+.toggle:disabled             { /* TODO */ }
+
+/* Toggle thumb */
+.thumb {
+    position: absolute;
+    aspect-ratio: 1 / 1;
+    width: calc(var(--toggle-height) - var(--toggle-padding));
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    border: 1px solid var(--button-primary-hover);
+    left: var(--toggle-padding);
+    transition: transform 220ms ease;
+    transform: translateX(0);
+}

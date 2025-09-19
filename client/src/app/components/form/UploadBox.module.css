@@ -1,0 +1,79 @@
+/* UploadBox.module.css */
+
+/* Root fills the parent width; height is controlled via --upload-h (default 10rem) */
+.root {
+  width: 100%;
+  --upload-h: 10rem; /* default; overridden by inline style from props */
+}
+
+/* Hidden file input */
+.hiddenInput {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; border: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ========== Empty state (dashed box) ========== */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: var(--upload-h);
+  padding: 48px; /* per your request */
+  background: var(--primary-color);
+  border: 1px dashed var(--tertiary-color);
+  border-radius: var(--border-radius);
+
+  cursor: pointer;
+  text-align: center;
+
+  /* inherit font & color context */
+  font: inherit;
+  color: inherit;
+}
+
+.emptyPrimary,
+.emptySecondary {
+  font-size: 1.5rem;
+  color: var(--text-muted-color);
+  line-height: 1.2;
+}
+
+.emptyPrimary { margin-bottom: .25rem; font-weight: 700; }
+.emptySecondary { font-weight: 600; }
+
+/* ========== Preview state ========== */
+.previewStack {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+/* Square preview box: width 100%, height = width via aspect-ratio */
+.previewWrap {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--primary-color);
+  border: 1px solid var(--tertiary-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Actions row */
+.actions {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+  justify-content: space-between; /* or space-between if you prefer */
+}

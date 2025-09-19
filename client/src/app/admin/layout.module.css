@@ -1,0 +1,46 @@
+.adminShell {
+    display: grid;
+    /* SideBar is --sidebar-width wide, rest of screen is 1fr */
+    grid-template-columns: var(--sidebar-width) 1fr;
+    height: 100dvh;
+
+    
+    overflow: hidden; /* Let children scroll, not the whole page */
+    background-color: var(--background-color);
+}
+
+.adminNavigation {
+    position: sticky; /* Keep the sidebar pinned while main content scrolls */
+    top: 0;
+    align-self: start;
+    height: 100dvh;
+    overflow: none;
+}
+
+.adminContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--site-gap);
+    min-width: 0;
+    overflow: auto; /* Let main content scroll if needed */
+    padding: var(--site-padding);
+    background-color: var(--background-color);
+
+    h1 {
+        font-size: var(--font-size-title);
+        font-weight: var(--font-weight-heading);
+        white-space: nowrap;
+    }
+
+    h2 {
+        font-size: var(--font-size-heading);
+        font-weight: var(--font-weight-subheading);
+        white-space: nowrap;
+    }
+
+    h3 {
+        font-size: var(--font-size-subheading);
+        font-weight: var(--font-weight-subheading);
+        white-space: nowrap;
+    }
+}
