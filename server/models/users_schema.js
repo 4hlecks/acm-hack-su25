@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema({
   savedEvents: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Event'
+  }],
+
+  //Following
+  following: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }]
 },
 {
