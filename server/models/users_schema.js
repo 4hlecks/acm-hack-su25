@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['club', 'user'], default: 'user' },
+  role: { type: String, enum: ['club', 'user', 'admin'], default: 'user' },
   approved: { type: Boolean, default: false }, // clubs: false until admin approves
   profilePic: { type: String, default: "" },
   bio: { type: String, default: "" },

@@ -14,6 +14,8 @@ const authRoutes = require('./routes/auth');
 const usersRouter = require('./routes/users.js');
 const eventsRouter = require('./routes/event_router/event_router');
 const clubsRouter = require('./routes/club_router/club_router');
+const adminEventsRouter = require('./routes/admin/admin_event_router.js');
+const adminUsersRouter = require('./routes/admin/admin_users_router.js');
 const requireAuth = require('./middleware/auth');
 
 const searchRouter = require('./routes/search_router/search_router')
@@ -55,6 +57,8 @@ app.get('/api/me', requireAuth, (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/users', usersRouter);
 app.use('/api/loadEvents', eventsRouter);
+app.use('/api/admin/events', adminEventsRouter);
+app.use('/api/admin/users', adminUsersRouter);
 app.use('/api/findClub', clubsRouter);
 app.use('/api/search', searchRouter);
 
