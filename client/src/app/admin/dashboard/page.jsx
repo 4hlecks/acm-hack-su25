@@ -35,9 +35,9 @@ export default function Dashboard() {
 
     // Overview metrics state (replace later with API)
     const [overviewItems, setOverviewItems] = useState([
-        { label: 'accounts in review', value: '0', accent: '#E8D53D' },
-        { label: 'bugs', value: '0', accent: '#F76B6B' },
-        { label: 'reports', value: '0', accent: '#61C861' },
+        { label: 'Accounts in Review', value: '0', accent: '#E8D53D' },
+        { label: 'Bugs', value: '0', accent: '#F76B6B' },
+        { label: 'Reports', value: '0', accent: '#61C861' },
     ]);
 
     // Account requests state (replace later with API)
@@ -55,9 +55,9 @@ export default function Dashboard() {
           .then(res => res.json())
           .then(data => {
             setOverviewItems([
-              { label: 'accounts in review', value: String(data.accountsInReview || 0), accent: '#E8D53D' },
-              { label: 'bugs', value: String(data.bugs || 0), accent: '#F76B6B' },
-              { label: 'reports', value: String(data.reports || 0), accent: '#61C861' },
+              { label: 'Accounts in Review', value: String(data.accountsInReview || 0), accent: '#E8D53D' },
+              { label: 'Bugs', value: String(data.bugs || 0), accent: '#F76B6B' },
+              { label: 'Reports', value: String(data.reports || 0), accent: '#61C861' },
             ]);
           })
           .catch(err => console.error("Error fetching metrics:", err));
