@@ -98,6 +98,7 @@ export default function Profile() {
           profilePic={normalizedPic(club?.profilePic, club?.updatedAt)}
           onEdit={handleEdit}
           isOwner={true}
+          clubId={club?._id}
         />
 
         {/* Upcoming Events */}

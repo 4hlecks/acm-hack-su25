@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
 const User = require('../models/users_schema'); // ONLY users model now
+const Event = require('../models/event_schema')
 const auth = require('../middleware/auth');
 const clubAuth = require('../middleware/clubAuth');
 const upload = require('../middleware/upload');
@@ -181,13 +182,18 @@ router.post('/reset-password', async (req, res) => {
 });
 
 // Get own club profile 
-router.get('/profile/me', auth, clubAuth, async (req, res) => {
+router.get('/profile/me', auth, async (req, res) => {
   try {
     res.set('Cache-Control', 'no-store');
-    const club = await User.findById(req.user.id)
+    const user = await User.findById(req.user.id)
       .select('name email role bio profilePic approved updatedAt');
-    if (!club) return res.status(404).json({ message: 'Club not found.' });
-    res.json({ club });
+    if (!user) return res.status(404).json({ message: 'User not found.' });
+    
+    if (user.role === 'club') {
+      res.json({ club: user });
+    } else {
+      res.json({ user: user });
+    }
   } catch (err) {
     console.error('Get profile error:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
@@ -279,12 +285,15 @@ router.get('/:userId/saved-events', auth, async (req, res) => {
 router.post('/:userId/saved-events/:eventId', auth, async (req, res) => {
   try{
     const {userId, eventId} = req.params;
+    console.log("Save event - userId:", userId, "eventId:", eventId);
+    console.log("Authenticated user ID:", req.user.id);
 
     if (req.user.id !== userId){
       return res.status(403).json({error: 'Unauthorized'})
     }
 
     //Check if event exists
+    console.log("Looking for event with ID:", eventId);
     const event = await Event.findById(eventId);
     if (!event){
       return res.status(404).json({error: 'Event not found'})
@@ -340,5 +349,83 @@ router.delete('/:userId/saved-events/:eventId', auth, async (req, res) => {
     res.status(500).json({error: 'Internal server error'})
   }
 });
+
+//POST follow another user
+router.post('/:userId/follow/:clubId', auth, async (req, res) => {
+  try {
+    const {userId, clubId} = req.params;
+
+    if (req.user.id !== userId){
+      return res.status(403).json({error: 'Unauthorized'});
+    }
+
+    //Add target user to following list
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {$addToSet: {following: clubId}},
+      {new: true}
+    ).populate('following');
+
+    if (!user){
+      return res.status(404).json({error: 'User not found'});
+    }
+
+    res.json({
+      following: user.following
+    })
+  } catch(error){
+    console.error('Error following user', error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+}) 
+
+//Unfollow a user
+router.delete('/:userId/follow/:clubId', auth, async (req, res) => {
+  try {
+    const {userId, clubId} = req.params;
+
+    if (req.user.id !== userId){
+      return res.status(403).json({error: 'Unauthorized'});
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {$pull: {following: clubId}},
+      {new: true}).populate('following', 'name profilePic bio role')
+    
+
+    if (!user){
+      return res.status(404).json({error: 'User not found'});
+    }
+
+    res.json({
+      following: user.following
+    });
+  } catch (error){
+    console.error('Error unfollowing user', error);
+    res.status(500).json({error: 'Internal server error'})
+  }
+})
+
+//GET current user's following list
+router.get('/:userId/following', auth, async (req, res) => {
+  try { 
+    const {userId} = req.params;
+
+    if (req.user.id !== userId){
+      return res.status(403).json({error: 'Unauthorized'});
+    }
+
+    const user = await User.findById(userId).populate('following', 'name profilePic bio role');
+    if (!user){
+      return res.status(404).json({error: 'User not found'});
+    }
+
+    res.json(user.following);
+  } catch (error){
+    console.error('Error fetching following list:', error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+})
 
 module.exports = router;

@@ -111,7 +111,8 @@ export default function PublicProfile({ params }) {
           name={club?.name}
           bio={club?.bio}
           profilePic={club?.profilePic}
-          isOwner={false} // visiting profile you don't own
+          isOwner={false}
+          clubId={club?._id} // visiting profile you don't own
         />
 
         {/* Upcoming Events */}

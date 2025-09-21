@@ -56,7 +56,8 @@ export default function Home() {
           if (profileData.club) {
             setClub(profileData.club);
             setUserRole("club");
-          } else {
+          } else if (profileData.user){
+            setClub(null);
             setUserRole("user");
           }
         }

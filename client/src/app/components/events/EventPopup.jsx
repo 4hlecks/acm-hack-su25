@@ -24,7 +24,7 @@ const checkIfEventSaved = async() => {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const userId = user.id;
 
-      const response = await fetch(`http://localhost:5001/api/users/${userId}/saved-events`, {
+      const response = await fetch(`http://localhost:5001/users/${userId}/saved-events`, {
           headers:{
               'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
@@ -98,7 +98,7 @@ const checkIfEventSaved = async() => {
 
       const method = isSaved ? 'DELETE' : 'POST';
 
-      const response = await fetch(`http://localhost:5001/api/users/${userId}/saved-events/${event._id}`, {
+      const response = await fetch(`http://localhost:5001/users/${userId}/saved-events/${event._id}`, {
           method: method,
           headers: {
               'Authorization': `Bearer ${token}`,
