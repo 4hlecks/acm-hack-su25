@@ -30,15 +30,19 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("role", data.user.role);
 
-
       alert("Logged in successfully!");
-      router.push("/"); // redirect after login
+
+      // redirect admins to dashboard, others to homepage
+      if (data.user.role === "admin") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/");
+      }
     } catch (err) {
       console.error("Login error:", err);
       alert("Error: " + err.message);
     }
   };
-
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
@@ -122,7 +126,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer style={{
-        backgroundColor: '#001f3f', // Navy blue
+        backgroundColor: '#001f3f', 
         height: '60px',
         width: '100%',
         marginTop: '2rem'
