@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -29,6 +28,8 @@ export default function LoginPage() {
       // Save token + user info in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("role", data.user.role);
+
 
       alert("Logged in successfully!");
       router.push("/"); // redirect after login
@@ -37,6 +38,7 @@ export default function LoginPage() {
       alert("Error: " + err.message);
     }
   };
+
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
