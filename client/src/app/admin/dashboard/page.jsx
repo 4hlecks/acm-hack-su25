@@ -1,7 +1,9 @@
 'use client';
 
+import { useRouter } from "next/navigation";
+import { useEffect, useState, useMemo } from "react";
 import styles from './page.module.css';
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import MetricCard from '../components/MetricCard';
 // Table + UI
 import DataTable from '../../components/datatable/DataTable';
@@ -18,52 +20,67 @@ function prettyDate(d) {
     }).format(d);
 }
 
-export default function Dashboard() {
-    // Replace this hardcoded array with data from your API.
-    // Example API shape:
-    //   GET /api/admin/metrics  -> { accountsInReview: 12, bugs: 36, reports: 7 }
-    const overviewItems = [
-        { label: 'accounts in review', value: '12', accent: '#E8D53D' },
-        { label: 'bugs',               value: '36', accent: '#F76B6B' },
-        { label: 'reports',            value: '7',  accent: '#61C861' },
-    ];
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
-    /**
-     * Account Requests table state (moved from AccountRequestsTable into this page).
-     * BACKEND:
-     *   - On mount, fetch rows: GET /api/admin/account-requests?status=pending
-     *   - Set rows with the response.
-     */
-    const [rows, setRows] = useState([
-        {
-            id: 'req_001',
-            requestDate: new Date('2025-09-12'),
-            type: 'Student',
-            name: 'Alex Atienza',
-            email: 'alatienza@ucsd.edu',
-        },
-        {
-            id: 'req_002',
-            requestDate: new Date('2025-09-10'),
-            type: 'Org Officer',
-            name: 'Jamie Lee',
-            email: 'jlee@ucsd.edu',
-        },
-        {
-            id: 'req_003',
-            requestDate: new Date('2025-09-13'),
-            type: 'Faculty',
-            name: 'Prof. Dana Cruz',
-            email: 'dcruz@ucsd.edu',
-        },
-        {
-            id: 'req_004',
-            requestDate: new Date('2025-08-30'),
-            type: 'Student',
-            name: 'Taylor Nguyen',
-            email: 'tnguyen@ucsd.edu',
-        },
+export default function Dashboard() {
+    const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      if (!token || role !== "admin") {
+        router.push("/login");
+      }
+    }, [router]);
+
+    // Overview metrics state (replace later with API)
+    const [overviewItems, setOverviewItems] = useState([
+        { label: 'accounts in review', value: '0', accent: '#E8D53D' },
+        { label: 'bugs', value: '0', accent: '#F76B6B' },
+        { label: 'reports', value: '0', accent: '#61C861' },
     ]);
+
+    // Account requests state (replace later with API)
+    const [rows, setRows] = useState([]);
+
+    // Fetch metrics + account requests
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        // fetch metrics
+        fetch(`${API_BASE}/api/admin/metrics`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+          .then(res => res.json())
+          .then(data => {
+            setOverviewItems([
+              { label: 'accounts in review', value: String(data.accountsInReview || 0), accent: '#E8D53D' },
+              { label: 'bugs', value: String(data.bugs || 0), accent: '#F76B6B' },
+              { label: 'reports', value: String(data.reports || 0), accent: '#61C861' },
+            ]);
+          })
+          .catch(err => console.error("Error fetching metrics:", err));
+
+        // fetch account requests
+        fetch(`${API_BASE}/api/admin/account-requests?status=pending`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.items) {
+              const mapped = data.items.map(u => ({
+                id: u._id,
+                requestDate: new Date(u.createdAt || Date.now()), // fallback if no createdAt
+                type: u.role,
+                name: u.name,
+                email: u.email,
+              }));
+              setRows(mapped);
+            }
+          })
+          .catch(err => console.error("Error fetching requests:", err));
+    }, []);
 
     /**
      * Approve/Deny handlers.
@@ -73,12 +90,20 @@ export default function Dashboard() {
      *     POST /api/admin/account-requests/:id/deny
      */
     async function handleApprove(row) {
-        // await fetch(`/api/admin/account-requests/${row.id}/approve`, { method: 'POST' });
+        const token = localStorage.getItem("token");
+        await fetch(`${API_BASE}/api/admin/account-requests/${row.id}/approve`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+        });
         setRows(prev => prev.filter(r => r.id !== row.id));
     }
 
     async function handleDeny(row) {
-        // await fetch(`/api/admin/account-requests/${row.id}/deny`, { method: 'POST' });
+        const token = localStorage.getItem("token");
+        await fetch(`${API_BASE}/api/admin/account-requests/${row.id}/deny`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+        });
         setRows(prev => prev.filter(r => r.id !== row.id));
     }
 

@@ -16,7 +16,11 @@ const eventsRouter = require('./routes/event_router/event_router');
 const clubsRouter = require('./routes/club_router/club_router');
 const adminEventsRouter = require('./routes/admin/admin_event_router.js');
 const adminUsersRouter = require('./routes/admin/admin_users_router.js');
+const adminAccountRequestsRouter = require('./routes/admin/admin_account_requests_router.js');
 const requireAuth = require('./middleware/auth');
+const adminAccountRequests = require("./routes/admin/admin_account_requests_router");
+const adminMetrics = require("./routes/admin/metrics_router");
+
 
 const searchRouter = require('./routes/search_router/search_router')
 
@@ -59,8 +63,12 @@ app.use('/users', usersRouter);
 app.use('/api/loadEvents', eventsRouter);
 app.use('/api/admin/events', adminEventsRouter);
 app.use('/api/admin/users', adminUsersRouter);
+app.use('/api/admin/account-requests', adminAccountRequestsRouter);
 app.use('/api/findClub', clubsRouter);
+app.use("/api/admin/account-requests", adminAccountRequests);
 app.use('/api/search', searchRouter);
+app.use("/api/admin/metrics", adminMetrics);
+
 
 app.use('/uploads', express.static('uploads'));
 
