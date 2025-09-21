@@ -32,28 +32,60 @@
 //    - You can keep DataTable presentational and pass it already-sliced rows from the API.
 
 'use client';
+import { useRouter } from "next/navigation";
 import styles from './page.module.css';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SearchWithFilter from '../../components/form/SearchWithFilter';
 import DataTable from '../../components/datatable/DataTable';
-import UserDrawer from '../components/UserDrawer'; // adjust path if different
+import UserDrawer from '../components/UserDrawer';
 import { Button } from '../../components/buttons/Buttons';
 import { PlusSquare, Users, Tag, Mail, Command, Edit, Trash2 } from 'react-feather';
 
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
+
 export default function UsersPage() {
-    // MOCK DATA:
-    // Replace with API data. Example client fetch (pseudo):
-    //   useEffect(() => {
-    //     fetch('/api/admin/users?limit=50')
-    //       .then(r => r.json())
-    //       .then(data => setRows(data.users));
-    //   }, []);
-    const [rows, setRows] = useState([
-        { id: 'usr_001', type: 'Student',     name: 'Alex Atienza',      email: 'alatienza@ucsd.edu',     avatarUrl: '' },
-        { id: 'usr_002', type: 'Org Officer', name: 'Jamie Lee',          email: 'jlee@ucsd.edu',          avatarUrl: '' },
-        { id: 'usr_003', type: 'Faculty',     name: 'Prof. Dana Cruz',    email: 'dcruz@ucsd.edu',         avatarUrl: '' },
-        { id: 'usr_004', type: 'Admin',       name: 'Taylor Morgan',      email: 'tmorgan@ucsd.edu',       avatarUrl: '' },
-    ]);
+    const router = useRouter();
+  
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      if (!token || role !== "admin") {
+        router.push("/login");
+      }
+    }, [router]);
+
+    const [rows, setRows] = useState([]);
+
+    // Fetch real users 
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+    
+        fetch(`${API_BASE}/api/admin/users?role=club&approved=false`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.items) {
+              const mapped = data.items.map(u => ({
+                id: u._id,
+                type: u.role,
+                name: u.name,
+                email: u.email,
+                avatarUrl: u.profilePic || "",
+                approved: u.approved,
+                role: u.role,
+                _id: u._id,
+              }));
+              setRows(mapped);
+            }
+          })
+          .catch(err => console.error("Error fetching users:", err));
+      }, []);
 
     // Search / filter UI state.
     // For server-side search, send these to the API and replace visibleRows with the response.
@@ -63,6 +95,40 @@ export default function UsersPage() {
     // Drawer state. `editing` is the selected user row for edit, or null for create.
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [editing, setEditing] = useState(null); // null => create mode
+
+    // ---- Backend handlers ----
+    async function approve(id) {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE}/api/admin/account-requests/${id}/approve`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+            setRows(prev => prev.filter(u => u._id !== id && u.id !== id));
+        }
+    }
+
+    async function deny(id) {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE}/api/admin/account-requests/${id}/deny`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+            setRows(prev => prev.filter(u => u._id !== id && u.id !== id));
+        }
+    }
+
+    async function deleteUser(id) {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_BASE}/api/admin/users/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+            setRows(prev => prev.filter(u => u._id !== id && u.id !== id));
+        }
+    }
 
     // DataTable columns. If you add server-side sorting, pass sort info to your API instead
     // of relying on client-side sort for large datasets.
@@ -77,6 +143,28 @@ export default function UsersPage() {
             sortable: false,
             render: (r) => (
                 <div style={{ display: 'inline-flex', gap: '0.5rem' }}>
+                    {/* Approve / Deny buttons (only show for pending clubs) */}
+                    {r.role === 'club' && r.approved === false && (
+                        <>
+                            <Button
+                                size="small"
+                                width="auto"
+                                variant="success"
+                                onClick={() => approve(r._id || r.id)}
+                            >
+                                Approve
+                            </Button>
+                            <Button
+                                size="small"
+                                width="auto"
+                                variant="danger"
+                                onClick={() => deny(r._id || r.id)}
+                            >
+                                Deny
+                            </Button>
+                        </>
+                    )}
+
                     {/* Edit: open drawer populated with this row's data.
                        Backend: in handleSave below, call PATCH /api/admin/users/:id. */}
                     <Button
@@ -96,10 +184,7 @@ export default function UsersPage() {
                         iconLeft={<Trash2 />}
                         onClick={() => {
                             if (!confirm(`Delete user "${r.name}"?`)) return;
-                            // Replace this with:
-                            //   await fetch(`/api/admin/users/${r.id}`, { method: 'DELETE' });
-                            //   if ok -> setRows(prev => prev.filter(x => x.id !== r.id));
-                            setRows(prev => prev.filter(x => x.id !== r.id));
+                            deleteUser(r._id || r.id);
                         }}
                     >
                         Delete
@@ -198,7 +283,7 @@ export default function UsersPage() {
             <DataTable
                 columns={columns}
                 data={visibleRows}
-                rowKey={(r) => r.id}
+                rowKey={(r) => r._id || r.id}
                 stickyHeader
             />
 
