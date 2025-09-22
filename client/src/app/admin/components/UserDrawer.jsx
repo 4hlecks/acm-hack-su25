@@ -13,8 +13,7 @@ export default function UserDrawer({
     userTypeOptions = [     // FALLBACK options for the "User Type" combobox.
                             // BACKEND: supply real options from API (e.g., GET /api/user-types) via parent prop.
         { value: 'student', label: 'Student' },
-        { value: 'org-officer', label: 'Org Officer' },
-        { value: 'faculty', label: 'Faculty' },
+        { value: 'club', label: 'Club' },
         { value: 'admin', label: 'Admin' },
     ],
     onSave,                 // callback to parent when user clicks "Save".
@@ -51,14 +50,19 @@ export default function UserDrawer({
         // 2) If isEdit: PATCH /api/admin/users/:id with { name, email, userType, ...(password ? { password } : {}), avatarUrl }
         //    Else (create): POST /api/admin/users with { name, email, userType, password, avatarUrl }
         // 3) On success: parent updates list state (optimistic or refetch) and closes drawer: onOpenChange(false)
+        if (!name || !email || !userType || (!isEdit && !password)) {
+            alert("All fields are required (except profile picture).");
+            return;
+        }
+
         onSave?.({
             id: initialUser?.id,
             userType,
             name,
             email,
-            password: password || undefined, // undefined tells parent/backend "leave password unchanged" when editing
-            avatarFile,                      // send the File so parent can upload if needed
-            avatarUrl,                       // existing URL; parent may overwrite with the new URL after upload
+            password: password || undefined,
+            avatarFile,                      
+            avatarUrl,                       
         });
     }
 

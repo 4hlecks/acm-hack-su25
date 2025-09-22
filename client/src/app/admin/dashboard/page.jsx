@@ -72,7 +72,11 @@ export default function Dashboard() {
               const mapped = data.items.map(u => ({
                 id: u._id,
                 requestDate: new Date(u.createdAt || Date.now()), // fallback if no createdAt
-                type: u.role,
+                type: u.role === "club"
+                    ? "Club"
+                    : u.role === "user"
+                        ? "Student"
+                        : u.role.charAt(0).toUpperCase() + u.role.slice(1),
                 name: u.name,
                 email: u.email,
               }));
