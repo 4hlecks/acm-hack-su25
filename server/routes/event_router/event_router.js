@@ -19,7 +19,7 @@ function buildEndDateTime(event) {
   // Check if the base date is invalid 
   if (isNaN(baseDate.getTime())) {
     console.error(`Invalid base date for event ${event._id}: "${event.date}"`);
-    return new Date(); // Return current date as fallback
+    return new Date('1900-01-01'); // Return current date as fallback
   }
   
   const endTimeStr = event.endTime || "23:59";
