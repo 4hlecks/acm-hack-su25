@@ -5,6 +5,8 @@ const auth = require('../../middleware/auth');
 const adminAuth = require('../../middleware/adminAuth');
 const User = require('../../models/users_schema');
 
+const bcrypt = require("bcrypt");
+
 // All admin user routes require auth + admin
 router.use(auth, adminAuth);
 
@@ -22,17 +24,10 @@ router.use(auth, adminAuth);
  */
 router.get('/', async (req, res) => {
     try {
-        const {
-            role = 'club',
-            approved,
-            q,
-            page = '1',
-            limit = '25',
-            sort = 'name',
-        } = req.query;
+        const { role, approved, q, page = '1', limit = '25', sort = 'name' } = req.query;
 
         const where = {};
-        if (role) where.role = role;
+        if (role) where.role = role; 
 
         // For clubs, default to approved=true unless caller explicitly sets approved
         if (role === 'club') {
@@ -88,5 +83,107 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+
+/**
+ * POST /api/admin/users
+ * Create a new user (all inputs required except profilePic)
+ */
+router.post("/", async (req, res) => {
+    try {
+      const { name, email, password, role } = req.body;
+  
+      if (!name || !email || !password || !role) {
+        return res.status(400).json({ message: "All fields are required (except profilePic)." });
+      }
+  
+      const emailLower = String(email).toLowerCase().trim();
+      if (!/\S+@\S+\.\S+/.test(emailLower)) {
+        return res.status(400).json({ message: "Invalid email address." });
+      }
+  
+      const existing = await User.findOne({ email: emailLower });
+      if (existing) {
+        return res.status(409).json({ message: "Email already in use." });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+  
+      const newUser = new User({
+        name: name.trim(),
+        email: emailLower,
+        password: hashedPassword,
+        role,
+        approved: role === "user" || role === "student" || role === "admin" || role === "club",
+        bio: "",
+        profilePic: "",
+      });
+  
+      await newUser.save();
+  
+      res.status(201).json({
+        message: "User created successfully.",
+        user: {
+          id: newUser._id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role,
+          approved: newUser.approved,
+          profilePic: newUser.profilePic,
+        },
+      });
+    } catch (err) {
+      console.error("Admin create user error:", err);
+      res.status(500).json({ message: "Server error", error: err.message });
+    }
+  });
+
+/**
+ * PATCH /api/admin/users/:id
+ * Update user fields (if password is blank, keep existing).
+ */
+router.patch("/:id", async (req, res) => {
+    try {
+      const { name, email, password, role, approved } = req.body;
+  
+      const updateData = {};
+      if (name) updateData.name = name.trim();
+      if (email) updateData.email = String(email).toLowerCase().trim();
+      if (role) updateData.role = role;
+      if (approved !== undefined) updateData.approved = approved === "true" || approved === true;
+  
+      if (password) {
+        updateData.password = await bcrypt.hash(password, 10);
+      }
+  
+      const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, {
+        new: true,
+        runValidators: true,
+      }).select("name email role approved profilePic");
+  
+      if (!updatedUser) return res.status(404).json({ message: "User not found" });
+  
+      res.json({ message: "User updated successfully.", user: updatedUser });
+    } catch (err) {
+      console.error("Admin update user error:", err);
+      res.status(500).json({ message: "Server error", error: err.message });
+    }
+  });
+
+/**
+ * DELETE /api/admin/users/:id
+ * Delete a user completely.
+ */
+router.delete("/:id", async (req, res) => {
+    try {
+      const deleted = await User.findByIdAndDelete(req.params.id);
+      if (!deleted) return res.status(404).json({ message: "User not found" });
+  
+      res.json({ message: "User deleted successfully." });
+    } catch (err) {
+      console.error("Admin delete user error:", err);
+      res.status(500).json({ message: "Server error", error: err.message });
+    }
+  });
 
 module.exports = router;
