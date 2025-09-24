@@ -6,7 +6,6 @@ const adminAuth = require('../../middleware/adminAuth');
 const User = require('../../models/users_schema');
 
 const bcrypt = require("bcrypt");
-const upload = require("../../middleware/upload");
 
 // All admin user routes require auth + admin
 router.use(auth, adminAuth);
@@ -90,7 +89,7 @@ router.get('/:id', async (req, res) => {
  * POST /api/admin/users
  * Create a new user (all inputs required except profilePic)
  */
-router.post("/", upload.single("profilePic"), async (req, res) => {
+router.post("/", async (req, res) => {
     try {
       const { name, email, password, role } = req.body;
   
@@ -115,9 +114,9 @@ router.post("/", upload.single("profilePic"), async (req, res) => {
         email: emailLower,
         password: hashedPassword,
         role,
-        approved: role === "user", // auto-approve students, require approval for clubs
+        approved: role === "user" || role === "student" || role === "admin" || role === "club",
         bio: "",
-        profilePic: req.file?.path || req.file?.secure_url || "",
+        profilePic: "",
       });
   
       await newUser.save();
@@ -143,7 +142,7 @@ router.post("/", upload.single("profilePic"), async (req, res) => {
  * PATCH /api/admin/users/:id
  * Update user fields (if password is blank, keep existing).
  */
-router.patch("/:id", upload.single("profilePic"), async (req, res) => {
+router.patch("/:id", async (req, res) => {
     try {
       const { name, email, password, role, approved } = req.body;
   
@@ -155,10 +154,6 @@ router.patch("/:id", upload.single("profilePic"), async (req, res) => {
   
       if (password) {
         updateData.password = await bcrypt.hash(password, 10);
-      }
-  
-      if (req.file) {
-        updateData.profilePic = req.file?.path || req.file?.secure_url || "";
       }
   
       const updatedUser = await User.findByIdAndUpdate(req.params.id, updateData, {

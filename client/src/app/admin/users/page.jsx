@@ -204,7 +204,6 @@ export default function UsersPage() {
             filtered = rows.filter(r => String(r[filterKey] ?? '').toLowerCase().includes(q));
         }
 
-        // Sorting rules
         if (filterKey === 'type') {
             const order = { admin: 1, club: 2, user: 3 }; // user == Student
             return [...filtered].sort((a, b) => (order[a.role] || 99) - (order[b.role] || 99));
@@ -224,73 +223,118 @@ export default function UsersPage() {
         setDrawerOpen(true);
     }
 
-    function handleSave(userData) {
-        setRows(prev => {
+    async function handleSave(userData) {
+        const token = localStorage.getItem("token");
+    
+        try {
             if (userData.id) {
-                return prev.map(u => u.id === userData.id ? {
-                    ...u,
-                    type: userData.userType ?? u.type,
-                    name: userData.name ?? u.name,
-                    email: userData.email ?? u.email,
-                    avatarUrl: userData.avatarUrl ?? u.avatarUrl,
-                } : u);
-            } else {
-                const id = `usr_${Date.now()}`;
-                return [
-                    ...prev,
-                    {
-                        id,
-                        type: userData.userType || '',
-                        name: userData.name || '',
-                        email: userData.email || '',
-                        avatarUrl: userData.avatarUrl || '',
+                const res = await fetch(`${API_BASE}/api/admin/users/${userData.id}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
                     },
-                ];
+                    body: JSON.stringify({
+                        name: userData.name,
+                        email: userData.email,
+                        role: userData.role?.toLowerCase(),
+                        password: userData.password,
+                        approved: userData.role?.toLowerCase() === "user" ? true : userData.approved,
+                      }),
+                });
+                if (!res.ok) throw new Error("Failed to update user");
+            } else {
+                const res = await fetch(`${API_BASE}/api/admin/users`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        name: userData.name,
+                        email: userData.email,
+                        role: userData.role?.toLowerCase(),
+                        password: userData.password,
+                        approved: userData.role?.toLowerCase() === "user" ? true : userData.approved,
+                      }),
+                  });
+                
+                  if (!res.ok) {
+                    const errorText = await res.text();
+                    console.error("Create user failed:", res.status, errorText);
+                    throw new Error("Failed to create user");
+                  }
+                }
+    
+            const refresh = await fetch(`${API_BASE}/api/admin/users`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            const data = await refresh.json();
+            if (data.items) {
+                const mapped = data.items.map(u => ({
+                    id: u._id,
+                    type: u.role === "user" ? "Student" : u.role.charAt(0).toUpperCase() + u.role.slice(1),
+                    name: u.name,
+                    email: u.email,
+                    role: u.role,
+                    approved: u.approved,
+                    _id: u._id,
+                }));
+                setRows(mapped);
             }
-        });
-        setDrawerOpen(false);
+    
+            setDrawerOpen(false);
+        } catch (err) {
+            console.error("Error saving user:", err);
+            alert("Failed to save user");
+        }
     }
-
+    
     return (
         <>
-            <h1>Users</h1>
-            <div className={styles.top}>
-                <SearchWithFilter
-                    query={query}
-                    onQueryChange={setQuery}
-                    filterKey={filterKey}
-                    onFilterKeyChange={setFilterKey}
-                    filterOptions={filterOptions}
-                    placeholder="Search users…"
-                    onSubmit={() => { }}
-                />
-                <Button
-                    size="medium"
-                    width="auto"
-                    variant="primary"
-                    iconRight={<PlusSquare />}
-                    onClick={handleCreate}
-                >
-                    Create User
-                </Button>
-            </div>
-            <DataTable
-                columns={columns}
-                data={visibleRows}
-                rowKey={(r) => r._id || r.id}
-                stickyHeader
+          <h1>Users</h1>
+          <div className={styles.top}>
+            <SearchWithFilter
+              query={query}
+              onQueryChange={setQuery}
+              filterKey={filterKey}
+              onFilterKeyChange={setFilterKey}
+              filterOptions={filterOptions}
+              placeholder="Search users…"
+              onSubmit={() => { }}
             />
-            <UserDrawer
-                open={drawerOpen}
-                onOpenChange={setDrawerOpen}
-                initialUser={editing}
-                userTypeOptions={[
-                    { value: 'student', label: 'Student' },
-                    { value: 'club', label: 'Club' },
-                    { value: 'admin', label: 'Admin' },
-                ]}
-                onSave={handleSave}
-            />
+            <Button
+              size="medium"
+              width="auto"
+              variant="primary"
+              iconRight={<PlusSquare />}
+              onClick={handleCreate}
+            >
+              Create User
+            </Button>
+          </div>
+          <DataTable
+            columns={columns}
+            data={visibleRows}
+            rowKey={(r) => r._id || r.id}
+            stickyHeader
+          />
+      
+          <UserDrawer
+            open={drawerOpen}
+            onOpenChange={setDrawerOpen}
+            initialUser={editing}
+            userTypeOptions={[
+              { value: 'user', label: 'Student' },
+              { value: 'club', label: 'Club' },
+              { value: 'admin', label: 'Admin' },
+            ]}
+            onSave={handleSave}
+          />
         </>
-    );
+      );
+      
 }
