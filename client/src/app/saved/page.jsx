@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/navbar/NavBar";
 import EventCard from "../components/events/EventCard";
 import styles from '../page.module.css'; 
 

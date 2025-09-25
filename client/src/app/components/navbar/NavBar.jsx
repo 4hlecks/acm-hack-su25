@@ -1,140 +1,113 @@
-'use client';
+'use client'
 
-import { useRouter, usePathname } from 'next/navigation';
-import styles from './NavBar.module.css';
-import { LogOut, LogIn, Bookmark, PlusSquare, User, Calendar} from 'react-feather';
-import SearchBar from '../SearchBar'
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import {
+    Bookmark, Calendar, PlusSquare, User, Users,
+    Command, LogIn, LogOut
+} from 'react-feather';
 import { usePopup } from '@/app/context/PopupContext';
+import styles from './NavBar.module.css';
+import NavItem from './NavItem';
+import SearchBar from '../SearchBar';
 
 export default function NavBar() {
-    const router = useRouter();
-    const pathname = usePathname();
+    const [ready, setReady] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isClub, setIsClub] = useState(false);
+    const [role, setRole] = useState('student'); // 'student' | 'club' | 'admin'
     const { openEventPopup, handleClubSelect } = usePopup();
 
-
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const userData = localStorage.getItem('user');
-
-        if (token && userData) {
-            setIsLoggedIn(true);
-
-            try {
-                const parsedUser = JSON.parse(userData);
-                setIsClub(parsedUser.role === 'club'); 
-              } catch {
-                setIsClub(false);
-              }
+        try {
+            const token = localStorage.getItem('token');
+            const userData = localStorage.getItem('user');
+            if (token && userData) {
+                setIsLoggedIn(true);
+                const r = (JSON.parse(userData)?.role || 'student').toLowerCase();
+                setRole(r === 'admin' ? 'admin' : r === 'club' ? 'club' : 'student');
             } else {
-              setIsLoggedIn(false);
-              setIsClub(false);
+                setIsLoggedIn(false);
+                setRole('student');
             }
-          }, []);
+        } catch {
+            setIsLoggedIn(false);
+            setRole('student');
+        } finally {
+            setReady(true);
+        }
+    }, []);
 
-    const handleLogout = async () => {
+    // Site Logo
+    const logoItem = (<NavItem type="logo" />);
+
+    // Student Navigation Items
+    const studentItems = [
+        { action: '/calendar',  label: 'Calendar', icon: <Calendar className={styles.navIcon}/> },
+        { action: '/saved',     label: 'Saved',   icon: <Bookmark className={styles.navIcon}/> },
+        { action: '/following', label: 'Following',    icon: <Users className={styles.navIcon}/> },
+    ];
+
+    // Club Navigation Items
+    const clubItems = [
+        { action: '/calendar',     label: 'Calendar', icon: <Calendar className={styles.navIcon}/> },
+        { action: '/add-event',    label: 'Create',   icon: <PlusSquare className={styles.navIcon}/> },
+        { action: '/profile-page', label: 'Profile',  icon: <User className={styles.navIcon}/> },
+    ];
+
+    // Admin Navigation Items
+    const adminItems = [
+        { action: '/admin', label: 'Admin Dashboard', icon: <Command className={styles.navIcon} />}
+    ];
+
+    // Navigation items depending on role
+    const navItems = role === 'admin' ? adminItems : role === 'club' ? clubItems : studentItems;
+
+    // Login/Logout
+    const handleLogoutClick = () => {
         try {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             setIsLoggedIn(false);
-            setIsClub(false);
-            router.push('/login');
-        } catch (err) {
-        console.error('Logout failed:', err);
-        }
+            setRole('student');
+        } catch {}
     };
 
+    const authItem = isLoggedIn ? (
+        <NavItem
+            type="link"
+            action="/login"
+            icon={<LogOut className={styles.navIcon} />}
+            label="Logout"
+            onClick={handleLogoutClick}
+        />
+    ) : (
+        <NavItem
+            type="link"
+            action="/login"
+            icon={<LogIn className={styles.navIcon} />}
+            label="Login"
+        />
+    );
+
+    if (!ready) return null; // avoids flicker before reading localStorage
+
     return (
-    <nav className={styles.navBar}>
-        <div className={styles.leftSide}>
-            <Link href="/" className={styles.siteLogo}>Current</Link>
-            <SearchBar onEventClick={openEventPopup} onClubSelect={handleClubSelect}/>
-        </div>
-
-        <div className={styles.rightSide}>
-            {isLoggedIn ? (
-                <>
-            <ul className={styles.navMiddleItems}>
-            {isClub ? (
-              <>
-                <li>
-                  <Link
-                    href="/add-event"
-                    className={`${styles.navItem} ${
-                      pathname === '/add-event' ? styles.activeLink : ''
-                    }`}
-                  >
-                    <PlusSquare className={styles.navIcon} /> Create
-                  </Link>
-                </li>
-                <li>
-                <Link
-                  href="/calendar"
-                  className={`${styles.navItem} ${pathname === '/calendar' ? styles.activeLink : ''}`}
-                >
-                  <Calendar className={styles.navIcon} /> Calendar
-                </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/profile-page"
-                    className={`${styles.navItem} ${
-                      pathname === '/profile-page' ? styles.activeLink : ''
-                    }`}
-                  >
-                    <User className={styles.navIcon} /> Profile
-                  </Link>
-                </li>
-              </>
-            ) : (
-              <>
-                <li>
-                  <Link
-                    href="/saved"
-                    className={`${styles.navItem} ${
-                      pathname === '/saved' ? styles.activeLink : ''
-                    }`}
-                  >
-                    <Bookmark className={styles.navIcon} /> Saved
-                  </Link>
-                </li>
-                <li>
-                <Link
-                  href="/calendar"
-                  className={`${styles.navItem} ${pathname === '/calendar' ? styles.activeLink : ''}`}
-                >
-                  <Calendar className={styles.navIcon} /> Calendar
-                </Link>
-            </li>
-                <li>
-                  <Link
-                    href="/following"
-                    className={`${styles.navItem} ${
-                      pathname === '/following' ? styles.activeLink : ''
-                    }`}
-                  >
-                    <User className={styles.navIcon} /> Following
-                  </Link>
-                </li>
-              </>
-            )}
-          </ul>
-
-            <button onClick={handleLogout} className={styles.navAuth}> 
-            <LogOut size={16} className={styles.navIcon} /> 
-            <span>Logout</span>
-          </button>
-        </>
-        ) : (
-          <Link href="/login" className={styles.navAuth}>
-            <LogIn size={16} className={styles.navIcon} /> 
-            <span>Login</span> 
-          </Link>
-        )}
-        </div>
-    </nav>
-  );
+        <nav className={styles.navBar}>
+            {logoItem}
+            <SearchBar onEventClick={openEventPopup} onClubSelect={handleClubSelect} />
+            <ul className={styles.navItemList}>
+                {isLoggedIn &&
+                    navItems.map(item => (
+                        <li>
+                            <NavItem
+                                type="link"
+                                action={item.action}
+                                icon={item.icon}
+                                label={item.label}
+                            />
+                        </li>
+                    ))}
+                <li>{authItem}</li>
+            </ul>
+        </nav>
+    );
 }
