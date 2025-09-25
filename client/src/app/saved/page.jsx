@@ -5,22 +5,24 @@ import EventCard from "../components/events/EventCard";
 import styles from '../page.module.css'; 
 import { usePopup } from "../context/PopupContext";
 import EventPopup from "../components/events/EventPopup";
+import {useRouter} from 'next/navigation';
 
 export default function SavedEventsPage() {
   const [savedEvents, setSavedEvents] = useState([]);
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const { selectedEvent, isPopupOpen, closeEventPopup } = usePopup();
-
+  const router = useRouter();
   
   const fetchSavedEvents = async () => {
     const token = localStorage.getItem('token');
     const userString = localStorage.getItem('user');
     
     if (!token || !userString) {
-      console.log('Missing token or userId, returning early');
+      router.push("/login");
       return;
     }
+    
     //Get the user's unique string
     const user = JSON.parse(userString);
     

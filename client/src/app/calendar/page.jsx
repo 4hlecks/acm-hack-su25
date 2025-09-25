@@ -4,7 +4,7 @@ import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay, add, sub } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-
+import NavBar from '../components/navbar/NavBar';
 const locales = { 'en-US': enUS };
 const localizer = dateFnsLocalizer({
   format,
@@ -25,7 +25,7 @@ function CustomEvent({ event }) {
   });
   return (
     <span>
-      {startTime} – {endTime} | <strong>{event.title}</strong>
+       <strong>{event.title}</strong>
     </span>
   );
 }
@@ -50,6 +50,7 @@ function CustomToolbar({ label, onNavigate, onView, view }) {
             color: 'white',
             border: 'none',
             borderRadius: '4px',
+            cursor: 'pointer'
           }}
         >
           ‹ Prev
@@ -62,6 +63,8 @@ function CustomToolbar({ label, onNavigate, onView, view }) {
             background: '#F0B323',
             border: 'none',
             borderRadius: '4px',
+            cursor: 'pointer'
+
           }}
         >
           Today
@@ -74,6 +77,7 @@ function CustomToolbar({ label, onNavigate, onView, view }) {
             color: 'white',
             border: 'none',
             borderRadius: '4px',
+            cursor: 'pointer'
           }}
         >
           Next ›
@@ -84,12 +88,16 @@ function CustomToolbar({ label, onNavigate, onView, view }) {
         value={view}
         onChange={(e) => onView(e.target.value)}
         style={{
-          padding: '0.4rem',
+          padding: '0.4rem 0.8rem',
           borderRadius: '6px',
           border: '1px solid #F0B323',
-          fontSize: '1rem',
+          fontSize: '0.9rem',
           backgroundColor: '#FFFFFF',
           color: '#001f3f',
+          cursor: 'pointer',
+          minWidth: '80px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          outline: 'none'
         }}
       >
         <option value={Views.MONTH}>Month</option>
@@ -105,11 +113,12 @@ export default function CalendarPage() {
   const [date, setDate] = useState(new Date());
   const [events, setEvents] = useState([]);
   const [accountType, setAccountType] = useState(null);
+  const [currentView, setCurrentView] = useState('all');
 
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const token = localStorage.getItem('accessToken');
+        const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const type = user.role;
         const userId = user.id;
@@ -117,40 +126,100 @@ export default function CalendarPage() {
 
         if (!userId || !token) return;
 
-        let url =
-          type === 'user'
-            ? `http://localhost:5001/api/users/${userId}/saved-events`
-            : 'http://localhost:5001/events/byOwner/me';
+        let allEvents = [];
 
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!res.ok) return;
-
-        const data = await res.json();
-        let rawEvents = [];
-
-        if (type === 'user') {
-          rawEvents = Array.isArray(data) ? data : [];
-        } else if (type === 'club') {
-          rawEvents = [...(data.upcomingEvents || []), ...(data.pastEvents || [])];
+        //Fetch saved events for users
+        if (currentView === 'all'){
+          const allEventsRes = await fetch('http://localhost:5001/api/loadEvents/all');
+          if (allEventsRes.ok){
+            const allEventsData = await allEventsRes.json();
+            allEvents = [...allEvents, ...(allEventsData.events || [])];
+          }
         }
 
-        const formatted = rawEvents.map((ev) => {
-          const baseDate = new Date(ev.date);
-          const dateStr = baseDate.toISOString().split('T')[0];
-          const start = new Date(`${dateStr}T${ev.startTime}`);
-          const end = new Date(`${dateStr}T${ev.endTime}`);
-          return {
-            title: ev.eventTitle,
-            start,
-            end,
-          };
-        });
+        if (type === 'user' && (currentView === 'saved' || currentView ==='all')){
+          const savedRes  = await fetch(`http://localhost:5001/users/${userId}/saved-events`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          if (savedRes.ok){
+            const savedData = await savedRes.json();
+            allEvents = [...allEvents, ...savedData];
+          }
+        }
+
+        //Fetch following events for users
+        if (type === 'user' && (currentView === 'following' || currentView === 'all')){
+          const followingRes = await fetch(`http://localhost:5001/users/${userId}/following`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          if (followingRes.ok){
+            const followingData = await followingRes.json();
+            for (const club of followingData){
+              const clubEventsRes = await fetch(`http://localhost:5001/api/loadEvents/byClub/${club._id}`);
+              if (clubEventsRes.ok){
+                const clubEvents = await clubEventsRes.json();
+                allEvents = [...allEvents, ...(clubEvents.upcomingEvents || []), ...(clubEvents.pastEvents || [])];
+              }
+            }
+          }
+        }
+
+        //For clubs, fetch their own events
+        if (type === 'club'){
+          const res = await fetch('http://localhost:5001/api/loadEvents/byOwner/me', {
+            headers:{
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          })
+
+          if (res.ok){
+            const data = await res.json();
+            allEvents = [...(data.upcomingEvents || []), ...(data.pastEvents || [])];
+          }
+        }
+
+        //Remove duplicates
+        const uniqueEvents = allEvents.filter((event, index, self) => 
+        index === self.findIndex(e => e._id === event._id));
+        
+
+        const formatted = uniqueEvents.map((ev) => {
+  console.log('Raw event data:', {
+    title: ev.eventTitle,
+    rawDate: ev.date,
+    startTime: ev.startTime,
+    endTime: ev.endTime
+  });
+
+  const eventDate = new Date(ev.date);
+  console.log('Parsed eventDate:', eventDate);
+  
+  // Create date string manually to avoid timezone issues
+  const year = eventDate.getFullYear();
+  const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+  const day = String(eventDate.getDate()).padStart(2, '0');
+  const dateStr = `${year}-${month}-${day}`;
+  
+  console.log('Final dateStr:', dateStr);
+  
+  const start = new Date(`${dateStr}T${ev.startTime}:00`);
+  const end = new Date(`${dateStr}T${ev.endTime}:00`);
+  
+  console.log('Calendar start/end:', start, end);
+
+  return {
+    title: ev.eventTitle,
+    start,
+    end,
+  };
+});
 
         formatted.sort((a, b) => a.start - b.start);
         setEvents(formatted);
@@ -160,7 +229,7 @@ export default function CalendarPage() {
     }
 
     fetchEvents();
-  }, []);
+  }, [currentView]);
 
   const handleNavigate = (action) => {
     if (action === 'TODAY') {
@@ -176,9 +245,9 @@ export default function CalendarPage() {
     }
   };
 
-  const HEADER_H = 40;
-
   return (
+    <>
+    <NavBar />
     <div
       style={{
         height: '100vh',
@@ -186,26 +255,14 @@ export default function CalendarPage() {
         overflow: 'hidden',
         position: 'relative',
         boxSizing: 'border-box',
+        paddingTop: 'var(--navbar-height)',
       }}
     >
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: HEADER_H,
-          background: '#001f3f',
-          zIndex: 1000,
-        }}
-      />
-
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          paddingTop: HEADER_H,
           overflow: 'hidden',
         }}
       >
@@ -216,8 +273,54 @@ export default function CalendarPage() {
             color: '#001f3f',
           }}
         >
-          {accountType === 'user' ? 'My Saved Events' : 'My Club’s Events'}
+          {accountType === 'user' ? currentView === 'saved' ? 'My Saved Events' : currentView === 'following' ? 'Events from Following' : 'All  Events' : 'My Club\s Events'}
         </h1>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '0.5rem',
+          margin: '0.5rem 0'
+          }}>
+        <button
+          onClick={() => setCurrentView('saved')}
+          style={{
+            padding: '0.4rem 0.8rem',
+            background: currentView === 'saved' ? '#F0B323' : '#fff',
+            color: currentView === 'saved' ? '#000' : '#001f3f',
+            border: '1px solid #F0B323',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          Saved Events
+        </button>
+        <button
+          onClick={() => setCurrentView('following')}
+          style={{
+            padding: '0.4rem 0.8rem',
+            background: currentView === 'following' ? '#F0B323' : '#fff',
+            color: currentView === 'following' ? '#000' : '#001f3f',
+            border: '1px solid #F0B323',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          Following
+        </button>
+        <button
+          onClick={() => setCurrentView('all')}
+          style={{
+            padding: '0.4rem 0.8rem',
+            background: currentView === 'all' ? '#F0B323' : '#fff',
+            color: currentView === 'all' ? '#000' : '#001f3f',
+            border: '1px solid #F0B323',
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          All Events
+        </button>
+      </div>
 
         <div
           style={{
@@ -282,5 +385,7 @@ export default function CalendarPage() {
         }
       `}</style>
     </div>
+    </>
+    
   );
 }

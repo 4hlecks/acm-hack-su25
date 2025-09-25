@@ -42,6 +42,25 @@ function buildEndDateTime(event) {
   return endDateTime;
 }
 
+router.get('/all', async (req, res) => {
+  try {
+    const date = new Date();
+    const allEvents = await Event.find({})
+      .populate('eventOwner', 'name _id profilePic')
+      .sort({ date: 1 });
+
+    // Filter for upcoming events 
+    const upcomingEvents = allEvents.filter(event => {
+      const endDateTime = buildEndDateTime(event);
+      return endDateTime >= date;
+    });
+
+    res.json({ events: upcomingEvents });
+  } catch (err) {
+    console.error('Error fetching all events:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 // create event route
 router.post('/create', auth, clubAuth, upload.single('coverPhoto'), async (req, res) => {
   try {
