@@ -1,6 +1,6 @@
-import NavBar from "../components/navbar/NavBar";
+import NavBar from "../../components/navbar/NavBar";
 import AddEventPage from "./AddEventPage";
-import TabBar from '../components/navbar/TabBar'
+import TabBar from '../../components/navbar/TabBar'
 
 export default function Page() {
   return (

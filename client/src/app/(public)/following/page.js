@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import EventCard from '../components/events/EventCard';
 import styles from './FollowingEvents.module.css'; 
 import { ArrowLeft } from "react-feather";
-import NavBar from '../components/navbar/NavBar';
 import EventPopup from '../components/events/EventPopup';
 import { usePopup } from '../context/PopupContext';
 import Link from 'next/link';
@@ -111,7 +110,6 @@ export default function FollowingPage(){
 
     return(
         <>
-            <NavBar/>
             <div className={styles.container}>
                 <header className={styles.header}>
                     <h1 className={styles.title}>Following</h1>

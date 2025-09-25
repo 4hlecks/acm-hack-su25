@@ -1,7 +1,7 @@
 import React from "react";
 import { Calendar, MapPin, Clock } from "react-feather";
 import styles from "./EventCard.module.css";
-import { usePopup } from "@/app/context/PopupContext";
+import { usePopup } from "@/app/(public)/context/PopupContext";
 
 const EventCard = ({ event, disableHover = false }) => {
     const {

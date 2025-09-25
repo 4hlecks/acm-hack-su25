@@ -1,10 +1,10 @@
 'use client';
 import React from 'react';
-import Drawer from '../../components/drawer/Drawer';
-import UploadBox from '../../components/form/UploadBox';
-import { Button } from '../../components/buttons/Buttons';
-import { TextField } from '../../components/form/Form';
-import Spacer from '../../components/form/Spacer';
+import Drawer from '../../../components/drawer/Drawer';
+import UploadBox from '../../../components/form/UploadBox';
+import { Button } from '../../../components/buttons/Buttons';
+import { TextField } from '../../../components/form/Form';
+import Spacer from '../../../components/form/Spacer';
 
 export default function ProfileDrawer({
     open,                  // controlled "open" state from parent (true = drawer visible)

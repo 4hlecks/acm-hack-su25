@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
-import Drawer from '../../components/drawer/Drawer';
+import Drawer from '../../../components/drawer/Drawer';
 import styles from './SettingsDrawer.module.css';
-import { Button, ToggleButton } from '../../components/buttons/Buttons';
+import { Button, ToggleButton } from '../../../components/buttons/Buttons';
 
 export default function SettingsDrawer({ open, onOpenChange }) {
 	const onSignOut = () => {

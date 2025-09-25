@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import NavBar from "../components/navbar/NavBar";
 import EventCard from "../components/events/EventCard";
 import styles from '../page.module.css'; 
 
@@ -30,7 +29,6 @@ export default function SavedEventsPage() {
   
   return (
     <>
-      <NavBar />
       <main style={{ padding: "2rem", marginTop: "80px" }}>
         <h1 className={styles.pageTitle}>Saved Events</h1>
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "1.5rem", marginTop: "2rem" }}>

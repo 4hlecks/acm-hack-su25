@@ -5,10 +5,10 @@ import {
     Bookmark, Calendar, PlusSquare, User, Users,
     Command, LogIn, LogOut
 } from 'react-feather';
-import { usePopup } from '@/app/context/PopupContext';
+import { usePopup } from '@/app/(public)/context/PopupContext';
 import styles from './NavBar.module.css';
 import NavItem from './NavItem';
-import SearchBar from '../SearchBar';
+import SearchBar from '../searchbar/SearchBar';
 
 export default function NavBar() {
     const [ready, setReady] = useState(false);
@@ -97,7 +97,7 @@ export default function NavBar() {
             <ul className={styles.navItemList}>
                 {isLoggedIn &&
                     navItems.map(item => (
-                        <li>
+                        <li key={item.label}>
                             <NavItem
                                 type="link"
                                 action={item.action}
