@@ -273,7 +273,7 @@ export default function CalendarPage() {
             color: '#001f3f',
           }}
         >
-          {accountType === 'user' ? currentView === 'saved' ? 'My Saved Events' : currentView === 'following' ? 'Events from Following' : 'All  Events' : 'My Club\s Events'}
+          {accountType === 'user' ? currentView === 'saved' ? 'My Saved Events' : currentView === 'following' ? 'Upcoming Events from Following' : 'All  Events' : 'My Club\s Events'}
         </h1>
         <div style={{
           display: 'flex',
