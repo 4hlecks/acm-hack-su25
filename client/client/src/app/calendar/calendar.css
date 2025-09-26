@@ -14,9 +14,11 @@
   border: none !important;
   border-radius: 6px !important;
   padding: 4px 6px !important;
-  font-size: 0.9rem !important;
+  font-size: 0.75rem !important;
   white-space: normal !important;
-  line-height: 1.2em !important;
+  line-height: 1.1em !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .rbc-event:hover {
