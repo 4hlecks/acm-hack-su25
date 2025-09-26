@@ -1,11 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Drawer from '../../components/drawer/Drawer';
 import styles from './SettingsDrawer.module.css';
 import { Button, ToggleButton } from '../../components/buttons/Buttons';
 
 export default function SettingsDrawer({ open, onOpenChange }) {
 	const [maintenance, setMaintenance] = useState(false); 
+	const router = useRouter();
 
 	useEffect(() => {
 		fetch("/api/maintenance")
@@ -14,9 +16,17 @@ export default function SettingsDrawer({ open, onOpenChange }) {
 		  .catch(err => console.error("Failed to fetch maintenance mode", err));
 	  }, []);
 
-	const onSignOut = () => {
-		window.alert("TO DO: Sign Out");
-	}
+	  const onSignOut = () => {
+		try {
+		  localStorage.removeItem("token");
+		  localStorage.removeItem("user");
+		  localStorage.removeItem("role");
+		  window.dispatchEvent(new Event("authChanged"));
+		} catch (err) {
+		  console.error("Error during sign out:", err);
+		}
+		router.push("/login");
+	  };
 
 	const onShutDown = async (newState) => {
 		setMaintenance(newState); 

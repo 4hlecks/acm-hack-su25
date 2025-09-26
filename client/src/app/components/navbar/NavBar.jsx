@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { usePopup } from '@/app/context/PopupContext';
 
-export default function NavBar({ maintenance, userRole }) {
+export default function NavBar() {
     const router = useRouter();
     const pathname = usePathname();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -47,110 +47,94 @@ export default function NavBar({ maintenance, userRole }) {
         }
     };
 
-    const isLocked = maintenance && userRole !== 'admin';
-
     return (
-      <nav className={styles.navBar}>
+    <nav className={styles.navBar}>
         <div className={styles.leftSide}>
-          <Link href="/" className={styles.siteLogo}>
-            Current
-          </Link>
-          <SearchBar onEventClick={openEventPopup} onClubSelect={handleClubSelect} />
+            <Link href="/" className={styles.siteLogo}>Current</Link>
+            <SearchBar onEventClick={openEventPopup} onClubSelect={handleClubSelect}/>
         </div>
-  
+
         <div className={styles.rightSide}>
-          {isLoggedIn ? (
-            isLocked ? (
-              // Maintenance mode for non-admin: only Logout
-              <button onClick={handleLogout} className={styles.navAuth}>
-                <LogOut size={16} className={styles.navIcon} />
-                <span>Logout</span>
-              </button>
+            {isLoggedIn ? (
+                <>
+            <ul className={styles.navMiddleItems}>
+            {isClub ? (
+              <>
+                <li>
+                  <Link
+                    href="/add-event"
+                    className={`${styles.navItem} ${
+                      pathname === '/add-event' ? styles.activeLink : ''
+                    }`}
+                  >
+                    <PlusSquare className={styles.navIcon} /> Create
+                  </Link>
+                </li>
+                <li>
+                <Link
+                  href="/calendar"
+                  className={`${styles.navItem} ${pathname === '/calendar' ? styles.activeLink : ''}`}
+                >
+                  <Calendar className={styles.navIcon} /> Calendar
+                </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/profile-page"
+                    className={`${styles.navItem} ${
+                      pathname === '/profile-page' ? styles.activeLink : ''
+                    }`}
+                  >
+                    <User className={styles.navIcon} /> Profile
+                  </Link>
+                </li>
+              </>
             ) : (
               <>
-                <ul className={styles.navMiddleItems}>
-                  {isClub ? (
-                    <>
-                      <li>
-                        <Link
-                          href="/add-event"
-                          className={`${styles.navItem} ${
-                            pathname === '/add-event' ? styles.activeLink : ''
-                          }`}
-                        >
-                          <PlusSquare className={styles.navIcon} /> Create
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/calendar"
-                          className={`${styles.navItem} ${
-                            pathname === '/calendar' ? styles.activeLink : ''
-                          }`}
-                        >
-                          <Calendar className={styles.navIcon} /> Calendar
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/profile-page"
-                          className={`${styles.navItem} ${
-                            pathname === '/profile-page' ? styles.activeLink : ''
-                          }`}
-                        >
-                          <User className={styles.navIcon} /> Profile
-                        </Link>
-                      </li>
-                    </>
-                  ) : (
-                    <>
-                      <li>
-                        <Link
-                          href="/saved"
-                          className={`${styles.navItem} ${
-                            pathname === '/saved' ? styles.activeLink : ''
-                          }`}
-                        >
-                          <Bookmark className={styles.navIcon} /> Saved
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/calendar"
-                          className={`${styles.navItem} ${
-                            pathname === '/calendar' ? styles.activeLink : ''
-                          }`}
-                        >
-                          <Calendar className={styles.navIcon} /> Calendar
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/following"
-                          className={`${styles.navItem} ${
-                            pathname === '/following' ? styles.activeLink : ''
-                          }`}
-                        >
-                          <User className={styles.navIcon} /> Following
-                        </Link>
-                      </li>
-                    </>
-                  )}
-                </ul>
-  
-                <button onClick={handleLogout} className={styles.navAuth}>
-                  <LogOut size={16} className={styles.navIcon} />
-                  <span>Logout</span>
-                </button>
+                <li>
+                  <Link
+                    href="/saved"
+                    className={`${styles.navItem} ${
+                      pathname === '/saved' ? styles.activeLink : ''
+                    }`}
+                  >
+                    <Bookmark className={styles.navIcon} /> Saved
+                  </Link>
+                </li>
+                <li>
+                <Link
+                  href="/calendar"
+                  className={`${styles.navItem} ${pathname === '/calendar' ? styles.activeLink : ''}`}
+                >
+                  <Calendar className={styles.navIcon} /> Calendar
+                </Link>
+            </li>
+                <li>
+                  <Link
+                    href="/following"
+                    className={`${styles.navItem} ${
+                      pathname === '/following' ? styles.activeLink : ''
+                    }`}
+                  >
+                    <User className={styles.navIcon} /> Following
+                  </Link>
+                </li>
               </>
-            )
-          ) : (
-            <Link href="/login" className={styles.navAuth}>
-              <LogIn size={16} className={styles.navIcon} />
-              <span>Login</span>
-            </Link>
-          )}
+            )}
+          </ul>
+
+            <button onClick={handleLogout} className={styles.navAuth}> 
+            <LogOut size={16} className={styles.navIcon} /> 
+            <span>Logout</span>
+          </button>
+        </>
+        ) : (
+          <Link href="/login" className={styles.navAuth}>
+            <LogIn size={16} className={styles.navIcon} /> 
+            <span>Login</span> 
+          </Link>
+        )}
         </div>
-      </nav>
-    );
-  }
+    </nav>
+  );
+}
