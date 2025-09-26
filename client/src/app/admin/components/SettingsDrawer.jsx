@@ -1,17 +1,36 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Drawer from '../../components/drawer/Drawer';
 import styles from './SettingsDrawer.module.css';
 import { Button, ToggleButton } from '../../components/buttons/Buttons';
 
 export default function SettingsDrawer({ open, onOpenChange }) {
+	const [maintenance, setMaintenance] = useState(false); 
+
+	useEffect(() => {
+		fetch("/api/maintenance")
+		  .then(res => res.json())
+		  .then(data => setMaintenance(data.enabled))
+		  .catch(err => console.error("Failed to fetch maintenance mode", err));
+	  }, []);
+
 	const onSignOut = () => {
 		window.alert("TO DO: Sign Out");
 	}
 
-	const onShutDown = () => {
-		window.alert("TO DO: Maintenance Mode");
-	}
+	const onShutDown = async (newState) => {
+		setMaintenance(newState); 
+
+		try {
+			await fetch("/api/maintenance", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ enabled: newState }), 
+			});
+		} catch (err) {
+			console.error("Failed to update maintenance mode", err); 
+		}
+	};
 
 	return (
 		<Drawer open={open} onOpenChange={onOpenChange} title="Settings">
@@ -30,7 +49,8 @@ export default function SettingsDrawer({ open, onOpenChange }) {
 				<h3 className={styles.label}>Maintenance Mode</h3>
 				<ToggleButton 
 					size="medium"
-					onPressedChange={onShutDown}
+					pressed={maintenance} 
+          			onPressedChange={onShutDown}
 				/>
 			</div>
     	</Drawer>
