@@ -30,6 +30,8 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("role", data.user.role);
 
+      window.dispatchEvent(new Event("authChanged"));
+
       alert("Logged in successfully!");
 
       // redirect admins to dashboard, others to homepage
@@ -43,7 +45,7 @@ export default function LoginPage() {
       alert("Error: " + err.message);
     }
   };
-
+  
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
       {/* Top Navigation Bar */}
