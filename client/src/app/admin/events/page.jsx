@@ -75,7 +75,7 @@ function buildPayloadFromDrawer(d, ownerOptions) {
 // ---------- page ----------
 export default function AdminEventsPage() {
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // search
   const [query, setQuery] = useState('');
@@ -291,10 +291,18 @@ export default function AdminEventsPage() {
         </Button>
       </div>
 
-      {loading ? (
+      
+      {loading ? ( 
         <div style={{ padding: '1rem' }}>Loading…</div>
+      ) : rows.length === 0 ? ( 
+        <div style={{ padding: '1rem' }}>No events found.</div>
       ) : (
-        <DataTable columns={columns} data={rows} rowKey={(r) => r.id} stickyHeader />
+        <DataTable
+          columns={columns}
+          data={rows}
+          rowKey={(r) => r.id}
+          stickyHeader
+        />
       )}
 
       <EventDrawer

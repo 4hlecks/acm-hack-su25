@@ -19,6 +19,8 @@ const adminAccountRequestsRouter = require("./routes/admin/admin_account_request
 const requireAuth = require("./middleware/auth");
 const adminMetrics = require("./routes/admin/metrics_router");
 const searchRouter = require("./routes/search_router/search_router");
+const adminRouter = require("./routes/admin");
+
 
 const app = express();
 const server = http.createServer(app);
@@ -96,6 +98,7 @@ app.use("/api/admin/account-requests", adminAccountRequestsRouter);
 app.use("/api/findClub", clubsRouter);
 app.use("/api/search", searchRouter);
 app.use("/api/admin/metrics", adminMetrics);
+app.use("/api/admin", adminRouter);
 
 app.use("/uploads", express.static("uploads"));
 
