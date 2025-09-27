@@ -93,7 +93,6 @@ export default function Home() {
           userRole={userRole}      
         />
       )}
-      <TabBar />
     </>
   );
 }

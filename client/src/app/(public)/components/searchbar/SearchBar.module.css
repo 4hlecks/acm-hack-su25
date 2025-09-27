@@ -85,10 +85,3 @@
 .searchInputField::-webkit-search-decoration {
   -webkit-appearance: none;
 }
-
-/* Mobile Styles */
-@media (max-width: 48rem) {
-  .searchBar {
-      width: clamp(12rem, 90vw, 20rem);
-  }
-}

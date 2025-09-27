@@ -27,7 +27,15 @@ export default function NavItem({
     const content = (
         <>
             {icon}
-            {label && <span className={styles.navLabel}>{label}</span>}
+            {
+                label
+                && 
+                <span className={styles.navLabelWrapper}>
+                    <span className={styles.navLabel}>
+                        {label}
+                    </span>
+                </span>
+            }
         </>
     );
 

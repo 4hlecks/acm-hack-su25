@@ -8,6 +8,9 @@ export default function PublicLayout({ children }) {
                 <NavBar />
             </header>
             <main className={styles.siteContent}>{children}</main>
+            <footer className={styles.siteFooter}>
+                <NavBar data-variant="tabbar" aria-label="Tab bar"/>
+            </footer>
         </div>
     )
 }

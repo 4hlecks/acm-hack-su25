@@ -36,3 +36,15 @@
         white-space: nowrap;
     }
 }
+
+.siteFooter {
+    display: none;
+}
+
+@media (max-width: 72rem) {
+    .siteFooter {
+        display: block;
+        position: sticky;
+        bottom: 0;
+    }
+}
