@@ -1,7 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import styles from './page.module.css'
-import TabBar from './components/navbar/TabBar'
 import EventCarousel from './components/events/EventCarousel'
 import EventPopup from './components/events/EventPopup'
 import { usePopup } from './context/PopupContext';
