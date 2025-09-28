@@ -191,36 +191,34 @@ export default function CalendarPage() {
         
 
         const formatted = uniqueEvents.map((ev) => {
-  console.log('Raw event data:', {
-    title: ev.eventTitle,
-    rawDate: ev.date,
-    startTime: ev.startTime,
-    endTime: ev.endTime
-  });
+  
+          const eventDate = new Date(ev.date);
+          console.log('Parsed eventDate:', eventDate);
+          
+          // Create date string manually to avoid timezone issues
+          const year = eventDate.getFullYear();
+          const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+          const day = String(eventDate.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+          
+          console.log('Final dateStr:', dateStr);
+          
+          const start = new Date(`${dateStr}T${ev.startTime}:00`);
+          let end = new Date(`${dateStr}T${ev.endTime}:00`);
+          
+          if (ev.endTime < ev.startTime){
+            end.setDate(end.getDate() + 1);
+          }
 
-  const eventDate = new Date(ev.date);
-  console.log('Parsed eventDate:', eventDate);
-  
-  // Create date string manually to avoid timezone issues
-  const year = eventDate.getFullYear();
-  const month = String(eventDate.getMonth() + 1).padStart(2, '0');
-  const day = String(eventDate.getDate()).padStart(2, '0');
-  const dateStr = `${year}-${month}-${day}`;
-  
-  console.log('Final dateStr:', dateStr);
-  
-  const start = new Date(`${dateStr}T${ev.startTime}:00`);
-  const end = new Date(`${dateStr}T${ev.endTime}:00`);
-  
-  console.log('Calendar start/end:', start, end);
+          console.log('Calendar start/end:', start, end);
 
-  return {
-    title: ev.eventTitle,
-    start,
-    end,
-  };
-});
-
+          return {
+            title: ev.eventTitle,
+            start,
+            end,
+          };
+        });
+        
         formatted.sort((a, b) => a.start - b.start);
         setEvents(formatted);
       } catch (err) {
