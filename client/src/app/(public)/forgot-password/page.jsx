@@ -1,47 +1,100 @@
 'use client';
 import { useState } from 'react';
+import { TextField } from '../../../components/form/Form';
+import { Button } from '../../../components/buttons/Buttons';
+import styles from '../page.module.css';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
 
-  const handleSubmit = async (e) => {
+  // UI
+  const [loading, setLoading] = useState(false);
+  const [errMsg, setErrMsg]   = useState(null);
+  const [okMsg, setOkMsg]     = useState(null);
+
+  // field-level errors
+  const [fieldErr, setFieldErr] = useState({ email: '' });
+
+  function validate() {
+    const next = { email: '' };
+    if (!email.trim()) next.email = 'Email is required.';
+    else if (!/^\S+@\S+\.\S+$/.test(email)) next.email = 'Enter a valid email address.';
+    setFieldErr(next);
+    return !next.email;
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
+    setErrMsg(null);
+    setOkMsg(null);
+    if (!validate()) return;
+
+    setLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/users/forgot-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch(`${API_BASE}/users/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-
       const data = await res.json();
-      setMessage(data.message || "Check your email for reset instructions.");
+
+      if (!res.ok) throw new Error(data.message || 'Failed to send reset link.');
+
+      setOkMsg(data.message || 'Check your email for reset instructions.');
     } catch (err) {
-      console.error(err);
-      setMessage("Something went wrong. Try again.");
+      console.error('Forgot password error:', err);
+      setErrMsg(err.message || 'Something went wrong. Try again.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <main style={{ maxWidth: "500px", margin: "2rem auto", textAlign: "center" }}>
-      <h1>Forgot Password</h1>
-      <p>Enter your email and we’ll send you a reset link.</p>
+    <main className={styles.centeredPage}>
+      <header className={styles.onboardingHeader}>
+        <h1>Forgot password</h1>
+        <p style={{ fontSize: '1rem', fontWeight: 600 }}>
+          Enter your email and we will send you a reset link.
+        </p>
+      </header>
 
-      <form onSubmit={handleSubmit} style={{ marginTop: "1.5rem" }}>
-        <input
+      {errMsg && (
+        <div className={styles.errorBanner} role="alert">
+          {errMsg}
+        </div>
+      )}
+      {okMsg && (
+        <div className={styles.successBanner} role="status">
+          {okMsg}
+        </div>
+      )}
+
+      <form className={styles.onboardingForm} onSubmit={handleSubmit} noValidate>
+        <TextField
+          id="email"
+          label="Email"
           type="email"
-          value={email}
-          placeholder="Your email"
-          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          placeholder="Enter your email"
           required
-          style={{ width: "100%", padding: "0.5rem" }}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          error={fieldErr.email}
+          fieldWidth="100%"
         />
-        <button type="submit" style={{ marginTop: "1rem", padding: "0.5rem 1rem" }}>
-          Send Reset Link
-        </button>
-      </form>
 
-      {message && <p style={{ marginTop: "1rem" }}>{message}</p>}
+        <Button
+          type="submit"
+          width="fill"
+          variant="secondary"
+          disabled={loading}
+          aria-busy={loading ? 'true' : undefined}
+        >
+          {loading ? 'Sending…' : 'Send reset link'}
+        </Button>
+      </form>
     </main>
   );
 }

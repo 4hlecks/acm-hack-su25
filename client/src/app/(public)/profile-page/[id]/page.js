@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState, use } from "react";
 import styles from "../page.module.css";
-import NavBar from "../../components/navbar/NavBar";
 import EventCard from "../../components/events/EventCard";
 import EventPopup from "@/app/(public)/components/events/EventPopup";
 import ProfileCard from "../../components/profile/ProfileCard";
-import TabBar from "../../components/navbar/TabBar";
 import { useRouter } from "next/navigation";
 import { usePopup } from "@/app/(public)/context/PopupContext";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
@@ -105,7 +103,6 @@ export default function PublicProfile({ params }) {
     
   return (
     <>
-      <NavBar />
       <main className={styles.pageContent}>
         <ProfileCard
           name={club?.name}
@@ -167,7 +164,6 @@ export default function PublicProfile({ params }) {
           />
         )}
       </main>
-      <TabBar />
     </>
   );
 }

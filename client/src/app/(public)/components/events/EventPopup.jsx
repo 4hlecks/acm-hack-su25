@@ -121,6 +121,7 @@ const checkIfEventSaved = async() => {
     const d = new Date(dateValue);
     if (isNaN(d.getTime())) return "Date TBD";
     return d.toLocaleDateString("en-US", {
+      timezone: "UTC",
       weekday: "short",
       month: "short",
       day: "numeric",
@@ -134,9 +135,13 @@ const checkIfEventSaved = async() => {
     const startDate = new Date(
       startTime.includes("T") ? startTime : `1970-01-01T${startTime}`
     );
-    const endDate = new Date(
+    let endDate = new Date(
       endTime.includes("T") ? endTime : `1970-01-01T${endTime}`
     );
+
+    if (endDate < startDate) {
+    endDate.setDate(endDate.getDate() + 1);
+    }
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return "Time TBD";
 
     const startStr = startDate.toLocaleTimeString([], options);

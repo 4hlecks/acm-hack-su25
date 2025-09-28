@@ -6,8 +6,6 @@
     gap: 0.5rem; /* gap between label and field */
 }
 
-.field[data-layout="column"] {}
-
 .field[data-layout="row"] {
     grid-template-columns: max-content 1fr;
     align-items: center;
@@ -109,8 +107,14 @@
     box-shadow: none;
 }
 
+/* ✅ Only drop bottom radii when we believe the native select menu is open. */
+.controlBox[data-open="true"] .select {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
 /* Ensure the input/select/textarea container respects the field width */
-.field[data-layout="column"] .controlBox {
+.field .controlBox {
     width: var(--field-w, 100%);
 }
 
@@ -136,17 +140,32 @@
     box-shadow: none;
 }
 
-/* Combobox */
-
-/*
-    Top bar draws its own border/background (like .input).
-    Dropdown is a separate panel with the SAME stroke and bottom radii,
-    fused via border-top: 0 and a -1px overlap. No height animation on the bar.
-    UA focus rings are disabled inside to avoid the light blue halo.
-*/
+/* ===== Combobox ===== */
 
 .combo {
     position: relative;
+}
+
+/* Give the combobox input extra right padding when an end icon is present */
+.combo[data-has-icon="true"] .input {
+  padding-right: calc(1rem + var(--icon-size-medium) + 0.25rem);
+}
+
+/* Default: editable combobox behaves like a text input (I-beam) */
+.combo[data-editable="true"] .comboBar,
+.combo[data-editable="true"] .comboBar .input {
+  cursor: text;
+}
+
+/* Non-editable: make the whole bar feel clickable like a select */
+.combo[data-editable="false"] .comboBar,
+.combo[data-editable="false"] .comboBar .input {
+  cursor: pointer;
+}
+
+/* Options already clickable, but make it explicit */
+.comboList [role="option"] {
+  cursor: pointer;
 }
 
 /* Top bar (looks like an input) */
@@ -169,10 +188,10 @@
     min-width: 0;
     border: 0;
     background: transparent;
-    outline: none !important; /* kill UA outline on the input (we show focus via border color) */
+    outline: none !important;
     color: var(--text-color, inherit);
     height: 100%;
-    padding: 0; /* padding already on the bar */
+    padding: 0;
 }
 
 /* Focus/open state: change border color, drop bottom radii so list fuses in */
@@ -187,7 +206,7 @@
 .comboList {
     list-style: none;
     margin: 0;
-    padding: 0.25rem 0; /* items add horizontal padding */
+    padding: 0.25rem 0;
     background: var(--input-bg, #fff);
     border: 1px solid var(--input-focus-border, #000000); /* same stroke as fields */
     border-top: 0; /* fuse to bar */
@@ -199,7 +218,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    top: calc(var(--input-h, 2.5rem) - 1px); /* -1px to overlap seam */
+    top: calc(var(--input-h, 2.5rem) - 1px); /* overlap seam by 1px */
     z-index: 10;
 
     /* Animation */
@@ -215,7 +234,6 @@
     /* Prevent accidental hits while closed */
     pointer-events: none;
 
-    /* Kill UA focus ring on the list itself */
     outline: none;
 }
 
@@ -230,7 +248,7 @@
 
 /* Option items */
 .comboOption {
-    padding: 0.5rem 1rem; /* same horizontal padding as fields */
+    padding: 0.5rem 1rem; /* match field horizontal padding */
     cursor: pointer;
     background: var(--input-bg, #fff);
     border-top: 1px solid var(--tertiary-color, #E5E5E5);
@@ -251,4 +269,27 @@
 .comboEmpty {
     color: var(--text-muted-color, #777);
     cursor: default;
+}
+
+/* ----- Error styles (field-level) ----- */
+.error {
+  color: #b91c1c;
+}
+
+/* Optional: stronger error chrome */
+.hasError .input,
+.hasError .select,
+.hasError .textarea {
+  border-color: #ef4444;
+}
+
+/* Make placeholder text red when field is invalid (inputs/textarea) */
+.controlBox[data-invalid="true"] .input::placeholder,
+.controlBox[data-invalid="true"] .textarea::placeholder {
+  color: #b91c1c;
+}
+
+/* Make the SELECT's *visible text* red while invalid */
+.controlBox[data-invalid="true"] .select {
+  color: #b91c1c;
 }

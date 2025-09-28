@@ -2,11 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
-import NavBar from "../components/navbar/NavBar";
 import EventCard from "../components/events/EventCard";
 import EventPopup from "./ProfileEventPopup";
 import ProfileCard from "../components/profile/ProfileCard";
-import TabBar from "../components/navbar/TabBar";
 import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
@@ -90,7 +88,6 @@ export default function Profile() {
 
   return (
     <>
-      <NavBar />
       <main className={styles.pageContent}>
         <ProfileCard
           name={club?.name}
@@ -154,7 +151,6 @@ export default function Profile() {
           />
         )}
       </main>
-      <TabBar />
     </>
   );
 }

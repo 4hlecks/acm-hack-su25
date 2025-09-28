@@ -1,5 +1,5 @@
 'use client';
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 import styles from './Form.module.css';
 
 /** Base Form Field Wrapper: label + control + help/error */
@@ -64,17 +64,10 @@ export function TextField({
 
   function openNativePicker(e) {
     if (!isPicker) return;
-    // avoid blurring the input before opening the picker
-    e.preventDefault();
+    e.preventDefault(); // avoid blur before opening
     const el = inputRef.current;
-    if (el?.showPicker) {
-      // Chrome/Edge/Safari 16.4+
-      el.showPicker();
-    } else {
-      // Fallback: focus so the OS picker may appear on mobile,
-      // or at least place caret for manual entry
-      el?.focus();
-    }
+    if (el?.showPicker) el.showPicker();
+    else el?.focus();
   }
 
   return (
@@ -87,7 +80,11 @@ export function TextField({
       error={error}
       required={required}
     >
-      <div className={styles.controlBox} data-has-icon={icon ? 'true' : undefined}>
+      <div
+        className={styles.controlBox}
+        data-has-icon={icon ? 'true' : undefined}
+        data-invalid={error ? 'true' : undefined}
+      >
         <Input
           ref={inputRef}
           id={id}
@@ -109,14 +106,78 @@ export function TextField({
   );
 }
 
-/** Select Field (native arrow removed; custom icon shown) */
+/** Select Field (supports placeholder; drops bottom radii only while native menu is visible) */
 export function SelectField({
-  id, label, icon, layout, fieldWidth, help, error, required, children, ...rest
+  id,
+  label,
+  icon,
+  layout,
+  fieldWidth,
+  help,
+  error,
+  required,
+  placeholder,          // pass a string to auto-inject a disabled empty option
+  children,
+  onChange,
+  ...rest
 }) {
+  const [open, setOpen] = React.useState(false);
+  const justOpenedByPointer = React.useRef(false);
+
   const describedBy = [
     help ? `${id}-help` : null,
     error ? `${id}-error` : null,
   ].filter(Boolean).join(' ') || undefined;
+
+  // Pointer interaction:
+  // - If closed → open and mark "just opened" to ignore the immediate click.
+  // - If open   → proactively close so corners restore when menu collapses.
+  function handleMouseDown() {
+    if (!open) {
+      setOpen(true);
+      justOpenedByPointer.current = true;
+    } else {
+      setOpen(false);
+      justOpenedByPointer.current = false;
+    }
+  }
+
+  // Click fires after mousedown; ignore the first click that opened the menu.
+  // If it wasn't a "just opened" click and we're still open, close now (covers
+  // browsers that don't blur when the menu collapses on the second click).
+  function handleClick() {
+    if (justOpenedByPointer.current) {
+      justOpenedByPointer.current = false;
+      return;
+    }
+    if (open) setOpen(false);
+  }
+
+  // Keyboard: Enter/Space/ArrowDown likely opens; Tab should close before moving focus.
+  function handleKeyDown(e) {
+    const k = e.key;
+    if (k === 'Enter' || k === ' ' || k === 'ArrowDown') {
+      setOpen(true);
+    } else if (k === 'Tab') {
+      setOpen(false);
+    }
+  }
+
+  // Fallback close on keyup Tab as well (some UA quirks).
+  function handleKeyUp(e) {
+    if (e.key === 'Tab') setOpen(false);
+  }
+
+  // Close on blur and on value change, too.
+  function handleBlur() {
+    setOpen(false);
+    justOpenedByPointer.current = false;
+  }
+  function handleChange(e) {
+    setOpen(false);
+    justOpenedByPointer.current = false;
+    onChange?.(e);
+  }
 
   return (
     <FormField
@@ -128,13 +189,29 @@ export function SelectField({
       error={error}
       required={required}
     >
-      <div className={styles.controlBox} data-has-icon={icon ? 'true' : undefined}>
+      <div
+        className={styles.controlBox}
+        data-has-icon={icon ? 'true' : undefined}
+        data-open={open ? 'true' : undefined}
+        data-invalid={error ? 'true' : undefined}
+      >
         <SelectEl
           id={id}
           aria-invalid={!!error}
           aria-describedby={describedBy}
+          onMouseDown={handleMouseDown}
+          onClick={handleClick}
+          onKeyDown={handleKeyDown}
+          onKeyUp={handleKeyUp}
+          onBlur={handleBlur}
+          onChange={handleChange}
           {...rest}
         >
+          {placeholder && (
+            <option value="" disabled>
+              {placeholder}
+            </option>
+          )}
           {children}
         </SelectEl>
         {icon && <span className={styles.icon} aria-hidden>{icon}</span>}
@@ -143,7 +220,7 @@ export function SelectField({
   );
 }
 
-/** Date & Time reuse TextField with type override (overlay method for the icon) */
+/** Date & Time reuse TextField with type override */
 export function DateField(props) { return <TextField {...props} type="date" />; }
 export function TimeField(props) { return <TextField {...props} type="time" />; }
 
@@ -166,7 +243,10 @@ export function TextAreaField({
       error={error}
       required={required}
     >
-      <div className={styles.controlBox}>
+      <div
+        className={styles.controlBox}
+        data-invalid={error ? 'true' : undefined}
+      >
         <textarea
           id={id}
           className={styles.textarea}
@@ -181,155 +261,183 @@ export function TextAreaField({
 }
 
 /**
- * ComboBoxField - type-to-filter + dropdown list of options.
- * Minimal ARIA: role=combobox + listbox + options
- * options: Array<{ value: string, label: string }>
+ * ComboBoxField (unchanged from your last version)
  */
-// replace your ComboBoxField with this version (only the component body changed)
 export function ComboBoxField({
-    id,
-    label,
-    options = [],
-    value = '',
-    onChange,
-    onSelect,
-    placeholder = '',
-    layout,
-    fieldWidth,
-    help,
-    error,
-    required,
+  id,
+  label,
+  options = [],
+  value = '',
+  onChange,
+  onSelect,
+  placeholder = '',
+  layout,
+  fieldWidth,
+  help,
+  error,
+  required,
+  editable = true,              // ✅ NEW: disable text manipulation when false
+  icon = null,                  // ✅ NEW: optional right-side icon
 }) {
-    const [open, setOpen] = React.useState(false);
-    const [activeIdx, setActiveIdx] = React.useState(-1);
-    const inputRef = React.useRef(null);
-    const wrapRef = React.useRef(null);
-    const listRef = React.useRef(null);
-    const listId = `${id}-listbox`;
+  const [open, setOpen] = React.useState(false);
+  const [activeIdx, setActiveIdx] = React.useState(-1);
+  const inputRef = React.useRef(null);
+  const wrapRef = React.useRef(null);
+  const listRef = React.useRef(null);
+  const listId = `${id}-listbox`;
 
-    // Pointer-intent guard: only open on pointer focus (not label-induced focus)
-    const pointerIntent = React.useRef(false);
-    const armPointerIntent = () => { pointerIntent.current = true; };
-    const disarmPointerIntentSoon = () => { setTimeout(() => { pointerIntent.current = false; }, 0); };
+  const pointerIntent = React.useRef(false);
+  const armPointerIntent = () => { pointerIntent.current = true; };
+  const disarmPointerIntentSoon = () => { setTimeout(() => { pointerIntent.current = false; }, 0); };
 
-    const filtered = React.useMemo(() => {
-        const q = (value || '').toLowerCase().trim();
-        if (!q) return options;
-        return options.filter(o => o.label.toLowerCase().includes(q));
-    }, [options, value]);
+  // If not editable, don't filter; otherwise filter by typed value.
+  const filtered = React.useMemo(() => {
+    if (!editable) return options;
+    const q = (value || '').toLowerCase().trim();
+    if (!q) return options;
+    return options.filter(o => o.label.toLowerCase().includes(q));
+  }, [options, value, editable]);
 
-    // No wrapper height animation anymore; measuring kept in case you want it
-    React.useLayoutEffect(() => {
-        if (!wrapRef.current) return;
-        const barH = wrapRef.current.offsetHeight || 0;
-        const listH = open && listRef.current ? listRef.current.offsetHeight : 0;
-        wrapRef.current.style.setProperty('--combo-shadow-h', `${barH + listH}px`);
-    }, [open, filtered.length]);
+  React.useLayoutEffect(() => {
+    if (!wrapRef.current) return;
+    const barH = wrapRef.current.offsetHeight || 0;
+    const listH = open && listRef.current ? listRef.current.offsetHeight : 0;
+    wrapRef.current.style.setProperty('--combo-shadow-h', `${barH + listH}px`);
+  }, [open, filtered.length]);
 
-    function commitOption(opt) {
-        onSelect?.(opt);
-        onChange?.(opt.label);
-        setOpen(false);
-        inputRef.current?.blur();
+  function commitOption(opt) {
+    onSelect?.(opt);
+    // For editable=false, parent typically controls "value" to be the label
+    // For editable=true, we keep using label text as before
+    onChange?.(opt.label);
+    setOpen(false);
+    inputRef.current?.blur();
+  }
+
+  function handleKeyDown(e) {
+    // Open on arrows if closed
+    if (!open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault();
+      setOpen(true);
+      setActiveIdx(0);
+      return;
     }
+    if (!open) return;
 
-    function handleKeyDown(e) {
-        if (!open && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-            e.preventDefault();
-            setOpen(true);
-            setActiveIdx(0);
-            return;
-        }
-        if (!open) return;
-
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            setActiveIdx(i => Math.min(i + 1, filtered.length - 1));
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            setActiveIdx(i => Math.max(i - 1, 0));
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            const opt = filtered[activeIdx];
-            if (opt) commitOption(opt);
-        } else if (e.key === 'Escape') {
-            setOpen(false);
-        }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIdx(i => Math.min(i + 1, filtered.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIdx(i => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const opt = filtered[activeIdx];
+      if (opt) commitOption(opt);
+    } else if (e.key === 'Escape') {
+      setOpen(false);
     }
+  }
 
-    return (
-        <FormField
-            id={id}
-            label={label}
-            layout={layout}
-            fieldWidth={fieldWidth}
-            help={help}
-            error={error}
-            required={required}
+  // When not editable, ignore typing but allow focus to open via pointer.
+  function handleInputChange(e) {
+    if (!editable) return;            // 🔒 block text manipulation
+    onChange?.(e.target.value);
+    setOpen(true);
+    setActiveIdx(0);
+  }
+
+  // Clicking the icon should toggle/open the list without focusing input first.
+  function handleIconMouseDown(e) {
+    e.preventDefault();
+    setOpen(o => !o);
+    // if opening, set a sensible active index
+    if (!open) setActiveIdx(0);
+  }
+
+  return (
+    <FormField
+      id={id}
+      label={label}
+      layout={layout}
+      fieldWidth={fieldWidth}
+      help={help}
+      error={error}
+      required={required}
+    >
+      <div
+        ref={wrapRef}
+        className={`${styles.combo} ${open ? styles.comboOpen : ''}`}
+        data-has-icon={icon ? 'true' : undefined}
+        data-editable={editable ? 'true' : 'false'}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false);
+        }}
+      >
+        <div
+          className={styles.comboBar}
+          onPointerDown={armPointerIntent}
+          onPointerUp={disarmPointerIntentSoon}
         >
-            <div
-                ref={wrapRef}
-                className={`${styles.combo} ${open ? styles.comboOpen : ''}`}
-                // ❌ remove onFocus here
-                onBlur={(e) => {
-                    if (!e.currentTarget.contains(e.relatedTarget)) setOpen(false);
-                }}
-            >
-                <div
-                    className={styles.comboBar}
-                    onPointerDown={armPointerIntent}
-                    onPointerUp={disarmPointerIntentSoon}
-                >
-                    <input
-                        ref={inputRef}
-                        id={id}
-                        className={styles.input}
-                        type="text"
-                        value={value}
-                        placeholder={placeholder}
-                        onFocus={() => {
-                            // Only open if focus came from a pointer inside the bar
-                            if (pointerIntent.current) setOpen(true);
-                        }}
-                        onChange={(e) => {
-                            onChange?.(e.target.value);
-                            setOpen(true);            // typing should open
-                            setActiveIdx(0);
-                        }}
-                        onKeyDown={handleKeyDown}      // arrows open
-                        role="combobox"
-                        aria-expanded={open}
-                        aria-controls={listId}
-                        aria-autocomplete="list"
-                        aria-invalid={!!error}
-                    />
-                </div>
+          <input
+            ref={inputRef}
+            id={id}
+            className={styles.input}
+            type="text"
+            value={value}
+            placeholder={placeholder}
+            autoComplete="off"
+            readOnly={!editable}               // ✅ non-editable like a select
+            onFocus={() => {
+              if (pointerIntent.current) setOpen(true);
+            }}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listId}
+            aria-autocomplete={editable ? 'list' : 'none'}
+            aria-invalid={!!error}
+          />
 
-                <ul
-                    ref={listRef}
-                    id={listId}
-                    role="listbox"
-                    className={styles.comboList}
-                    data-open={open ? 'true' : undefined}
-                >
-                    {filtered.map((opt, i) => (
-                        <li
-                            key={opt.value}
-                            role="option"
-                            aria-selected={i === activeIdx}
-                            className={`${styles.comboOption} ${i === activeIdx ? styles.comboOptionActive : ''}`}
-                            onMouseDown={(e) => { e.preventDefault(); commitOption(opt); }}
-                        >
-                            {opt.label}
-                        </li>
-                    ))}
-                    {filtered.length === 0 && (
-                        <li className={`${styles.comboOption} ${styles.comboEmpty}`} aria-disabled="true">
-                            No matches
-                        </li>
-                    )}
-                </ul>
-            </div>
-        </FormField>
-    );
+          {/* ✅ Optional right-side icon that toggles menu */}
+          {icon && (
+            <span
+              className={styles.iconBtn}
+              aria-hidden
+              onMouseDown={handleIconMouseDown}
+              title="Toggle"
+            >
+              {icon}
+            </span>
+          )}
+        </div>
+
+        <ul
+          ref={listRef}
+          id={listId}
+          role="listbox"
+          className={styles.comboList}
+          data-open={open ? 'true' : undefined}
+        >
+          {filtered.map((opt, i) => (
+            <li
+              key={opt.value}
+              role="option"
+              aria-selected={i === activeIdx}
+              className={`${styles.comboOption} ${i === activeIdx ? styles.comboOptionActive : ''}`}
+              onMouseDown={(e) => { e.preventDefault(); commitOption(opt); }}
+            >
+              {opt.label}
+            </li>
+          ))}
+          {filtered.length === 0 && (
+            <li className={`${styles.comboOption} ${styles.comboEmpty}`} aria-disabled="true">
+              No matches
+            </li>
+          )}
+        </ul>
+      </div>
+    </FormField>
+  );
 }

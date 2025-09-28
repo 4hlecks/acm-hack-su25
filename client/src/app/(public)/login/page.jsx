@@ -3,134 +3,139 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+import styles from '../page.module.css'; // uses .onboarding + friends you already have
+import { TextField } from '../../../components/form/Form';
+import { Button } from '../../../components/buttons/Buttons';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:5001';
+
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+
+  // form state
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignUp = () => {
-    router.push('/register');
-  };
+  // ui state
+  const [loading, setLoading] = useState(false);
+  const [errMsg, setErrMsg]   = useState(null);
 
-  const handleLogin = async (e) => {
+  // field-level errors
+  const [fieldErr, setFieldErr] = useState({ email: '', password: '' });
+
+  function validate() {
+    const next = { email: '', password: '' };
+    if (!email.trim()) next.email = 'Email is required.';
+    else if (!/^\S+@\S+\.\S+$/.test(email)) next.email = 'Enter a valid email address.';
+
+    if (!password) next.password = 'Password is required.';
+    setFieldErr(next);
+
+    return !next.email && !next.password;
+  }
+
+  async function handleLogin(e) {
     e.preventDefault();
+    setErrMsg(null);
+    if (!validate()) return;
 
+    setLoading(true);
     try {
-      const res = await fetch("http://localhost:5001/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch(`${API_BASE}/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // If you later switch to httpOnly refresh cookies, add: credentials: 'include'
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
+      if (!res.ok) throw new Error(data.message || 'Login failed');
 
-      // Save token + user info in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("role", data.user.role);
+      // Persist (your backend currently returns token + user)
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('role', data.user.role);
 
-      alert("Logged in successfully!");
-
-      // redirect admins to dashboard, others to homepage
-      if (data.user.role === "admin") {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/");
-      }
+      // Route by role
+      if (data.user.role === 'admin') router.push('/admin/dashboard');
+      else router.push('/');
     } catch (err) {
-      console.error("Login error:", err);
-      alert("Error: " + err.message);
+      console.error('Login error:', err);
+      setErrMsg(err.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'white' }}>
-      {/* Top Navigation Bar */}
-      <header style={{
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #ccc',
-        padding: '1rem 2rem',
-        display: 'flex',
-        alignItems: 'center',
-      }}>
-        <Link href="/" style={{ fontSize: '1.5rem', fontWeight: 'bold', textDecoration: 'none', color: 'black' }}>
-          current
-        </Link>
+    <main className={styles.centeredPage}>
+      <header className={styles.onboardingHeader}>
+        <h1>Log in</h1>
+        <p style={{ fontSize: '1rem', fontWeight: 600 }}>
+          Log in to manage or save events!
+        </p>
       </header>
 
-      {/* Main Content */}
-      <main style={{
-        flex: '1',
-        padding: '2rem',
-        maxWidth: '600px',
-        margin: '0 auto',
-        fontFamily: 'sans-serif',
-        textAlign: 'center',
-      }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>Login</h1>
-        <p>Log in to manage or save events</p>
-
-        {/* Login Form */}
-        <form onSubmit={handleLogin} style={{ textAlign: 'left', marginTop: '2rem' }}>
-          <label>
-            Username or email:<br />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }}
-              required
-            />
-          </label>
-          <br /><br />
-          <label>
-            Password:<br />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              style={{ width: '100%', padding: '0.5rem', marginTop: '0.3rem' }}
-              required
-            />
-          </label>
-          <br />
-          <a href="/forgot-password" style={{ fontSize: '0.9rem' }}>Forgot password?</a>
-          <br /><br />
-          <div style={{ textAlign: 'center' }}>
-            <button type="submit" style={{ padding: '0.5rem 1rem' }}>
-              Log In
-            </button>
-          </div>
-        </form>
-
-        {/* Sign-up Section */}
-        <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-          <p style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>Don’t have an account?</p>
-          <button
-            onClick={handleSignUp}
-            style={{
-              margin: '0.5rem',
-              padding: '0.5rem 1rem',
-              backgroundColor: '#F0B323',
-              border: 'none',
-              cursor: 'pointer'
-            }}
-          >
-            Sign Up
-          </button>
+      {/* Error banner */}
+      {errMsg && (
+        <div className={styles.errorBanner} role="alert">
+          {errMsg}
         </div>
-      </main>
+      )}
 
-      {/* Footer */}
-      <footer style={{
-        backgroundColor: '#001f3f', 
-        height: '60px',
-        width: '100%',
-        marginTop: '2rem'
-      }} />
-    </div>
+      <form className={styles.onboardingForm} onSubmit={handleLogin} noValidate>
+        <TextField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+		  placeholder="Enter your email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          error={fieldErr.email}
+          fieldWidth="100%"
+        />
+
+        <TextField
+          id="password"
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+		  placeholder="Enter your password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          error={fieldErr.password}
+          fieldWidth="100%"
+        />
+
+        {/* Forgot password */}
+        <span className={styles.forgotPassword}>
+          <Link href="/forgot-password" className={styles.bodyLink}>
+            Forgot your password?
+          </Link>
+        </span>
+
+        {/* Log in */}
+        <Button
+          type="submit"
+          width="fill"
+          variant="secondary"
+          disabled={loading}
+          aria-busy={loading ? 'true' : undefined}
+        >
+          {loading ? 'Logging in…' : 'Log in'}
+        </Button>
+
+        {/* Sign up */}
+        <p className={styles.onboardingAlternate}>
+          First time here?{' '}
+          <Link href="/register" className={styles.bodyLink}>
+            Sign up
+          </Link>
+        </p>
+      </form>
+    </main>
   );
 }
