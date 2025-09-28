@@ -50,7 +50,7 @@ const ProfileEventPopup = ({ event, clubId, onClose }) => {
   function formatDisplayDate(value) {
     const d = new Date(value);
     if (isNaN(d.getTime())) return "Date TBD";
-    return d.toLocaleDateString("en-US", {
+    return d.toLocaleDateString("en-US", {      timezone: "UTC",
       weekday: "short",
       month: "short",
       day: "numeric",

@@ -1,13 +1,20 @@
 'use client';
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import {useRouter, useSearchParams} from 'next/navigation';
 export default function ResetPasswordPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [token, setToken] = useState('');
 
-  const token = typeof window !== "undefined"
-    ? new URLSearchParams(window.location.search).get("token")
-    : null;
+  // Fix hydration error by using useSearchParams instead of window.location
+  useEffect(() => {
+    const tokenFromUrl = searchParams.get('token');
+    if (tokenFromUrl) {
+      setToken(tokenFromUrl);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +26,15 @@ export default function ResetPasswordPage() {
       });
 
       const data = await res.json();
-      setMessage(data.message || "Password reset complete.");
+      
+      if (res.ok) {
+        setMessage("Password reset successfully! Redirecting to login...");
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
+      } else {
+        setMessage(data.message || "Password reset failed.");
+      }
     } catch (err) {
       console.error(err);
       setMessage("Something went wrong.");
