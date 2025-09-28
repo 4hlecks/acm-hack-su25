@@ -10,7 +10,6 @@ import { usePopup } from "@/app/(public)/context/PopupContext";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
 export default function PublicProfile({ params }) {
-  // 👇 unwrap the promise
   const { id } = use(params);
 
   const [club, setClub] = useState(null);
