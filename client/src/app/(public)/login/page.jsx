@@ -54,7 +54,7 @@ export default function LoginPage() {
       // Persist (your backend currently returns token + user)
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('role', data.user.role);
+      localStorage.setItem("role", data.user.role.toLowerCase());
 
 	  window.dispatchEvent(new Event("authChanged"));
 
