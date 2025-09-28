@@ -4,6 +4,7 @@
   display: flex;
   align-items: center;
   height: var(--searchbar-height);     /* stays centered in navbar */
+  max-width: 48rem;
   width: 100%;
   font-size: var(--font-size-body);
   z-index: 1001;
@@ -84,4 +85,11 @@
 .searchInputField::-webkit-search-cancel-button,
 .searchInputField::-webkit-search-decoration {
   -webkit-appearance: none;
+}
+
+@media screen and (max-width: 72rem) {
+  .searchBar {
+    width: 100%;
+    max-width: none;
+  }
 }

@@ -19,27 +19,36 @@ const EventCarousel = ({ category, events = [] }) => {
                 
             </header>
             <div className={styles.carouselContent}>
-                <button className={styles.carouselLeft} id={`carousel-left-${categoryID}`}><ChevronLeft className={styles.carouselLeftIcon}/></button>
+                {/* Square backers directly under each button */}
+                <div className={`${styles.buttonBacker} ${styles.buttonBackerLeft}`} />
+                <div className={`${styles.buttonBacker} ${styles.buttonBackerRight}`} />
+
+                <button className={styles.carouselLeft} id={`carousel-left-${categoryID}`}>
+                    <ChevronLeft className={styles.carouselLeftIcon}/>
+                </button>
+
                 <Swiper
-                    slidesPerView={"auto"}
-                    slidesPerGroup={5}
+                    slidesPerView="auto"
+                    slidesPerGroupAuto={true}
                     spaceBetween={16}
                     navigation={{
-                        nextEl: `#carousel-right-${categoryID}`,
-                        prevEl: `#carousel-left-${categoryID}`,
+                    nextEl: `#carousel-right-${categoryID}`,
+                    prevEl: `#carousel-left-${categoryID}`,
                     }}
                     modules={[Navigation]}
                     className={styles.carouselSwiper}
                 >
                     {events.map((event, index) => (
-                        <SwiperSlide key={index} className={styles.carouselCard}>
-                            <EventCard event={event} />
-                        </SwiperSlide>
+                    <SwiperSlide key={index} className={styles.carouselCard}>
+                        <EventCard event={event} />
+                    </SwiperSlide>
                     ))}
                 </Swiper>
-                <button className={styles.carouselRight} id={`carousel-right-${categoryID}`}><ChevronRight className={styles.carouselRightIcon}/></button>
+
+                <button className={styles.carouselRight} id={`carousel-right-${categoryID}`}>
+                    <ChevronRight className={styles.carouselRightIcon}/>
+                </button>
             </div>
-                
         </section>
     )
 }

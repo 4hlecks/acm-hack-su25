@@ -1,85 +1,124 @@
 .carouselSection {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+
+  .carouselHeader {
     display: flex;
-    flex-direction: column;
-    padding: 1rem 0;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 
-    .carouselHeader {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-
-        .carouselTitle {
-            font-size: var(--font-size-heading);
-            font-weight: var(--font-weight-heading);
-        }
+    .carouselTitle {
+      font-size: var(--font-size-heading);
+      font-weight: var(--font-weight-heading);
+    }
         
-        .carouselSeeAll {
-            text-decoration: none;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            gap: .25rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
+    .carouselSeeAll {
+      text-decoration: none;
+      color: #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      gap: .25rem;
+      cursor: pointer;
+      transition: color .2s ease;
 
-            .carouselSeeAllIcon {
-                width: var(--icon-size-large);
-                height: var(--icon-size-large);
-                stroke-width: var(--icon-width-large);
-            }
-        }
-
-        .carouselSeeAll:hover {
-            color: var(--tertiary-color);
-            transition: color 0.3s ease, background-color 0.3s ease;
-            cursor: pointer;
-        }
+      .carouselSeeAllIcon {
+        width: var(--icon-size-large);
+        height: var(--icon-size-large);
+        stroke-width: var(--icon-width-large);
+      }
     }
 
-    .carouselContent {
-        display: flex;
-        flex-direction: row;
-        /* overflow: hidden; */
-
-        .carouselSwiper {
-            .carouselCard {
-                width: auto;
-            }
-        }
+    .carouselSeeAll:hover {
+      color: var(--tertiary-color);
+      transition: color 0.3s ease, background-color 0.3s ease;
+      cursor: pointer;
     }
+  }
 
-    .carouselContent button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--button-primary-bg);
-        min-width: 2.5rem;
-        border: none;
-        cursor: pointer;
+  /* === Core container for track + backers + buttons === */
+  .carouselContent {
+    position: relative;               /* anchor absolute backers & buttons */
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;             /* track defines height; backers/buttons match it */
+    overflow: hidden;                 /* tuck overflowing track under edges */
+    background: var(--background-color, #fff);
+  }
 
-        .carouselLeftIcon, .carouselRightIcon {
-            color: var(--button-primary-color);
-            width: 48px;
-            height: 48px;
-            stroke-width: 2.25px;
-        }
+  /* Swiper fills & shrinks with parent; side padding = button width */
+  .carouselSwiper {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+    padding: 0 2.5rem;                /* equals button width */
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;                       /* slides under backers & buttons */
+
+    .carouselCard {
+      position: relative;
+      z-index: 1;
+      width: auto;                    /* slidesPerView:'auto' uses this */
     }
+  }
 
-    .carouselContent button:hover {
-        transition: color 0.3s ease, background-color 0.3s ease;
-        background-color: var(--button-primary-hover);
-    }
+  /* ===== BACKERS (square, same size as buttons, no radius) =====
+     Sit ABOVE slides (z:2) and BELOW buttons (z:3). */
+  .buttonBacker {
+    position: absolute;
+    inset-block: 0;                   /* top:0; bottom:0 => match track height */
+    width: 2.5rem;                    /* EXACTLY the button width */
+    background: var(--background-color, #fff);
+    z-index: 2;                       /* above slides, below buttons */
+    pointer-events: none;             /* don't block clicks */
+  }
+  .buttonBackerLeft { left: 0; }
+  .buttonBackerRight { right: 0; }
 
-    .carouselLeft {
-        border-radius: var(--border-radius) 0 0 var(--border-radius);
-    }
+  /* ===== Buttons: overlay, full height, rounded, on top ===== */
+  .carouselContent button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--button-primary-bg);
+    min-width: 2.5rem;                /* visual/control width */
+    border: none;
+    cursor: pointer;
+  }
 
-    .carouselRight {
-        border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    }
+  .carouselContent button:hover {
+    transition: color 0.3s ease, background-color 0.3s ease;
+    background-color: var(--button-primary-hover);
+  }
+
+  .carouselLeft,
+  .carouselRight {
+    position: absolute;
+    inset-block: 0;                   /* full height */
+    transform: none;
+    z-index: 3;                       /* above backers & slides */
+    width: 2.5rem;                    /* equals swiper padding */
+  }
+
+  .carouselLeft {
+    left: 0;                          /* flush to edge */
+    border-radius: var(--border-radius) 0 0 var(--border-radius);
+  }
+
+  .carouselRight {
+    right: 0;                         /* flush to edge */
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+  }
+
+  .carouselLeftIcon, .carouselRightIcon {
+    color: var(--button-primary-color);
+    width: 48px;
+    height: 48px;
+    stroke-width: 2.25px;
+  }
 }
-

@@ -18,6 +18,7 @@
     padding: 0;
     height: 100%;
     align-items: center;
+    margin-left: auto;
 }
 
 /* NavItem Styles */
@@ -88,7 +89,7 @@
 /* TabBar Styles */
 
 /* Tablet Breakpoint */
-@media (max-width: 72rem) {
+@media screen and (max-width: 72rem) {
     .navBar .navItemList {
         display: none;
     }
@@ -100,6 +101,7 @@
 
     .navBar[data-variant="tabbar"] .navItemList {
         display: flex;
+        margin-left: 0;
     }
 
     .navItem {
@@ -138,7 +140,7 @@
 }
 
 /* Mobile Breakpoint */
-@media (max-width: 48rem) {
+@media screen and (max-width: 48rem) {
     .navBar[data-variant="tabbar"] {
         padding: 0;
     }
