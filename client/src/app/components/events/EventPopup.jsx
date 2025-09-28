@@ -13,6 +13,8 @@ const EventPopup = ({ event, onClose, isOpen, clubId, userRole }) => {
 
   const router = useRouter();
 
+  const normalizedRole = userRole ? userRole.toLowerCase() : null;
+
   useEffect(() => {
     setMounted(true);
     return () => setMounted(false);
@@ -160,24 +162,24 @@ const checkIfEventSaved = async() => {
           <article className={styles.eventContent}>
             {/* Mobile header */}
             <div className={styles.clubInfoMobile}>
-              {eventOwner?.profilePic ? (
-                <Link href={profileHref}> 
-                  <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
-                </Link>
-              ) : (
-                <Link href={profileHref}> 
-                  <canvas className={styles.clubLogo}></canvas>
-                </Link>
-              )}
-              <h3 className={styles.clubOwner}>
-                <Link href={profileHref}> 
-                  {eventOwner?.name || eventOwner || "Unknown Organizer"}
-                </Link>
-              </h3>
-              <button onClick={onClose} className={styles.closeButton}>
-                <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
-              </button>
-            </div>
+            {eventOwner?.profilePic ? (
+              <Link href={profileHref} onClick={onClose}> 
+                <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
+              </Link>
+            ) : (
+              <Link href={profileHref} onClick={onClose}> 
+                <canvas className={styles.clubLogo}></canvas>
+              </Link>
+            )}
+            <h3 className={styles.clubOwner}>
+              <Link href={profileHref} onClick={onClose}> 
+                {eventOwner?.name || eventOwner || "Unknown Organizer"}
+              </Link>
+            </h3>
+            <button onClick={onClose} className={styles.closeButton}>
+              <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
+            </button>
+          </div>
 
             {/* Flyer */}
             <figure className={styles.imageSection}>
@@ -198,25 +200,26 @@ const checkIfEventSaved = async() => {
 
             {/* Event info */}
             <section className={styles.eventSection}>
-              <div className={styles.clubInfo}>
-                {eventOwner?.profilePic ? (
-                  <Link href={profileHref}> 
-                    <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
-                  </Link>
-                ) : (
-                  <Link href={profileHref}>
-                    <canvas className={styles.clubLogo}></canvas>
-                  </Link>
-                )}
-                <h3 className={styles.clubOwner}>
-                  <Link href={profileHref}> 
-                    {eventOwner?.name || eventOwner || "Unknown Organizer"}
-                  </Link>
-                </h3>
-                <button onClick={onClose} className={styles.closeButton}>
-                  <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
-                </button>
-              </div>
+            <div className={styles.clubInfo}>
+              {eventOwner?.profilePic ? (
+                <Link href={profileHref} onClick={onClose}> 
+                  <img src={eventOwner.profilePic} alt="Club Logo" className={styles.clubLogo} />
+                </Link>
+              ) : (
+                <Link href={profileHref} onClick={onClose}> 
+                  <canvas className={styles.clubLogo}></canvas>
+                </Link>
+              )}
+              <h3 className={styles.clubOwner}>
+                <Link href={profileHref} onClick={onClose}> 
+                  {eventOwner?.name || eventOwner || "Unknown Organizer"}
+                </Link>
+              </h3>
+              <button onClick={onClose} className={styles.closeButton}>
+                <X size={25} strokeWidth={2.5} className={styles.closeButtonIcon} />
+              </button>
+            </div>
+
 
               <div className={styles.eventInfo}>
                 <Dialog.Title className={styles.eventTitle}>{eventTitle}</Dialog.Title>
@@ -260,7 +263,7 @@ const checkIfEventSaved = async() => {
 
               {/* Conditional buttons */}
               <div className={styles.buttonContainer}>
-                {userRole === "club" && isOwner && (
+                {normalizedRole === "club" && isOwner && (
                   <button
                     onClick={() =>
                       (window.location.href = `/profile-page/edit?eventId=${event._id}`)
@@ -270,13 +273,15 @@ const checkIfEventSaved = async() => {
                     Edit Event
                   </button>
                 )}
-                {userRole === "user" && (
+
+                {normalizedRole === "user" && (
                   <button onClick={handleSaveEvent} className={styles.saveButton}>
-                    {isSaved ? 'Remove from Saved' : 'Save Event'}
-                  </button>                               
+                    {isSaved ? "Remove from Saved" : "Save Event"}
+                  </button>
                 )}
-                {userRole === null  && (
-                  <button onClick={() => router.push('/login')} className={styles.saveButton}>
+
+                {!normalizedRole && (
+                  <button onClick={() => router.push("/login")} className={styles.saveButton}>
                     Login to Save Event
                   </button>
                 )}
@@ -287,6 +292,8 @@ const checkIfEventSaved = async() => {
       </Dialog.Portal>
     </Dialog.Root>
   );
+
+  console.log("DEBUG userRole in EventPopup (normalized):", normalizedRole);
 
   return createPortal(dialogContent, document.body);
 };
