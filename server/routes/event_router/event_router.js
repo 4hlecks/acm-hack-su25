@@ -165,10 +165,16 @@ router.get('/category/:categoryChoice', async (req, res) => {
         return false;
       }
 
+      //Also handle overnight events
+      const startTime = event.startTime || "00:00";
       const endTimeStr = event.endTime || "23:59";
-      const endDateTime = new Date(
+      let endDateTime = new Date(
         `${baseDate.toISOString().split("T")[0]}T${endTimeStr}`
       );
+
+      if (endTimeStr < startTime){
+        endDateTime.setDate(endDateTime.getDate() + 1);
+      }
 
       console.log(`Event: ${event.eventTitle}, EndTime: ${endDateTime}, Now: ${now}, Upcoming: ${endDateTime >= now}`);
       return endDateTime >= now;
