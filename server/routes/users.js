@@ -3,12 +3,22 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-
+const nodemailer = require('nodemailer')
 const User = require('../models/users_schema'); // ONLY users model now
 const Event = require('../models/event_schema')
 const auth = require('../middleware/auth');
 const clubAuth = require('../middleware/clubAuth');
 const upload = require('../middleware/upload');
+
+const createTransporter = () => {
+  return nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+};
 
 
 // Register
@@ -105,80 +115,103 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
+//Resetting Password Route
+router.post('/reset-password', async (req, res) => {
+  try{
+    const {token, password} = req.body;
+    if (!token || !password){
+      return res.status(400).json({message: 'Token and password are required.'});
+    }
 
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    //Find user with matching token 
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: {$gt: Date.now()}
+    })
+
+    if (!user){
+      return res.status(400).json({ message: 'Invalid or expired token.' });
+    }
+
+    //Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+    console.log('Password reset successfully for user:', user.email);
+    res.json({ message: 'Password has been reset successfully.' });
+  } catch (error){
+    res.status(500).json({ message: 'Server error. Please try again.' });
+
+  }
+})
 // Forgot Password Route
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
 
-  // checks email existence in MongoDB
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.json({ message: 'If that email exists, a reset link has been sent! Check inbox or spam :)' });
+  console.log('Forgot password request for:', email);
+
+  try {
+    // checks email existence in MongoDB
+    const user = await User.findOne({ email });
+    if (!user) {
+      console.log('User not found for email:', email);
+      return res.json({ message: 'If that email exists, a reset link has been sent! Check inbox or spam :)' });
+    }
+
+    console.log('User found, generating token...');
+
+    // hashing rawToken for reset link in email so others can't use token directly
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = Date.now() + 30 * 60 * 1000;
+
+    await user.save();
+    console.log('Token saved to database');
+
+    // reset link in the email 
+    const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${rawToken}`;
+    console.log('Reset link:', resetLink);
+
+    // Debug environment variables (remove sensitive info)
+    console.log('EMAIL_USER:', process.env.EMAIL_USER);
+    console.log('EMAIL_PASS exists:', !!process.env.EMAIL_PASS);
+    console.log('CLIENT_URL:', process.env.CLIENT_URL);
+
+    console.log('Creating transporter...');
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: { 
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS 
+      }
+    });
+    
+    const mailOptions = {
+      to: user.email,
+      subject: 'Password Reset Request',
+      html: `
+        <h2>Password Reset</h2>
+        <p>Click <a href="${resetLink}">here</a> to reset your password.</p>
+        <p>If you didn't request this, please ignore this email.</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+        
+    res.json({ message: 'If that email exists, a reset link has been sent! Check inbox or spam :)' });
+
+  } catch (error) {
+    // Still return success message for security
+    res.json({ message: 'If that email exists, a reset link has been sent! Check inbox or spam :)' });
   }
-
-  // hashing rawToken for reset link in email so others can't use token directly
-  const rawToken = crypto.randomBytes(32).toString('hex');
-  const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
-
-  user.resetPasswordToken = hashedToken;
-  // expiration time 30 mins
-  user.resetPasswordExpires = Date.now() + 30 * 60 * 1000; // 15 minutes
-
-  await user.save();
-
-  // reset link in the email 
-  // ****** REPLACE CLIENT_URL WITH FRONTEND SITE LINK ********
-  const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${rawToken}`;
-  
-  // DEV: log reset link instead of sending email 
-  // ****** DELETE AFTER EMAIL SET UP *******
-  console.log(`Password reset link: ${resetLink}`);
-
-  // Code for when we send reset link via email using Nodemailer
-  // ****** uncomment after our email connected to the website is set up *****
-  /*
-  const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-  });
-
-  await transporter.sendMail({
-    to: user.email,
-    subject: 'Password Reset',
-    html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`
-  });
-  */
-
-  res.json({ message: 'If that email exists, a reset link has been sent! Check inbox or spam :)' });
-});
-
-// Resetting Password
-router.post('/reset-password', async (req, res) => {
-  const { token, password } = req.body;
-
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
-  // looks for user whose resetPasswordToken matches the hashed token and resetPasswordExpires is still valid
-  const user = await User.findOne({
-    resetPasswordToken: hashedToken,
-    resetPasswordExpires: { $gt: Date.now() }
-  });
-
-  if (!user) {
-    return res.status(400).json({ message: 'Invalid or expired token.' });
-  }
-
-  // new password hashed before storing
-  const hashedPassword = await bcrypt.hash(password, 10);
-  // updates the user’s password to the new hashed password.
-  user.password = hashedPassword;
-  // clears the reset token and expiration time so the token can’t be reused.
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpires = undefined;
-  // saves the updated user object back to MongoDB
-  await user.save();
-
-  res.json({ message: 'Password has been reset successfully.' });
 });
 
 // Get own club profile 
@@ -280,7 +313,30 @@ router.get('/:userId/saved-events', auth, async (req, res) => {
       return res.status(404).json({error: 'User not found'});
     }
 
-    res.json(user.savedEvents);
+
+    const now = new Date();
+    const upcomingEvents = user.savedEvents.filter(event => {
+      if (!event) return false; 
+      
+      const baseDate = new Date(event.date);
+      if (isNaN(baseDate.getTime())) {
+        return false;
+      }
+
+      const startTime = event.startTime || "00:00"; 
+      const endTimeStr = event.endTime || "23:59";
+      let endDateTime = new Date(
+        `${baseDate.toISOString().split("T")[0]}T${endTimeStr}`
+      );
+      if (endTimeStr < startTime){
+        endDateTime.setDate(endDateTime.getDate() + 1);
+      }
+
+
+      return endDateTime >= now;
+    });
+
+    res.json(upcomingEvents);
   } catch (error){
     console.error('Error fetching saved events:', error);
     res.status(500).json({error: 'Internal server error'});
