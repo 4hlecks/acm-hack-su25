@@ -115,7 +115,41 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 });
+//Resetting Password Route
+router.post('/reset-password', async (req, res) => {
+  try{
+    const {token, password} = req.body;
+    if (!token || !password){
+      return res.status(400).json({message: 'Token and password are required.'});
+    }
 
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    //Find user with matching token 
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: {$gt: Date.now()}
+    })
+
+    if (!user){
+      return res.status(400).json({ message: 'Invalid or expired token.' });
+    }
+
+    //Hash new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+    console.log('Password reset successfully for user:', user.email);
+    res.json({ message: 'Password has been reset successfully.' });
+  } catch (error){
+    res.status(500).json({ message: 'Server error. Please try again.' });
+
+  }
+})
 // Forgot Password Route
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
@@ -279,7 +313,25 @@ router.get('/:userId/saved-events', auth, async (req, res) => {
       return res.status(404).json({error: 'User not found'});
     }
 
-    res.json(user.savedEvents);
+    // Filter for upcoming events only (same logic as category endpoint)
+    const now = new Date();
+    const upcomingEvents = user.savedEvents.filter(event => {
+      if (!event) return false; // Handle null events
+      
+      const baseDate = new Date(event.date);
+      if (isNaN(baseDate.getTime())) {
+        return false;
+      }
+
+      const endTimeStr = event.endTime || "23:59";
+      const endDateTime = new Date(
+        `${baseDate.toISOString().split("T")[0]}T${endTimeStr}`
+      );
+
+      return endDateTime >= now;
+    });
+
+    res.json(upcomingEvents);
   } catch (error){
     console.error('Error fetching saved events:', error);
     res.status(500).json({error: 'Internal server error'});
