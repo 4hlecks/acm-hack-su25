@@ -25,8 +25,7 @@ export default function FollowingPage(){
         const fetchFollowingAccounts = async() => {
             const token = localStorage.getItem('token');
             if (!token){
-                setLoading(false);
-                return;
+                router.push("/login")
             }
 
             try {

@@ -268,7 +268,13 @@ router.get('/:userId/saved-events', auth, async (req, res) => {
     }
 
     //Find user and populate saved events
-    const user = await User.findById(userId).populate('savedEvents');
+    const user = await User.findById(userId).populate({
+      path: 'savedEvents',
+      populate: {
+        path: 'eventOwner',
+        select: 'name profilePic _id'
+      }
+    });
 
     if (!user){
       return res.status(404).json({error: 'User not found'});

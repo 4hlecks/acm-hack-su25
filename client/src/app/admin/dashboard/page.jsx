@@ -34,23 +34,21 @@ export default function Dashboard() {
     }, [router]);
 
     // Overview metrics state (replace later with API)
-    const [overviewItems, setOverviewItems] = useState([
-        { label: 'Accounts in Review', value: '0', accent: '#E8D53D' },
-        { label: 'Bugs', value: '0', accent: '#F76B6B' },
-        { label: 'Reports', value: '0', accent: '#61C861' },
-    ]);
+    const [metricsLoading, setMetricsLoading] = useState(true);
+    const [overviewItems, setOverviewItems] = useState([]);
 
     // Account requests state (replace later with API)
     const [rows, setRows] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     // Fetch metrics + account requests
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (!token) return;
-
+      
         // fetch metrics
         fetch(`${API_BASE}/api/admin/metrics`, {
-            headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         })
           .then(res => res.json())
           .then(data => {
@@ -60,31 +58,33 @@ export default function Dashboard() {
               { label: 'Reports', value: String(data.reports || 0), accent: '#61C861' },
             ]);
           })
-          .catch(err => console.error("Error fetching metrics:", err));
-
+          .catch(err => console.error("Error fetching metrics:", err))
+          .finally(() => setMetricsLoading(false));
+      
         // fetch account requests
         fetch(`${API_BASE}/api/admin/account-requests?status=pending`, {
-            headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` }
         })
           .then(res => res.json())
           .then(data => {
             if (data.items) {
-              const mapped = data.items.map(u => ({
+              setRows(data.items.map(u => ({
                 id: u._id,
-                requestDate: new Date(u.createdAt || Date.now()), // fallback if no createdAt
+                requestDate: new Date(u.createdAt || Date.now()),
                 type: u.role === "club"
-                    ? "Club"
-                    : u.role === "user"
-                        ? "Student"
-                        : u.role.charAt(0).toUpperCase() + u.role.slice(1),
+                  ? "Club"
+                  : u.role === "user"
+                    ? "Student"
+                    : u.role.charAt(0).toUpperCase() + u.role.slice(1),
                 name: u.name,
                 email: u.email,
-              }));
-              setRows(mapped);
+              })));
             }
           })
-          .catch(err => console.error("Error fetching requests:", err));
-    }, []);
+          .catch(err => console.error("Error fetching requests:", err))
+          .finally(() => setLoading(false));
+      }, []);
+      
 
     /**
      * Approve/Deny handlers.
@@ -180,13 +180,10 @@ export default function Dashboard() {
                For client fetching, use SWR/React Query and pass data here. */}
             <h2>Overview</h2>
             <div className={styles.overview}>
-                {overviewItems.map(item => (
-                    <MetricCard
-                        key={item.label}
-                        label={item.label}
-                        value={item.value}
-                        accent={item.accent}
-                    />
+            {metricsLoading
+                ? <p>Loading metrics…</p>
+                : overviewItems.map(item => (
+                    <MetricCard key={item.label} {...item} />
                 ))}
             </div>
 
@@ -201,14 +198,19 @@ export default function Dashboard() {
                  - Fetch rows on mount.
                  - Approve/Deny call endpoints, then remove the row or refetch. */}
             <h2>Account Requests</h2>
-            <div>
-                <DataTable
-                    columns={columns}
-                    data={rows}
-                    rowKey={(r) => r.id}
-                    stickyHeader
-                />
-            </div>
-        </>
-    );
+      <div>
+        {loading ? ( // ⭐ correct condition
+          <div style={{ padding: "1rem" }}>Loading account requests…</div>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={rows}
+            rowKey={(r) => r.id}
+            stickyHeader
+          />
+        )}
+      </div>
+    </>
+  );
 }
+   
