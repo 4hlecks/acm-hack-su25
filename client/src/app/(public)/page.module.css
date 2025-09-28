@@ -1,0 +1,76 @@
+.centeredPage {
+  min-height: 100dvh;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+}
+
+/* Onboarding Page Styles */
+.onboardingHeader {
+  display: grid;
+  gap: .5rem;
+  text-align: center;
+}
+
+.onboardingForm {
+  width: clamp(16rem, 100%, 32rem);
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
+.forgotPassword {
+    text-align: right;
+}
+
+.onboardingAlternate {
+    text-align: center;
+}
+
+.bodyLink {
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 160ms ease;
+}
+
+.bodyLink:hover {
+    color: var(--text-link-color);
+    text-decoration: none;
+}
+
+.successBanner {
+    border: 1px solid #bbf7d0;   /* green-200 */
+    background: #f0fdf4;         /* green-50 */
+    color: #166534;              /* green-800 */
+    padding: 1rem 1rem;
+    margin: 1rem 0;
+    border-radius: var(--border-radius);
+}
+
+.pageTitle {
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-heading);
+}
+
+/* Enable hover only on non-touch devices */
+@media (hover: hover) and (pointer: fine) {
+}
+
+@media (prefers-reduced-motion) {
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+}
+
+/* Tablet and Smaller Desktop */
+@media (min-width: 701px) and (max-width: 1120px) {
+}
+
+@media (prefers-color-scheme: dark) {
+}
+
+@keyframes rotate {
+}

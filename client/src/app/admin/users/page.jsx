@@ -35,10 +35,10 @@
 import { useRouter } from "next/navigation";
 import styles from './page.module.css';
 import React, { useEffect, useMemo, useState } from 'react';
-import SearchWithFilter from '../../components/form/SearchWithFilter';
-import DataTable from '../../components/datatable/DataTable';
+import SearchWithFilter from '../../../components/form/SearchWithFilter';
+import DataTable from '../../../components/datatable/DataTable';
 import UserDrawer from '../components/UserDrawer';
-import { Button } from '../../components/buttons/Buttons';
+import { Button } from '../../../components/buttons/Buttons';
 import { PlusSquare, Users, Tag, Mail, Command, Edit, Trash2 } from 'react-feather';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";

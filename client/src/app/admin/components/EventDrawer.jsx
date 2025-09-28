@@ -4,16 +4,16 @@
 
 'use client';
 import React from 'react';
-import Drawer from '../../components/drawer/Drawer';
-import UploadBox from '../../components/form/UploadBox';
-import { Button } from '../../components/buttons/Buttons';
+import Drawer from '../../../components/drawer/Drawer';
+import UploadBox from '../../../components/form/UploadBox';
+import { Button } from '../../../components/buttons/Buttons';
 import {
     DateField,
     TimeField,
     TextField,
     TextAreaField,
     ComboBoxField,
-} from '../../components/form/Form';
+} from '../../../components/form/Form';
 import { Calendar, Clock } from 'react-feather';
 
 export default function EventDrawer({

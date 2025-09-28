@@ -2,10 +2,10 @@
 
 import styles from './page.module.css';
 import React, { useEffect, useMemo, useState } from 'react';
-import SearchWithFilter from '../../components/form/SearchWithFilter';
-import DataTable from '../../components/datatable/DataTable';
+import SearchWithFilter from '../../../components/form/SearchWithFilter';
+import DataTable from '../../../components/datatable/DataTable';
 import EventDrawer from '../components/EventDrawer';
-import { Button } from '../../components/buttons/Buttons';
+import { Button } from '../../../components/buttons/Buttons';
 import { PlusSquare, Edit, Trash2, Calendar as Cal, User, Tag, Command } from 'react-feather';
 
 // API helpers

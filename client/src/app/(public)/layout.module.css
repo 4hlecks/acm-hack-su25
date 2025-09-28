@@ -1,0 +1,50 @@
+.siteShell {
+    display: grid;
+    grid-template-rows: 4rem 1fr;
+    height: 100dvh;
+    background-color: #FFFFFF;
+    overflow: hidden; /* only let main content scroll */
+}
+
+.siteHeader {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.siteContent {
+    min-width: 0;
+    overflow: auto;
+    padding: var(--site-padding);
+    background-color: var(--background-color);
+
+    h1 {
+        font-size: var(--font-size-title);
+        font-weight: var(--font-weight-heading);
+        white-space: nowrap;
+    }
+
+    h2 {
+        font-size: var(--font-size-heading);
+        font-weight: var(--font-weight-subheading);
+        white-space: nowrap;
+    }
+
+    h3 {
+        font-size: var(--font-size-subheading);
+        font-weight: var(--font-weight-subheading);
+        white-space: nowrap;
+    }
+}
+
+.siteFooter {
+    display: none;
+}
+
+@media (max-width: 72rem) {
+    .siteFooter {
+        display: block;
+        position: sticky;
+        bottom: 0;
+    }
+}

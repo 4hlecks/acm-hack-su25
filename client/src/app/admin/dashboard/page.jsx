@@ -6,8 +6,8 @@ import styles from './page.module.css';
 import React from 'react';
 import MetricCard from '../components/MetricCard';
 // Table + UI
-import DataTable from '../../components/datatable/DataTable';
-import { Button } from '../../components/buttons/Buttons';
+import DataTable from '../../../components/datatable/DataTable';
+import { Button } from '../../../components/buttons/Buttons';
 import { Calendar, Tag, User, Mail, Command } from 'react-feather';
 
 /**
