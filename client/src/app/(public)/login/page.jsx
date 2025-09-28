@@ -56,6 +56,10 @@ export default function LoginPage() {
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('role', data.user.role);
 
+	  window.dispatchEvent(new Event("authChanged"));
+
+      alert("Logged in successfully!");
+	  
       // Route by role
       if (data.user.role === 'admin') router.push('/admin/dashboard');
       else router.push('/');
