@@ -28,7 +28,7 @@ export default function LoginPage() {
       // Save token + user info in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("role", data.user.role);
+      localStorage.setItem("role", data.user.role.toLowerCase());
 
       window.dispatchEvent(new Event("authChanged"));
 
