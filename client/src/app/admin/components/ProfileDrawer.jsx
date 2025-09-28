@@ -55,18 +55,24 @@ export default function ProfileDrawer({
                - Returns a File (or null) via onChange; we do NOT upload here.
                - Parent onSave should handle uploading and then persist the returned URL. */}
             <UploadBox
-                id="profile-avatar"
-                value={avatarFile}
-                previewUrl={avatarUrl}
-                onChange={(fileOrNull) => {
-                    setAvatarFile(fileOrNull);
-                    // If user clears the image, also clear the preview URL.
-                    if (!fileOrNull) setAvatarUrl(null);
-                }}
-                height="10rem"
-                labelEmptyPrimary="No picture selected"
-                labelEmptySecondary="Upload a profile picture"
+            id="profile-avatar"
+            value={avatarFile}
+            previewUrl={avatarFile ? URL.createObjectURL(avatarFile) : avatarUrl}
+            onChange={(fileOrNull) => {
+                setAvatarFile(fileOrNull);
+                if (!fileOrNull) {
+                // Cleared → reset preview
+                setAvatarUrl(null);
+                } else {
+                // New file → set preview URL
+                setAvatarUrl(URL.createObjectURL(fileOrNull));
+                }
+            }}
+            height="10rem"
+            labelEmptyPrimary="No picture selected"
+            labelEmptySecondary="Upload a profile picture"
             />
+
 
             {/* Simple controlled text input for the user's display name */}
             <TextField
