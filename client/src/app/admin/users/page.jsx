@@ -55,41 +55,45 @@ export default function UsersPage() {
     }, [router]);
 
     const [rows, setRows] = useState([]);
+    const [loading, setLoading] = useState(true); 
 
     // Fetch all users
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
-        fetch(`${API_BASE}/api/admin/users`, {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.items) {
-                    const mapped = data.items.map(u => ({
-                        id: u._id,
-                        type: u.role === "club"
-                            ? "Club"
-                            : u.role === "user"
-                                ? "Student"
-                                : u.role.charAt(0).toUpperCase() + u.role.slice(1),
-                        name: u.name,
-                        email: u.email,
-                        avatarUrl: u.profilePic || "",
-                        approved: u.approved,
-                        role: u.role,
-                        _id: u._id,
-                    }));
-                    setRows(mapped);
-                }
-            })
-            .catch(err => console.error("Error fetching users:", err));
-    }, []);
-
+    // Fetch all users
+useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+  
+    setLoading(true);
+    fetch(`${API_BASE}/api/admin/users`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.items) {
+          const mapped = data.items.map(u => ({
+            id: u._id,
+            type: u.role === "club"
+              ? "Club"
+              : u.role === "user"
+                ? "Student"
+                : u.role.charAt(0).toUpperCase() + u.role.slice(1),
+            name: u.name,
+            email: u.email,
+            avatarUrl: u.profilePic || "",
+            approved: u.approved,
+            role: u.role,
+            _id: u._id,
+          }));
+          setRows(mapped);
+        }
+      })
+      .catch(err => console.error("Error fetching users:", err))
+      .finally(() => setLoading(false)); 
+  }, []);
+  
     const [query, setQuery] = useState('');
     const [filterKey, setFilterKey] = useState('name');
 
@@ -316,12 +320,18 @@ export default function UsersPage() {
               Create User
             </Button>
           </div>
-          <DataTable
-            columns={columns}
-            data={visibleRows}
-            rowKey={(r) => r._id || r.id}
-            stickyHeader
-          />
+          {loading ? (
+            <div style={{ padding: '1rem' }}>Loading users…</div>
+          ) : visibleRows.length === 0 ? (
+            <div style={{ padding: '1rem' }}>No users found.</div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={visibleRows}
+              rowKey={(r) => r._id || r.id}
+              stickyHeader
+            />
+          )}
       
           <UserDrawer
             open={drawerOpen}
