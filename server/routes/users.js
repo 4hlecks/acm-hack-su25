@@ -313,20 +313,25 @@ router.get('/:userId/saved-events', auth, async (req, res) => {
       return res.status(404).json({error: 'User not found'});
     }
 
-    // Filter for upcoming events only (same logic as category endpoint)
+
     const now = new Date();
     const upcomingEvents = user.savedEvents.filter(event => {
-      if (!event) return false; // Handle null events
+      if (!event) return false; 
       
       const baseDate = new Date(event.date);
       if (isNaN(baseDate.getTime())) {
         return false;
       }
 
+      const startTime = event.startTime || "00:00"; 
       const endTimeStr = event.endTime || "23:59";
-      const endDateTime = new Date(
+      let endDateTime = new Date(
         `${baseDate.toISOString().split("T")[0]}T${endTimeStr}`
       );
+      if (endTimeStr < startTime){
+        endDateTime.setDate(endDateTime.getDate() + 1);
+      }
+
 
       return endDateTime >= now;
     });
