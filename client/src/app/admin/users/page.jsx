@@ -32,6 +32,8 @@
 //    - You can keep DataTable presentational and pass it already-sliced rows from the API.
 
 'use client';
+export const dynamic = "force-dynamic";
+
 import { useRouter } from "next/navigation";
 import styles from './page.module.css';
 import React, { useEffect, useMemo, useState } from 'react';
