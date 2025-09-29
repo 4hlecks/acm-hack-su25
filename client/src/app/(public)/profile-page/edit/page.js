@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import styles from "./edit.module.css";
-import NavBar from "../../components/navbar/NavBar";
 import EventCard from "../../components/events/EventCard";
 import Cropper from "react-easy-crop";
 
@@ -220,7 +219,6 @@ export default function EditProfile() {
 
   return (
     <>
-      <NavBar />
       <main className={styles.pageContent}>
         <div className={styles.profileHeader}>
           {/* Profile Picture with cropper */}
@@ -364,8 +362,6 @@ export default function EditProfile() {
           </div>
         </div>
       )}
-
-      <TabBar />
     </>
   );
 }
