@@ -107,8 +107,7 @@ function CustomToolbar({ label, onNavigate, onView, view }) {
     </div>
   );
 }
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "${API_BASE}";
-
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 export default function CalendarPage() {
   const [view, setView] = useState(Views.MONTH);
   const [date, setDate] = useState(new Date());
