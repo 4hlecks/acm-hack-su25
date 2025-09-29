@@ -1,5 +1,4 @@
 .centeredPage {
-  min-height: 100dvh;
   display: grid;
   justify-items: center;
   align-content: start;
