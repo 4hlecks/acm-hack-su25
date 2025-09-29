@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = "force-dynamic";
+
 import styles from './page.module.css';
 import React, { useEffect, useMemo, useState } from 'react';
 import SearchWithFilter from '../../../components/form/SearchWithFilter';
