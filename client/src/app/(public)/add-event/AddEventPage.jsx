@@ -15,6 +15,8 @@ const CATEGORIES = [
 	"Study Jam",
 	"Workshop",
 ];
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "${API_BASE}";
+
 
 export default function AddEventPage() {
 	const router = useRouter();
@@ -193,7 +195,7 @@ export default function AddEventPage() {
 		if (coverPhoto) formData.append("coverPhoto", coverPhoto);
 
 		try {
-			const res = await fetch("http://localhost:5001/api/loadEvents/create", {
+			const res = await fetch(`${API_BASE}/api/loadEvents/create`, {
 				method: "POST",
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem("token")}`,
