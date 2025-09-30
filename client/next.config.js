@@ -27,8 +27,6 @@ const nextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  // Add this for Netlify compatibility
-  distDir: '.next',
 };
 
 module.exports = nextConfig;
