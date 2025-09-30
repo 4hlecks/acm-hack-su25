@@ -9,7 +9,7 @@
   font-size: var(--font-size-body);
   z-index: 1001;
   box-sizing: border-box;
-  right: -2.5rem;
+  right: -1rem;
 }
 
 /* ONE unified background + border + shadow for bar + dropdown via ::before */
@@ -91,5 +91,6 @@
   .searchBar {
     width: 100%;
     max-width: none;
+    right: 0;
   }
 }

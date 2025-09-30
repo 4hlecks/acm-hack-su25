@@ -4,7 +4,7 @@
   flex-direction: row;
   gap: 1rem;              /* tighter spacing between items */
   align-items: center;
-  padding: 0 1rem;        /* less side padding */
+  padding: 0 1rem 0 2rem;        /* less side padding */
   top: 0;
   width: 100%;
   height: 4rem;           /* shorter navbar */
@@ -126,7 +126,6 @@
   display: inline-flex;
   align-items: center;
   text-decoration: none;
-  margin-left: 1.2rem;
 }
 
 .logoBox {
@@ -148,6 +147,10 @@
 /* ========= TabBar Styles (tablet/mobile top nav) ========= */
 @media screen and (max-width: 72rem) {
   .navBar .navItemList { display: none; }
+
+  .navBar {
+    padding: 0 1rem 0 1rem;
+  }
 
   .navBar[data-variant="tabbar"] {
     height: auto;

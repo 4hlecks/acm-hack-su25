@@ -120,10 +120,15 @@ body {
   overflow: visible !important;
 }
 
-/* Mobile */
 @media screen and (max-width: 2560px) {
   :root {
     --event-card-width: 10rem;
+  }
+}
+
+@media screen and (max-width: 72rem) {
+  :root {
+    --site-padding: 2rem 1rem;
   }
 }
 

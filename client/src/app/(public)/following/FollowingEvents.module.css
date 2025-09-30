@@ -9,7 +9,7 @@
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    font-size: var(--font-size-heading);
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
     font-weight: 600;
     color: #000000;
     padding: 0.5rem 0;
@@ -101,7 +101,7 @@
 
 
 .eventCount{
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #666;
     background: #f5f5f5;
     padding: 0.5rem 1rem;

@@ -44,9 +44,9 @@ export default function NavItem({
           src="/images/currentroughlogo.png"
           alt="Current"
           priority
-          width={161}                     // pick your exact pixel width
-          height={32}                     // pick your exact pixel height
-          style={{ width: '161px', height: '32px' }}  // hard lock size
+          width={161}
+          height={32}
+          style={{ width: '161px', height: '32px' }}
           className={styles.logo}
         />
       </span>

@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Home, Users, Calendar, Flag, FileText, MoreVertical, Settings } from 'react-feather';
 import SettingsDrawer from './SettingsDrawer';
 import ProfileDrawer from './ProfileDrawer';
+import NavItem from '@/app/(public)/components/navbar/NavItem';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001"; 
 
@@ -130,9 +131,11 @@ export default function SideBar() {
     }
   }
 
+  const logoItem = (<NavItem type="logo" />);
+
   return (
     <nav className={styles.sideBar}>
-      <Link href="/" className={styles.siteLogo}>current</Link>
+      {logoItem}
 
       <article className={styles.profileCard}>
         {profile?.avatarUrl ? (
