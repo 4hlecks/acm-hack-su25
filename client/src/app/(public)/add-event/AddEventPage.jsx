@@ -218,7 +218,7 @@ export default function AddEventPage() {
 
               {/* Date & time in one row */}
               <div className={styles.dateRow}>
-                <DateField
+                <TimeField
                   id="event-start"
                   label="Start Time"
                   value={startTime}
