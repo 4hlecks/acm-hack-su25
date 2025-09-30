@@ -1,6 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import {useRouter, useSearchParams} from 'next/navigation';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
+
 export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -19,7 +22,7 @@ export default function ResetPasswordPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5001/users/reset-password", {
+      const res = await fetch(`${API_BASE}/users/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),

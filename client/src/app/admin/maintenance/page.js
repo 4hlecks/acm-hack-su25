@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import styles from "./maintenance.module.css";
 
+export const dynamic = 'force-dynamic'
+
 export default function AdminMaintenancePage() {
   const [maintenance, setMaintenance] = useState(false);
 
