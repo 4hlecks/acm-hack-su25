@@ -70,7 +70,7 @@
   --event-info-padding: 1rem;
   --event-info-padding-2: .5rem;
   --searchbar-padding: 1rem;
-  --site-padding: 4rem;
+  --site-padding: 2rem;
   --site-gap: 1rem;
   --sidebar-padding: 1rem;
 
@@ -84,6 +84,11 @@
   /* Event Card Variables */
   --event-card-width: 12.5rem;
 
+}
+
+body {
+  margin: 0;
+  padding: 0;
 }
 
 /* Global resets */
@@ -115,10 +120,15 @@
   overflow: visible !important;
 }
 
-/* Mobile */
 @media screen and (max-width: 2560px) {
   :root {
     --event-card-width: 10rem;
+  }
+}
+
+@media screen and (max-width: 72rem) {
+  :root {
+    --site-padding: 2rem 1rem;
   }
 }
 

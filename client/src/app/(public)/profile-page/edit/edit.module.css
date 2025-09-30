@@ -93,7 +93,7 @@
 }
 
 /* picture editor (same sizing you had before) */
-.profilePicWrapper { position: relative; }
+.profilePicWrapper { position: relative; background-color: #ffffff; }
 .profilePicContainer {
   position: relative;
   width: 6rem;
@@ -101,6 +101,8 @@
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
+  border: dashed 2px #DFDFDF;
+  background-color: #ffffff;
 }
 .profilePic {
   width: 100%;

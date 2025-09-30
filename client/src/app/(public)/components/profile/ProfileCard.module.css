@@ -31,7 +31,9 @@
 
 .profileName {
     font-weight: var(--font-weight-heading) !important;
-    line-height: auto;
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem) !important; /* smaller than before */
+  line-height: 1.3;
+  margin: 0; 
 }
 
 .profileContent {
@@ -43,9 +45,10 @@
 
 .profileBioTitle {
     font-weight: var(--font-weight-heading) !important;
-    line-height: auto;
-    width: 100%;
-}
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem) !important; /* ~18–21px */
+    line-height: 1.3;
+    margin: 0 rem 0;
+  }
 
 .profileBio {
     font-size: 1rem;
