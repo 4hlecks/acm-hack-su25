@@ -9,11 +9,19 @@
   border-radius: 0.75rem;
 }
 
-.title {
+.formWrapper .title {
   margin: 0 0 0.75rem 0;
+  font-size: clamp(1rem, 1.6vw, 1.4rem); /* responsive ~16–22px */
+  font-weight: 700;
 }
 
 .form { display: flex; flex-direction: column; gap: 1rem; }
+
+.form label,
+.tagsLabel {
+  font-size: clamp(0.85rem, 1.4vw, 1rem); /* responsive ~14–16px */
+  font-weight: 600;
+}
 
 /* Top row */
 .topRow {
@@ -103,7 +111,7 @@
 /* tags */
 .tagsBlock { display: flex; flex-direction: column; gap: 0.25rem; }
 .tagsLabel {
-  font-size: var(--font-size-form-label);
+  font-size: clamp(0.85rem, 1.2vw, 1rem); /* ~14–16px depending on screen */
   font-weight: 600;
 }
 .tagsList { display: flex; flex-wrap: wrap; gap: .5rem; }

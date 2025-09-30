@@ -33,79 +33,80 @@ function CustomToolbar({ label, onNavigate, onView, view }) {
   return (
     <div
       style={{
-        display: 'flex',
-        justifyContent: 'space-between',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr', // equal thirds
         alignItems: 'center',
         marginBottom: '1rem',
       }}
     >
-      <div>
-        <button
-          onClick={() => onNavigate('PREV')}
-          style={{
-            marginRight: '0.5rem',
-            padding: '0.4rem 0.8rem',
-            background: '#001f3f',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          ‹ Prev
-        </button>
-        <button
-          onClick={() => onNavigate('TODAY')}
-          style={{
-            marginRight: '0.5rem',
-            padding: '0.4rem 0.8rem',
-            background: '#F0B323',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-
-          }}
-        >
-          Today
-        </button>
-        <button
-          onClick={() => onNavigate('NEXT')}
-          style={{
-            padding: '0.4rem 0.8rem',
-            background: '#001f3f',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Next ›
-        </button>
+      {/* Left controls */}
+      <div style={{ justifySelf: 'start' }}>
+        <button onClick={() => onNavigate('PREV')} style={navButtonStyle}>‹ Prev</button>
+        <button onClick={() => onNavigate('TODAY')} style={todayButtonStyle}>Today</button>
+        <button onClick={() => onNavigate('NEXT')} style={navButtonStyle}>Next ›</button>
       </div>
-      <h2 style={{ margin: 0, color: '#001f3f' }}>{label}</h2>
-      <select
-        value={view}
-        onChange={(e) => onView(e.target.value)}
+
+      {/* Centered label */}
+      <h2
         style={{
-          padding: '0.4rem 0.8rem',
-          borderRadius: '6px',
-          border: '1px solid #F0B323',
-          fontSize: '0.9rem',
-          backgroundColor: '#FFFFFF',
+          margin: 0,
           color: '#001f3f',
-          cursor: 'pointer',
-          minWidth: '80px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          outline: 'none'
+          textAlign: 'center',
+          justifySelf: 'center', // lock to middle column
+          fontSize: 'clamp(1.25rem, 2vw, 1.75rem)',
         }}
       >
-        <option value={Views.MONTH}>Month</option>
-        <option value={Views.WEEK}>Week</option>
-        <option value={Views.DAY}>Day</option>
-      </select>
+        {label}
+      </h2>
+
+      {/* Right select */}
+      <div style={{ justifySelf: 'end' }}>
+        <select
+          value={view}
+          onChange={(e) => onView(e.target.value)}
+          style={{
+            padding: '0.4rem 0.8rem',
+            borderRadius: '6px',
+            border: '1px solid #F0B323',
+            fontSize: '0.9rem',
+            backgroundColor: '#FFFFFF',
+            color: '#001f3f',
+            cursor: 'pointer',
+            minWidth: '80px',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            outline: 'none'
+          }}
+        >
+          <option value={Views.MONTH}>Month</option>
+          <option value={Views.WEEK}>Week</option>
+          <option value={Views.DAY}>Day</option>
+        </select>
+      </div>
     </div>
   );
 }
+
+const navButtonStyle = {
+  marginRight: '0.5rem',
+  padding: '0.4rem 0.8rem',
+  background: '#001f3f',
+  color: 'white',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer'
+};
+
+const todayButtonStyle = {
+  marginRight: '0.5rem',
+  padding: '0.4rem 0.8rem',
+  background: '#F0B323',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer'
+};
+
+    
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 export default function CalendarPage() {
   const [view, setView] = useState(Views.MONTH);
@@ -264,11 +265,13 @@ export default function CalendarPage() {
         <h1
           style={{
             textAlign: 'center',
-            margin: '0.6rem 0',
+            margin: '0.5rem 0 1rem',
             color: '#001f3f',
+            fontSize: 'clamp(1.4rem, 2.5vw, 2rem)',
+            fontWeight: 700
           }}
         >
-          {accountType === 'user' ? currentView === 'saved' ? 'My Saved Events' : currentView === 'following' ? 'Upcoming Events from Following' : 'All  Events' : 'My Club\s Events'}
+          {accountType === 'user' ? currentView === 'saved' ? 'My Saved Events' : currentView === 'following' ? 'Upcoming Events from Following' : 'All  Events' : "My Club's Events"}
         </h1>
         <div style={{
           display: 'flex',
