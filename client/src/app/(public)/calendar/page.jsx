@@ -4,7 +4,6 @@ import { Calendar, Views, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay, add, sub } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import NavBar from '../components/navbar/NavBar';
 const locales = { 'en-US': enUS };
 const localizer = dateFnsLocalizer({
   format,

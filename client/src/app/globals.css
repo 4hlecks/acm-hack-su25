@@ -80,6 +80,10 @@
   --icon-size-medium: 1rem;
   --icon-size-small: 0.875rem;
   --icon-width-small: 0.125rem;
+
+  /* Event Card Variables */
+  --event-card-width: 12.5rem;
+
 }
 
 /* Global resets */
@@ -110,6 +114,14 @@
 .swiper, .swiper-wrapper, .swiper-slide {
   overflow: visible !important;
 }
+
+/* Mobile */
+@media screen and (max-width: 1280px) {
+  :root {
+    --event-card-width: 10rem;
+  }
+}
+
 /*
 @media (prefers-color-scheme: dark) {
   html {

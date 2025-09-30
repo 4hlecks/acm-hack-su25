@@ -1,0 +1,67 @@
+.profileCard {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.profileHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    height: auto;
+}
+
+.profilePicture {
+    height: 6rem;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profileInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    align-items: flex-start;
+}
+
+.profileName {
+    font-weight: var(--font-weight-heading) !important;
+    line-height: auto;
+}
+
+.profileContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.profileBioTitle {
+    font-weight: var(--font-weight-heading) !important;
+    line-height: auto;
+    width: 100%;
+}
+
+.profileBio {
+    font-size: 1rem;
+    width: 100%;
+    white-space: pre-wrap;
+    color: var(--text-muted-color);
+}
+
+/* Mobile */
+@media screen and (max-width: 48rem) {
+    .profileHeader {
+        flex-direction: column;
+        margin: auto;
+    }
+
+    .profileInfo {
+        align-items: center;
+    }
+}

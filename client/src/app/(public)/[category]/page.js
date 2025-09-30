@@ -5,7 +5,6 @@ import {useState, useEffect} from 'react';
 import EventCard from '../components/events/EventCard';
 import styles from './CategoryEvents.module.css'
 import { ArrowLeft } from "react-feather";
-import NavBar from '../components/navbar/NavBar'
 import EventPopup from '../components/events/EventPopup';
 import { usePopup } from '../context/PopupContext';
 
@@ -91,7 +90,6 @@ export default function CategoryEventsPage() {
 
     return(
         <>
-            <NavBar />
             <div className={styles.container}>
                 <header className={styles.header}>
                     {/* Main title */}
