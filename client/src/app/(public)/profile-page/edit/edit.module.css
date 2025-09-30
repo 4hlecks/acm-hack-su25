@@ -93,7 +93,7 @@
 }
 
 /* picture editor (same sizing you had before) */
-.profilePicWrapper { position: relative; }
+.profilePicWrapper { position: relative; background-color: #ffffff; }
 .profilePicContainer {
   position: relative;
   width: 6rem;
