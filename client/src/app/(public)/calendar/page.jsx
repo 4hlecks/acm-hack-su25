@@ -53,7 +53,8 @@ function CustomToolbar({ label, onNavigate, onView, view }) {
           color: '#001f3f',
           textAlign: 'center',
           justifySelf: 'center', // lock to middle column
-          fontSize: 'clamp(1.25rem, 2vw, 1.75rem)',
+          fontSize: 'clamp(1.1rem, 1.8vw, 1.5rem)',
+
         }}
       >
         {label}
@@ -262,15 +263,17 @@ export default function CalendarPage() {
           overflow: 'hidden',
         }}
       >
-        <h1
-          style={{
-            textAlign: 'center',
-            margin: '0.5rem 0 1rem',
-            color: '#001f3f',
-            fontSize: 'clamp(1.4rem, 2.5vw, 2rem)',
-            fontWeight: 700
-          }}
-        >
+       
+       <h1
+  style={{
+    textAlign: 'center',
+    margin: '0.25rem 0 0.5rem', // slightly less space below too
+    color: '#001f3f',
+    fontSize: 'clamp(1.1rem, 1.8vw, 1.5rem)', 
+    fontWeight: 700
+  }}
+>
+
           {accountType === 'user' ? currentView === 'saved' ? 'My Saved Events' : currentView === 'following' ? 'Upcoming Events from Following' : 'All  Events' : "My Club's Events"}
         </h1>
         <div style={{

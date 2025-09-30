@@ -107,9 +107,9 @@
 /* Icons & labels */
 .navIcon {
   aspect-ratio: 1 / 1;
-  width: 1.25rem;         /* smaller icons */
-  height: 1.25rem;
-  stroke-width: 2px;
+  width: 1.4rem;        /* 🔹 make this bigger (e.g., 1.5rem or 1.75rem) */
+  height: 1.4rem;       /* 🔹 same value as width */
+  stroke-width: 2px;     
   color: inherit;
   transition: color 160ms ease, fill 160ms ease;
 }
