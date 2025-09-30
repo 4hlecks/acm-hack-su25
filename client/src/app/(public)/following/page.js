@@ -112,12 +112,6 @@ export default function FollowingPage(){
             <div className={styles.container}>
                 <header className={styles.header}>
                     <h1 className={styles.title}>Following</h1>
-                    <div className={styles.categorySection}>
-                        <button onClick={handleBackClick} className={styles.backButton}>
-                            <ArrowLeft className={styles.backIcon} />
-                            Back
-                        </button>
-                    </div>
                 </header>
                 {followingClubs.length === 0 ? (
                     <div className={styles.noEvents}>

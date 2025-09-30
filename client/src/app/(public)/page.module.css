@@ -54,9 +54,10 @@
 
 /* === Titles === */
 h1.pageTitle {
-  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  font-size: clamp(1.1rem, 2vw, 1.5rem); 
   font-weight: var(--font-weight-heading);
-  margin-top: 0;         /* no white space at the top */
+  margin-top: 0;
+  margin-bottom: 0.5rem; 
   text-align: left;
   width: 100%;
 }
