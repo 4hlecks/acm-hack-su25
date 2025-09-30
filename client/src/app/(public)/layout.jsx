@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import NavBar from './components/navbar/NavBar';
 import styles from './layout.module.css';
 
