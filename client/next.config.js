@@ -22,6 +22,13 @@ const nextConfig = {
       },
     ];
   },
+  // Force all pages to be dynamic
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
+  },
+  output: 'standalone',
 };
 
 module.exports = nextConfig;
