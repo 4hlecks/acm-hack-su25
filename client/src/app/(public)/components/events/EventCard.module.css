@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   background-color: var(--tertiary-color);
-  width: 12.5rem;
+  width: var(--event-card-width);
   border-radius: var(--border-radius);
   cursor: pointer;
   z-index: 1;
@@ -124,10 +124,6 @@
 
 
 @media screen and (max-width: 1280px) {
-  .eventCard {
-    width: 10rem;
-  }
-
   .eventCard .eventInfo .eventHeader .eventTitle,
   .eventCard .eventInfo .eventHeader .eventOwner {
     font-size: var(--font-size-medium);

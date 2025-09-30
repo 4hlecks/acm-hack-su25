@@ -102,6 +102,12 @@
 .button[data-variant="danger"]:hover {
     background-color: var(--button-danger-hover);
 }
+.button[data-variant="follow"] {
+    background-color: #4EBAFF;
+}
+.button[data-variant="follow"]:hover {
+    background-color: #2786C3;
+}
 
 /* States */
 .button:hover { /* TODO */ }
