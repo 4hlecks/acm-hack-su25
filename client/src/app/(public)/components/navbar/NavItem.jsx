@@ -3,6 +3,7 @@
 import styles from './NavBar.module.css';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 /**
  * @param {'logo'|'link'|'button'} type
@@ -36,18 +37,22 @@ export default function NavItem({
   );
 
   if (type === 'logo') {
-    return (
-      <Link
-        href="/"
-        className={`${styles.navLogo} ${className}`}
-        aria-label="Home"
-        title="Home"
-        {...rest}
-      >
-        <span>current</span>
-      </Link>
-    );
-  }
+  return (
+    <Link href="/" className={`${styles.logoWrap} ${className}`} aria-label="Home" {...rest}>
+      <span className={styles.logoBox}>
+        <Image
+          src="/images/currentroughlogo.png"
+          alt="Current"
+          priority
+          width={161}                     // pick your exact pixel width
+          height={32}                     // pick your exact pixel height
+          style={{ width: '161px', height: '32px' }}  // hard lock size
+          className={styles.logo}
+        />
+      </span>
+    </Link>
+  );
+}
 
   if (type === 'link') {
     const href = typeof action === 'string' ? action : '#';
