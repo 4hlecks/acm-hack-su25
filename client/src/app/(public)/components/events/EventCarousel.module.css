@@ -67,8 +67,6 @@
     }
   }
 
-  /* ===== BACKERS (square, same size as buttons, no radius) =====
-     Sit ABOVE slides (z:2) and BELOW buttons (z:3). */
   .buttonBacker {
     position: absolute;
     inset-block: 0;                   /* top:0; bottom:0 => match track height */

@@ -1,29 +1,5 @@
 .container {
     width: 100%;
-    margin: 0;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 1rem;
-}
-
-.header{
-    margin-bottom: 2rem;
-    padding-left: 0;
-}
-
-.headerTop{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-}
-
-.title{
-    font-size: 2rem;
-    font-weight: bold;
-    color: #1a1a1a;
-    margin: 0 0 2rem 0;
-    text-align: left;
 }
 
 .backButton{
@@ -35,13 +11,13 @@
     cursor: pointer;
     font-size: var(--font-size-heading);
     font-weight: 600;
-    color: #333;
+    color: #000000;
     padding: 0.5rem 0;
     transition: color 0.2s ease;
 }
 
 .backButton:hover{
-    color: var(--tertiary-color);
+    color: #D7D7D7;
     transition: color 0.3s ease, background-color 0.3s ease;
     cursor: pointer
 }
@@ -100,7 +76,6 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 1.5rem;
-    padding: 0.2%;
 }
 
 .clubInfo {
@@ -121,7 +96,7 @@
     font-size: 1.5rem;
     font-weight: 600;
     color: #1a1a1a;
-    margin: 0 0 0.25rem 0;
+    align-items: center;
 }
 
 
@@ -137,19 +112,10 @@
 .eventsGrid {
     display: flex;
     flex-wrap: wrap;
-    gap: 2rem;
-    margin-left: 2%;
-    margin-bottom: 1rem;
+    gap: 1rem;
 }
 
 @media (max-width: 48rem){
-    .container { 
-        padding: 1rem;
-    }
-    .title {
-        font-size: 2rem;
-    }
-
     .clubHeader {
         flex-direction: column;
         align-items: flex-start;
@@ -172,7 +138,6 @@
     }
 
     .eventsGrid {
-        gap: 1.5rem;
-        margin-left: 0;
+        gap: 1rem;
     }
 }

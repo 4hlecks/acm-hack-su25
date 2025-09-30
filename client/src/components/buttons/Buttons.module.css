@@ -104,6 +104,8 @@
 }
 .button[data-variant="follow"] {
     background-color: #4EBAFF;
+    border-color: #2786C3;
+    color: white;
 }
 .button[data-variant="follow"]:hover {
     background-color: #2786C3;

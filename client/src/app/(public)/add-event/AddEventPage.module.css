@@ -39,6 +39,34 @@
   object-fit: cover;   
 }
 
+/* image baseline */
+.coverPreview {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: transform 240ms ease, filter 200ms ease; /* add filter */
+  will-change: transform, filter;
+}
+
+/* existing slight zoom + now darken the image too */
+.uploadBox:hover .coverPreview {
+  filter: brightness(0.78) saturate(1.05); /* adjust to taste */
+}
+
+/* keep overlay vibe from eventCard (optional, slightly stronger) */
+.uploadBox::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.10);
+  transition: opacity 200ms ease;
+  z-index: 1; /* sits over image */
+}
+.uploadBox:hover::before { opacity: 1; }
+
 .uploadEmpty {
   inset: 0;
   display: flex;
