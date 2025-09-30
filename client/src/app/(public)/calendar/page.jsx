@@ -107,7 +107,7 @@ function CustomToolbar({ label, onNavigate, onView, view }) {
     </div>
   );
 }
-
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 export default function CalendarPage() {
   const [view, setView] = useState(Views.MONTH);
   const [date, setDate] = useState(new Date());
@@ -130,7 +130,7 @@ export default function CalendarPage() {
 
         //Fetch saved events for users
         if (currentView === 'all'){
-          const allEventsRes = await fetch('http://localhost:5001/api/loadEvents/all');
+          const allEventsRes = await fetch(`${API_BASE}/api/loadEvents/all`);
           if (allEventsRes.ok){
             const allEventsData = await allEventsRes.json();
             allEvents = [...allEvents, ...(allEventsData.events || [])];
@@ -138,7 +138,7 @@ export default function CalendarPage() {
         }
 
         if (type === 'user' && (currentView === 'saved' || currentView ==='all')){
-          const savedRes  = await fetch(`http://localhost:5001/users/${userId}/saved-events`, {
+          const savedRes  = await fetch(`${API_BASE}/users/${userId}/saved-events`, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ export default function CalendarPage() {
 
         //Fetch following events for users
         if (type === 'user' && (currentView === 'following' || currentView === 'all')){
-          const followingRes = await fetch(`http://localhost:5001/users/${userId}/following`, {
+          const followingRes = await fetch(`${API_BASE}/users/${userId}/following`, {
             headers: {
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ export default function CalendarPage() {
           if (followingRes.ok){
             const followingData = await followingRes.json();
             for (const club of followingData){
-              const clubEventsRes = await fetch(`http://localhost:5001/api/loadEvents/byClub/${club._id}`);
+              const clubEventsRes = await fetch(`${API_BASE}/api/loadEvents/byClub/${club._id}`);
               if (clubEventsRes.ok){
                 const clubEvents = await clubEventsRes.json();
                 allEvents = [...allEvents, ...(clubEvents.upcomingEvents || []), ...(clubEvents.pastEvents || [])];
@@ -172,7 +172,7 @@ export default function CalendarPage() {
 
         //For clubs, fetch their own events
         if (type === 'club'){
-          const res = await fetch('http://localhost:5001/api/loadEvents/byOwner/me', {
+          const res = await fetch(`${API_BASE}/api/loadEvents/byOwner/me`, {
             headers:{
               Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
@@ -245,7 +245,6 @@ export default function CalendarPage() {
 
   return (
     <>
-    <NavBar />
     <div
       style={{
         height: '100vh',
