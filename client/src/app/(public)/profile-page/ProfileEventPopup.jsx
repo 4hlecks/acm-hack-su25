@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { Clock, Calendar, MapPin, X } from "react-feather";
 import { Dialog } from "@base-ui-components/react/dialog";
 import styles from "./ProfileEventPopup.module.css";
+import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001"; 
  function normalizeImg(src) { 
@@ -15,6 +16,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
  } 
 
 const ProfileEventPopup = ({ event, clubId, onClose }) => {
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -176,10 +178,8 @@ const ProfileEventPopup = ({ event, clubId, onClose }) => {
               <div className={styles.buttonContainer}>
                 {isOwner && (
                   <button
-                    onClick={() =>
-                      (window.location.href = `/profile-page/edit?eventId=${event._id}`)
-                    }
-                    className={styles.saveButton}  
+                    onClick={() => router.push(`/events/${event._id}/edit`)}
+                    className={styles.saveButton}
                   >
                     Edit Event
                   </button>
