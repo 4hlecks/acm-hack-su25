@@ -1,7 +1,7 @@
 [build]
   base = "client"
   command = "npm run build"
-  publish = ".next"
+  publish = ".netlify/build"
 
 [[plugins]]
   package = "@netlify/next-runtime"
