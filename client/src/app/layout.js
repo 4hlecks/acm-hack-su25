@@ -2,6 +2,9 @@ import './globals.css'
 import { Onest } from 'next/font/google'
 import { PopupProvider } from '@/app/(public)/context/PopupContext';
 import MaintenanceWrapper from './MaintenanceWrapper'; // ⭐ new client component
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+export const revalidate = 0
 
 const onest = Onest({
   subsets: ["latin"],
