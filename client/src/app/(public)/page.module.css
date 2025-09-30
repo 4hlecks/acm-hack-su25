@@ -1,13 +1,17 @@
+
+
 .centeredPage {
   display: grid;
   justify-items: center;
   align-content: start;
+  margin-top: 0;
+  padding-top: 0;
 }
 
-/* Onboarding Page Styles */
+/* === Onboarding Page Styles === */
 .onboardingHeader {
   display: grid;
-  gap: .5rem;
+  gap: 0.5rem;
   text-align: center;
 }
 
@@ -20,56 +24,60 @@
 }
 
 .forgotPassword {
-    text-align: right;
+  text-align: right;
 }
 
 .onboardingAlternate {
-    text-align: center;
+  text-align: center;
 }
 
 .bodyLink {
-    font-weight: 700;
-    text-decoration: underline;
-    cursor: pointer;
-    transition: color 160ms ease;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 160ms ease;
 }
 
 .bodyLink:hover {
-    color: var(--text-link-color);
-    text-decoration: none;
+  color: var(--text-link-color);
+  text-decoration: none;
 }
 
 .successBanner {
-    border: 1px solid #bbf7d0;   /* green-200 */
-    background: #f0fdf4;         /* green-50 */
-    color: #166534;              /* green-800 */
-    padding: 1rem 1rem;
-    margin: 1rem 0;
-    border-radius: var(--border-radius);
+  border: 1px solid #bbf7d0;   /* green-200 */
+  background: #f0fdf4;         /* green-50 */
+  color: #166534;              /* green-800 */
+  padding: 1rem 1rem;
+  margin: 1rem 0;
+  border-radius: var(--border-radius);
 }
 
-.pageTitle {
-    font-size: var(--font-size-title);
-    font-weight: var(--font-weight-heading);
+/* === Titles === */
+h1.pageTitle {
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: var(--font-weight-heading);
+  margin-top: 0;         /* no white space at the top */
+  margin-bottom: 0.75rem;/* a bit less space before categories */
+  text-align: left;
+  width: 100%;
 }
 
-/* Enable hover only on non-touch devices */
+/* === Responsive / Accessibility === */
 @media (hover: hover) and (pointer: fine) {
 }
 
 @media (prefers-reduced-motion) {
 }
 
-/* Mobile */
 @media (max-width: 700px) {
 }
 
-/* Tablet and Smaller Desktop */
 @media (min-width: 701px) and (max-width: 1120px) {
 }
 
 @media (prefers-color-scheme: dark) {
 }
 
+/* === Animations === */
 @keyframes rotate {
 }

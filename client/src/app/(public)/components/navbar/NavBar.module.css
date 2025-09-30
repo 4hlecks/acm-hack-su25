@@ -2,14 +2,18 @@
 .navBar {
   display: flex;
   flex-direction: row;
-  gap: 2rem;
+  gap: 1rem;              /* tighter spacing between items */
   align-items: center;
-  padding: 0 2rem;
+  padding: 0 1rem;        /* less side padding */
   top: 0;
   width: 100%;
-  height: 4rem;
+  height: 4rem;           /* shorter navbar */
   z-index: 1000;
   background-color: #F5F5F5;
+}
+
+.navBar {
+  height: 4rem;   /* or 3.5rem */
 }
 
 .navItemList {
@@ -24,7 +28,7 @@
 /* NavItem Styles */
 .navLogo {
   font-weight: 700;
-  font-size: 2rem;
+  font-size: 1.25rem;     /* smaller logo text */
   transition: color 160ms ease;
 }
 .navLogo:hover { color: #FEBA02; }
@@ -33,16 +37,17 @@
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
-  padding: 1rem;
+  padding: 0.75rem 1rem;   /* a bit more padding vertically & horizontally */
   align-items: center;
-  border-radius: 1rem;
+  border-radius: 0.75rem;  /* adjusted rounding for bigger buttons */
   white-space: nowrap;
   background: none;
   outline: none;
   color: black;
-  height: 3rem;
+  height: 3rem;            /* taller button height */
   transition: background-color 160ms ease, color 160ms ease;
 }
+
 .navItem:focus-visible {
   outline: 2px solid #3B5998;
   outline-offset: 2px;
@@ -63,8 +68,8 @@
   content: "";
   position: absolute;
   left: 0; right: 0;
-  bottom: -0.5rem;
-  height: 3px;
+  bottom: -0.25rem;       /* closer underline */
+  height: 2px;            /* thinner line */
   background: #3B5998;
   pointer-events: none;
   border-bottom-left-radius: inherit;
@@ -79,7 +84,7 @@
 .navItem[data-variant="pageTab"] {}
 
 .navItem[data-variant="pageTab"].navLabel {
-    font-size: 1.5rem;
+    font-size: 1.1rem;    /* smaller page tab label */
 }
 
 /* Only hover when NOT active — use data attribute (module-safe) */
@@ -91,7 +96,7 @@
 /* Active pageTab keeps accent, no bg on hover */
 .navItem[data-variant="pageTab"][data-active="true"] {
   color: #3B5998;
-  box-shadow: none; /* remove this line entirely if you had it */
+  box-shadow: none;
 }
 
 .navItem[data-variant="pageTab"][data-active="true"]:hover {
@@ -102,8 +107,9 @@
 /* Icons & labels */
 .navIcon {
   aspect-ratio: 1 / 1;
-  width: 1.875rem;
-  stroke-width: 2.25px;
+  width: 1.25rem;         /* smaller icons */
+  height: 1.25rem;
+  stroke-width: 2px;
   color: inherit;
   transition: color 160ms ease, fill 160ms ease;
 }
@@ -111,7 +117,7 @@
 .navLabelWrapper { display: inline-flex; }
 .navLabel {
   font-weight: 600;
-  font-size: 1.5rem;
+  font-size: 1.3rem;       
   overflow: hidden;
   transition: width 160ms ease;
 }
@@ -120,22 +126,21 @@
   display: inline-flex;
   align-items: center;
   text-decoration: none;
+  margin-left: 1.2rem;
 }
 
 .logoBox {
-  /* Prevent flexbox from stretching the child */
   display: inline-flex;
   flex: 0 0 auto;
-  width: 140px;   /* match the width you set in the component */
-  height: 32px;   /* match the height you set in the component */
+  width: 120px;           /* narrower logo box */
+  height: 24px;           /* shorter logo box */
 }
 
-/* Ensure the image itself never stretches */
 .logo {
   display: block;
   flex: 0 0 auto;
-  width: 140px !important;   /* hard lock */
-  height: 32px !important;   /* hard lock */
+  width: 120px !important;  /* smaller locked size */
+  height: 24px !important;
   object-fit: contain;
 }
 
@@ -169,29 +174,25 @@
     cursor: pointer;
   }
 
-  /* Remove desktop bottom underline inside tabbar */
   .navBar[data-variant="tabbar"] .activeLink::after { content: none; }
 
-  /* Active top border for tabbar */
   .navBar[data-variant="tabbar"] .navItem[data-active="true"] {
     color: #3B5998;
-    box-shadow: inset 0 3px 0 #3B5998; /* TOP border */
+    box-shadow: inset 0 2px 0 #3B5998;
   }
   .navBar[data-variant="tabbar"] .navItem[data-active="true"]:hover {
     color: #3B5998;
   }
 
   .navIcon {
-    width: 1.75rem;
-    height: 1.75rem;
-    stroke-width: 0.125rem;
+    width: 1.1rem;        /* smaller in tabbar too */
+    height: 1.1rem;
+    stroke-width: 2px;
   }
 
-  .navLabel { font-size: 0.75rem; }
+  .navLabel { font-size: 0.7rem; }
 
-  /* PageTab rules also apply on tablet (kept above) */
-  .navItem[data-variant="pageTab"] .navLabel { font-size: 1.5rem; }
-
+  .navItem[data-variant="pageTab"] .navLabel { font-size: 1rem; }
 }
 
 /* Mobile */
@@ -205,5 +206,5 @@
 }
 
 @media screen and (max-width: 36rem) {
-    .navItem[data-variant="pageTab"] .navLabel { font-size: 1rem; }
+    .navItem[data-variant="pageTab"] .navLabel { font-size: 0.85rem; }
 }

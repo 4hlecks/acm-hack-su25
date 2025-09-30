@@ -1,7 +1,20 @@
 .carouselSection {
   display: flex;
   flex-direction: column;
-  padding: 1rem 0;
+  padding-top: 0.6rem;    
+  padding-bottom: 2rem;  
+}
+
+.carouselSection:first-of-type {
+  padding-top: 0.25rem;    
+  margin-top: 0;
+}
+
+.carouselSection:first-of-type .carouselTitle {
+  margin-top: 0;
+}
+
+
 
   .carouselHeader {
     display: flex;
@@ -10,19 +23,20 @@
     align-items: center;
 
     .carouselTitle {
-      font-size: var(--font-size-heading);
+      font-size: clamp(1.2rem, 2vw, 1.6rem);
       font-weight: var(--font-weight-heading);
+      margin-top: 0rem;   /* tighten space above */
+      margin-bottom: 0.6rem;   /* keep comfortable space below */
     }
-        
     .carouselSeeAll {
       text-decoration: none;
       color: #333;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      gap: .25rem;
+      font-size: 1.1rem;
+  font-weight: bold;
+  gap: .25rem;
       cursor: pointer;
       transition: color .2s ease;
 
@@ -119,4 +133,4 @@
     height: 48px;
     stroke-width: 2.25px;
   }
-}
+

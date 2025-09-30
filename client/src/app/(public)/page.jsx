@@ -72,14 +72,13 @@ export default function Home() {
 
   return (
     <>
-      <h1 className={styles.pageTitle}>Home</h1>
-        {categories.filter(category => eventsByCategory[category]?.length > 0).map(category => (
-          <EventCarousel
-            key={category}
-            category={category}
-            events={eventsByCategory[category] || []}
-          /> 
-        ))}
+  {categories.filter(category => eventsByCategory[category]?.length > 0).map(category => (
+    <EventCarousel
+      key={category}
+      category={category}
+      events={eventsByCategory[category] || []}
+    /> 
+  ))}
       
       {isPopupOpen && (
         <EventPopup 
