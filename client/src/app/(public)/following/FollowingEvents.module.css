@@ -2,19 +2,42 @@
     width: 100%;
 }
 
-.backButton{
+/* Page Title */
+h1.title {
+    font-size: clamp(1.1rem, 2.6vw, 1.6rem); 
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    color: #1a1a1a;
+  }
+  
+  /* Club Name */
+  h2.clubName {
+    font-size: clamp(1rem, 2vw, 1.4rem); 
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    align-items: center;
+  }
+  
+  .clubName a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+.backButton {
     background: none;
     border: none;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);  
     font-weight: 600;
     color: #000000;
     padding: 0.5rem 0;
     transition: color 0.2s ease;
 }
+
 
 .backButton:hover{
     color: #D7D7D7;
@@ -23,8 +46,8 @@
 }
 
 .backIcon{
-    width: 1.5rem;
-    height: 1.5rem;
+    width: clamp(1rem, 2vw, 1.25rem);  
+    height: clamp(1rem, 2vw, 1.25rem);
 }
 
 .categorySection{
@@ -92,14 +115,6 @@
     border: 2px solid #e0e0e0;
 }
 
-.clubName{
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #1a1a1a;
-    align-items: center;
-}
-
-
 .eventCount{
     font-size: 1rem;
     color: #666;
@@ -125,6 +140,7 @@
     .clubInfo {
         width: 100%;
     }
+
 
     .clubBio {
         max-width: 100%;

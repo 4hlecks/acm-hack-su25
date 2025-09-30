@@ -2,19 +2,7 @@
     width: 100%;
 }
 
-.backButton{
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-size: clamp(1.2rem, 2vw, 1.6rem);
-    font-weight: 600;
-    color: #000000;
-    padding: 0.5rem 0;
-    transition: color 0.2s ease;
-}
+
 
 .backButton:hover{
     color: #D7D7D7;
@@ -22,10 +10,25 @@
     cursor: pointer
 }
 
-.backIcon{
-    width: 1.5rem;
-    height: 1.5rem;
-}
+.backButton {
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem; 
+    cursor: pointer;
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    font-weight: 600;
+    color: #000000;
+    padding: 0.3rem 0; 
+    transition: color 0.2s ease;
+  }
+  
+  .backIcon {
+    width: 1.1rem;  /* smaller arrow */
+    height: 1.1rem;
+  }
+  
 
 .categorySection{
     display: flex;
@@ -98,6 +101,12 @@
     align-items: center;
 }
 
+h1.title {
+    font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: #1a1a1a;
+  }
 
 .eventCount{
     font-size: 0.9rem;
