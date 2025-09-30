@@ -1,9 +1,16 @@
-"use client"
+'use client'
 
 export const dynamic = 'force-dynamic'
 
-import { redirect } from 'next/navigation';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function AdminView() {
-    redirect('/admin/dashboard');
+    const router = useRouter();
+    
+    useEffect(() => {
+        router.push('/admin/dashboard');
+    }, [router]);
+    
+    return null;
 }
