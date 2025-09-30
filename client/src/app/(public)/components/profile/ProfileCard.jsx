@@ -1,5 +1,7 @@
-import React , {useState, useEffect} from "react";
-import "./ProfileCard.css";
+import React, { useState, useEffect } from "react";
+import styles from "./ProfileCard.module.css";
+import { Button } from "@/components/buttons/Buttons";
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
 function formatTimeRange(startTime, endTime) {
@@ -8,150 +10,184 @@ function formatTimeRange(startTime, endTime) {
   const options = {
     hour: "numeric",
     minute: "2-digit",
-    hour12: true, // ensures AM/PM instead of 24h
+    hour12: true,
   };
 
   const start = new Date(startTime).toLocaleTimeString([], options);
   const end = new Date(endTime).toLocaleTimeString([], options);
 
-  // remove :00 if exact hour
   const cleanStart = start.replace(":00", "");
   const cleanEnd = end.replace(":00", "");
 
   return `${cleanStart} - ${cleanEnd}`;
 }
 
-function ProfileCard({ name, bio, profilePic, onEdit, isOwner, startTime, endTime, clubId }) {
+function ProfileCard({
+  name,
+  bio,
+  profilePic,
+  onEdit,
+  isOwner,
+  startTime,
+  endTime,
+  clubId,
+}) {
   const timeRange = formatTimeRange(startTime, endTime);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  //Get current user info
+  // Get current user info
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData){
+    const userData = localStorage.getItem("user");
+    if (userData) {
       try {
         const User = JSON.parse(userData);
         setCurrentUser(User);
-      } catch (error){
-        console.error('Error parsing user data:', error)
+      } catch (error) {
+        console.error("Error parsing user data:", error);
       }
     }
   }, []);
 
-  //Check if current user is already following this club
+  // Check if current user is already following this club
   useEffect(() => {
     const checkFollow = async () => {
-      if (!clubId || !currentUser || isOwner || currentUser.role !== 'user') return;
+      if (!clubId || !currentUser || isOwner || currentUser.role !== "user")
+        return;
 
-      try{
-        const token = localStorage.getItem('token');
+      try {
+        const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await fetch(`${API_BASE}/users/${currentUser.id}/following`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `${API_BASE}/users/${currentUser.id}/following`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        if (response.ok){
+        if (response.ok) {
           const data = await response.json();
-          console.log('API response:', data);
-
-          const isCurrentlyFollowing = data.some(club => club._id === clubId);
-          setIsFollowing(isCurrentlyFollowing)
+          const isCurrentlyFollowing = data.some((club) => club._id === clubId);
+          setIsFollowing(isCurrentlyFollowing);
         }
-      } catch (error){
-        console.error('Error checking follow status:', error)
+      } catch (error) {
+        console.error("Error checking follow status:", error);
       }
     };
     checkFollow();
-  }, [clubId, currentUser, isOwner])
+  }, [clubId, currentUser, isOwner]);
 
   const handleFollow = async () => {
     if (loading || !currentUser) return;
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      if (!token){
+      const token = localStorage.getItem("token");
+      if (!token) {
         setLoading(false);
         return;
       }
 
-      const method = isFollowing ? 'DELETE': 'POST';
-      const response = await fetch(`${API_BASE}/users/${currentUser.id}/follow/${clubId}`, {
-        method: method,
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      
-      if (response.ok){
+      const method = isFollowing ? "DELETE" : "POST";
+      const response = await fetch(
+        `${API_BASE}/users/${currentUser.id}/follow/${clubId}`,
+        {
+          method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
         setIsFollowing(!isFollowing);
-      } else{
+      } else {
         const errorData = await response.json();
-        alert(errorData.error || 'Failed to update follow status');
+        alert(errorData.error || "Failed to update follow status");
       }
-    } catch (error){
-      console.error('Error toggling follow:', error);
+    } catch (error) {
+      console.error("Error toggling follow:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  //Show follow button if user is a normal user
-  const showFollowButton = !isOwner && currentUser?.role === 'user' && clubId;
+  // Show follow button if user is a normal user
+  	const showFollowButton =
+    	!isOwner && currentUser?.role === "user" && clubId;
+
+	const displayBio =
+	typeof bio === 'string' && bio.trim().length > 0
+		? bio
+		: "This club hasn't added a bio yet.";
+  	const isEmptyBio = !(typeof bio === 'string' && bio.trim().length > 0);
 
   return (
-    <section className="profile-section">
-      <div className="profile-header">
-        {/* Profile picture */}
+    <article className={styles.profileCard}>
+      <header className={styles.profileHeader}>
         <img
           src={
             profilePic ||
             "https://upload.wikimedia.org/wikipedia/commons/6/6a/ACM_logo.svg"
           }
           alt={`${name || "Club"} Logo`}
-          className="profile-logo"
+          className={styles.profilePicture}
         />
+        <div className={styles.profileInfo}>
+          <h2 className={styles.profileName}>{name || "Club Name"}</h2>
 
-        {/* Info to the right */}
-        <div className="profile-info">
-          <div className="profile-title-row">
-            <h1 className="profile-name">{name || "Club Name"}</h1>
-            {isOwner ? (
-              <button
-                className="edit-btn"
-                onClick={onEdit}
-                aria-label="Edit profile"
+          {isOwner ? (
+            <Button
+              size="medium"
+              width="auto"
+              variant="secondary"
+              onClick={onEdit}
+              aria-label="Edit profile"
+            >
+              Edit Profile / Events
+            </Button>
+          ) : showFollowButton ? (
+            isFollowing ? (
+              <Button
+                size="medium"
+                width="auto"
+                variant="primary" // unfollow = primary
+                onClick={handleFollow}
+                disabled={loading}
+                aria-label="Unfollow user"
               >
-                Edit Profile / Events
-              </button>
-            ) : showFollowButton ? (
-              <button className={`follow-btn ${isFollowing ? 'following': ''}`}
-              onClick={handleFollow}
-              disabled={loading}
-              aria-label={isFollowing ? 'Unfollow user': 'Follow user'}
+                Following
+              </Button>
+            ) : (
+              <Button
+                size="medium"
+                width="auto"
+                variant="follow" // follow = follow variant
+                onClick={handleFollow}
+                disabled={loading}
+                aria-label="Follow user"
               >
-                {isFollowing ? 'Following' : 'Follow'}
-              </button>
-            ) : null}
-          </div>
-          {timeRange && (
-            <p className="profile-time">{timeRange}</p>
-          )}
-
-          <section className="profile-about">
-            <h2>About</h2>
-            <div className="about-description">
-              {bio || "This club does not have a bio yet."}
-            </div>
-          </section>
+                Follow
+              </Button>
+            )
+          ) : null}
         </div>
-      </div>
-    </section>
+      </header>
+
+       <section className={styles.profileContent}>
+        <h3 className={styles.profileBioTitle}>About</h3>
+        <p
+          className={styles.profileBio}
+          data-empty={isEmptyBio ? 'true' : 'false'}
+        >
+          {displayBio}
+        </p>
+      </section>
+    </article>
   );
 }
 

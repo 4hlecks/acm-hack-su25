@@ -5,10 +5,13 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import styles from "./edit.module.css";
 import EventCard from "../../components/events/EventCard";
 import Cropper from "react-easy-crop";
+import { TextField, TextAreaField } from "@/components/form/Form";
+import { Button } from "@/components/buttons/Buttons";
+import NavItem from "../../components/navbar/NavItem";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
-// ---------- image cropping helpers ----------
+/* ---------- image cropping helpers ---------- */
 async function getCroppedImg(imageSrc, cropPixels) {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
@@ -44,7 +47,7 @@ function createImage(url) {
   });
 }
 
-// ---------- date helpers ----------
+/* ---------- event helpers ---------- */
 function parseDateOnly(raw) {
   if (!raw) return null;
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
@@ -54,7 +57,6 @@ function parseDateOnly(raw) {
   const d = new Date(raw);
   return isNaN(d.getTime()) ? null : d;
 }
-
 function parseTimeHM(raw) {
   if (!raw) return null;
   if (raw.includes("T")) {
@@ -78,7 +80,6 @@ function parseTimeHM(raw) {
   }
   return null;
 }
-
 function eventStartTimestamp(e) {
   const rawDate = e.Date ?? e.date ?? null;
   const rawStart = e.startTime ?? null;
@@ -96,14 +97,15 @@ function eventStartTimestamp(e) {
   ).getTime();
 }
 
+/* ---------- page ---------- */
 export default function EditProfile() {
   const router = useRouter();
   const [club, setClub] = useState(null);
-  const [orgEvents, setOrgEvents] = useState([]);
+  const [orgEvents, setOrgEvents] = useState({ upcoming: [], past: [] });
   const [loading, setLoading] = useState(true);
   const [deleteEventId, setDeleteEventId] = useState(null);
 
-  // cropping states
+  // cropping
   const [image, setImage] = useState(null);
   const [rawFile, setRawFile] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -111,6 +113,9 @@ export default function EditProfile() {
   const [croppedPixels, setCroppedPixels] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+
+  // tabs
+  const [tab, setTab] = useState("upcoming");
 
   const onCropComplete = useCallback((_, croppedAreaPixels) => {
     setCroppedPixels(croppedAreaPixels);
@@ -128,21 +133,31 @@ export default function EditProfile() {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
+
+      if (!profileRes.ok) throw new Error(`Profile fetch failed: ${profileRes.status}`);
+      if (!eventsRes.ok) throw new Error(`Events fetch failed: ${eventsRes.status}`);
+
       const profileData = await profileRes.json();
-      const { upcomingEvents } = await eventsRes.json();
+      const data = await eventsRes.json();
+
       setClub(profileData.club);
-      setOrgEvents(Array.isArray(upcomingEvents) ? upcomingEvents : []);
+      setOrgEvents({
+        upcoming: Array.isArray(data.upcomingEvents)
+          ? data.upcomingEvents
+          : Array.isArray(data.events)
+          ? data.events
+          : [],
+        past: Array.isArray(data.pastEvents) ? data.pastEvents : [],
+      });
     } catch (err) {
       console.error(err);
-      setOrgEvents([]);
+      setOrgEvents({ upcoming: [], past: [] });
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   useEffect(() => {
     const onFocus = () => fetchData();
@@ -150,16 +165,22 @@ export default function EditProfile() {
     return () => window.removeEventListener("focus", onFocus);
   }, [fetchData]);
 
-  const sortedEvents = useMemo(
-    () => [...orgEvents].sort((a, b) => eventStartTimestamp(a) - eventStartTimestamp(b)),
-    [orgEvents]
+  const sortedUpcoming = useMemo(
+    () => [...orgEvents.upcoming].sort((a, b) => eventStartTimestamp(a) - eventStartTimestamp(b)),
+    [orgEvents.upcoming]
+  );
+  const sortedPast = useMemo(
+    () => [...orgEvents.past].sort((a, b) => eventStartTimestamp(b) - eventStartTimestamp(a)),
+    [orgEvents.past]
   );
 
-  const handleSaveProfile = async () => {
+  const list = tab === "upcoming" ? sortedUpcoming : sortedPast;
+
+  async function handleSaveProfile() {
     const token = localStorage.getItem("token");
     const formData = new FormData();
-    formData.append("name", club.name);
-    formData.append("bio", club.bio);
+    formData.append("name", club?.name || "");
+    formData.append("bio", club?.bio || "");
     const res = await fetch(`${API_BASE}/users/updateProfile`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` },
@@ -171,9 +192,9 @@ export default function EditProfile() {
     } else {
       alert("Error updating profile info");
     }
-  };
+  }
 
-  const handleSaveProfilePic = async () => {
+  async function handleSaveProfilePic() {
     if (!rawFile || !croppedPixels) {
       alert("Please choose and crop a file first.");
       return;
@@ -200,168 +221,245 @@ export default function EditProfile() {
     } else {
       alert("Error updating profile picture");
     }
-  };
+  }
 
-  const handleDeleteEvent = async (eventId) => {
+  async function handleDeleteEvent(eventId) {
     const token = localStorage.getItem("token");
     const res = await fetch(`${API_BASE}/api/loadEvents/${eventId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
     if (res.ok) {
-      setOrgEvents((prev) => prev.filter((e) => e._id !== eventId));
+      setOrgEvents((prev) => ({
+        ...prev,
+        [tab]: prev[tab].filter((e) => e._id !== eventId),
+      }));
     } else {
       alert("Failed to delete event");
     }
-  };
+  }
 
-  if (loading) return <div>Loading…</div>;
+  if (loading) return <div className={styles.loading}>Loading…</div>;
+
+  // safe img src (avoid empty string warning)
+  const profileSrc =
+    previewUrl ||
+    (club?.profilePic?.startsWith?.("/uploads")
+      ? `${API_BASE}${club.profilePic}`
+      : club?.profilePic) ||
+    "https://upload.wikimedia.org/wikipedia/commons/6/6a/ACM_logo.svg";
 
   return (
-    <>
-      <main className={styles.pageContent}>
-        <div className={styles.profileHeader}>
-          {/* Profile Picture with cropper */}
-          <div className={styles.profilePicWrapper}>
-            <div
-              className={styles.profilePicContainer}
-              onClick={() => document.getElementById("fileInput").click()}
-            >
-              <img
-                src={
-                  previewUrl
-                    ? previewUrl
-                    : club?.profilePic?.startsWith?.("/uploads")
-                    ? `${API_BASE}${club.profilePic}`
-                    : club?.profilePic ||
-                      "https://upload.wikimedia.org/wikipedia/commons/6/6a/ACM_logo.svg"
-                }
-                alt="Profile"
-                className={styles.profilePic}
-              />
-              <div className={styles.overlay}>Click to edit</div>
-              <input
-                id="fileInput"
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  setRawFile(file);
-                  setImage(URL.createObjectURL(file));
-                  setShowCropper(true);
-                }}
-              />
+    <main className={styles.page}>
+      <div className={styles.container}>
+        {/* Header: image + Edit Name in a row; then Edit Bio + Save */}
+        <section className={styles.profileHeader} aria-labelledby="edit-header">
+          <div className={styles.editorGroup}>
+            {/* Row: Picture + Edit Name */}
+            <div className={styles.topRow}>
+              {/* Picture */}
+              <div className={styles.profilePicWrapper}>
+                <div
+                  className={styles.profilePicContainer}
+                  onClick={() => document.getElementById("fileInput").click()}
+                >
+                  <img
+                    src={profileSrc || undefined}
+                    alt="Profile"
+                    className={styles.profilePic}
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://upload.wikimedia.org/wikipedia/commons/6/6a/ACM_logo.svg";
+                    }}
+                  />
+                  <div className={styles.overlay}>Click to edit</div>
+                  <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setRawFile(file);
+                      setImage(URL.createObjectURL(file));
+                      setShowCropper(true);
+                    }}
+                  />
+                </div>
+
+                {showCropper && (
+                  <div className={styles.popupOverlay}>
+                    <div className={styles.popup}>
+                      <div style={{ position: "relative", width: 300, height: 300 }}>
+                        <Cropper
+                          image={image}
+                          crop={crop}
+                          zoom={zoom}
+                          aspect={1}
+                          cropShape="round"
+                          onCropChange={setCrop}
+                          onZoomChange={setZoom}
+                          onCropComplete={onCropComplete}
+                        />
+                      </div>
+                      <div className={styles.cropActions}>
+                        <Button
+                          size="medium"
+                          width="auto"
+                          variant="secondary"
+                          onClick={() => setShowCropper(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size="medium"
+                          width="auto"
+                          variant="primary"
+                          onClick={handleSaveProfilePic}
+                        >
+                          Save Logo
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Edit Name */}
+              <div className={styles.editNameArea}>
+                <TextField
+                  id="club-name"
+                  label="Edit Name"
+                  layout="column"
+                  fieldWidth="100%"
+                  required
+                  value={club?.name || ""}
+                  onChange={(e) => setClub({ ...club, name: e.target.value })}
+                  placeholder="Club name"
+                />
+              </div>
             </div>
 
-            {showCropper && (
-              <div className={styles.popupOverlay}>
-                <div className={styles.popup}>
-                  <div style={{ position: "relative", width: 300, height: 300 }}>
-                    <Cropper
-                      image={image}
-                      crop={crop}
-                      zoom={zoom}
-                      aspect={1}
-                      cropShape="round"
-                      onCropChange={setCrop}
-                      onZoomChange={setZoom}
-                      onCropComplete={onCropComplete}
-                    />
-                  </div>
-                  <div className={styles.cropActions}>
-                    <button
-                      className={`${styles.cropBtn} ${styles.cancelBtn}`}
-                      onClick={() => setShowCropper(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className={`${styles.cropBtn} ${styles.saveBtn}`}
-                      onClick={handleSaveProfilePic}
-                    >
-                      Save Logo
-                    </button>
-                  </div>
-                </div>
+            {/* Column: Bio + Save */}
+            <div className={styles.bottomCol}>
+              <TextAreaField
+                id="club-bio"
+                label="Edit Bio"
+                layout="column"
+                fieldWidth="100%"
+                rows={6}
+                value={club?.bio ?? ""}
+                onChange={(e) => setClub({ ...club, bio: e.target.value })}
+                placeholder="Tell students what your club is about…"
+              />
+
+              <div className={styles.saveRow}>
+                <Button
+                  size="medium"
+                  width="fill"
+                  variant="secondary"
+                  onClick={handleSaveProfile}
+                >
+                  Save Info
+                </Button>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Profile Content (Tabs + Grid) */}
+        <section
+          aria-labelledby={tab === "upcoming" ? "upcoming-title" : "past-title"}
+          className={styles.profileContent}
+        >
+          {/* Tabs */}
+          <nav role="tablist" className={styles.tabs}>
+            <NavItem
+              type="button"
+              label="Upcoming Events"
+              action={() => setTab("upcoming")}
+              role="tab"
+              aria-selected={tab === "upcoming"}
+              data-variant="pageTab"
+              active={tab === "upcoming"}
+            />
+            <NavItem
+              type="button"
+              label="Past Events"
+              action={() => setTab("past")}
+              role="tab"
+              aria-selected={tab === "past"}
+              data-variant="pageTab"
+              active={tab === "past"}
+            />
+          </nav>
+
+          {/* Event Grid */}
+          <div className={styles.eventGrid}>
+            {list.length === 0 ? (
+              <p className={styles.empty}>
+                {tab === "upcoming" ? "No upcoming events." : "No events from the last 30 days."}
+              </p>
+            ) : (
+              list.map((event) => (
+                <article key={event._id} className={styles.eventCell}>
+                  <EventCard event={event} disableHover />
+                  {/* Action strip directly under the card */}
+                  <div className={styles.cardActions}>
+                    <Button
+                      size="small"
+                      width="fill"
+                      variant="primary"
+                      onClick={() => router.push(`/events/${event._id}/edit`)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      size="small"
+                      width="fill"
+                      variant="danger"
+                      onClick={() => setDeleteEventId(event._id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </article>
+              ))
             )}
           </div>
-
-          {/* Profile form */}
-          <div className={styles.profileForm}>
-            <label className={styles.label}>Edit Name</label>
-            <input
-              className={styles.inputWide}
-              value={club?.name || ""}
-              onChange={(e) => setClub({ ...club, name: e.target.value })}
-            />
-            <label className={styles.label}>Edit About</label>
-            <textarea
-              className={styles.textareaWide}
-              value={club?.bio || ""}
-              onChange={(e) => setClub({ ...club, bio: e.target.value })}
-            />
-            <button onClick={handleSaveProfile} className={`${styles.actionBtn} ${styles.saveBtn}`}>
-              Save Info
-            </button>
-          </div>
-        </div>
-
-        {/* Events */}
-        <div className={styles.eventsHeader}>
-          <h2><strong>Manage Events</strong></h2>
-        </div>
-        <section className={styles.eventGrid}>
-          {sortedEvents.length === 0 ? (
-            <p>No events yet.</p>
-          ) : (
-            sortedEvents.map((event) => (
-              <div key={event._id} className={styles.eventWrapper}>
-                <EventCard event={event} disableHover />
-                <div className={styles.eventActions}>
-                  <button onClick={() => router.push(`/events/${event._id}/edit`)} className={styles.actionBtn}>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => setDeleteEventId(event._id)}
-                    className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
         </section>
-      </main>
+      </div>
 
       {/* Delete confirmation */}
       {deleteEventId && (
         <div className={styles.popupOverlay}>
           <div className={styles.popup}>
-            <h3>Are you sure you want to delete this event?</h3>
+            <h3 className={styles.popupTitle}>Are you sure you want to delete this event?</h3>
             <div className={styles.cropActions}>
-              <button
-                className={`${styles.cropBtn} ${styles.cancelBtn}`}
+              <Button
+                size="medium"
+                width="auto"
+                variant="secondary"
                 onClick={() => setDeleteEventId(null)}
               >
                 Cancel
-              </button>
-              <button
-                className={`${styles.cropBtn} ${styles.deleteBtn}`}
+              </Button>
+              <Button
+                size="medium"
+                width="auto"
+                variant="danger"
                 onClick={async () => {
                   await handleDeleteEvent(deleteEventId);
                   setDeleteEventId(null);
                 }}
               >
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       )}
-    </>
+    </main>
   );
 }

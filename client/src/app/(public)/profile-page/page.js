@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import EventCard from "../components/events/EventCard";
 import EventPopup from "./ProfileEventPopup";
-import ProfileCard from "../components/profile/NewProfileCard";
-import NavItem from "../components/navbar/NavItem"; // adjust import path
-import Spacer from "@/components/form/Spacer";
+import ProfileCard from "../components/profile/ProfileCard";
+import NavItem from "../components/navbar/NavItem";
 import { useRouter } from "next/navigation";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";

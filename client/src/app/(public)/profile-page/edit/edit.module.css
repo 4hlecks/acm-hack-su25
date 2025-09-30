@@ -1,257 +1,186 @@
-.pageContent {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 6rem 2rem 2rem 2rem;
-  }
-  
-  .profileHeader {
-    display: flex;
-    gap: 2rem;
-    align-items: flex-start;
-    margin-bottom: 2rem;
-    max-width: 1300px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .profilePicWrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  
-  .profilePic {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #ccc;
-  }
-  
-  .profileForm {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0rem;
-  }
-  
-  .label {
-    font-weight: bold;
-    margin-bottom: 0.1rem;
-  }
-  
-  .inputWide {
-    width: 600px;
-    max-width: 100%;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .inputWide:focus {
-    border-color: #0070f3;
-  }
-  
-  .textareaWide {
-    width: 750px;
-    max-width: 100%;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    min-height: 180px;
-    resize: vertical;
-    margin-bottom: 1.5rem;
-  }
-  
-  .textareaWide:focus {
-    border-color: #0070f3;
-  }
-  
-  .actionBtn {
-    background: gold;
-    color: black;
-    border: none;
-    border-radius: 6px;
-    padding: 0.4rem 1rem;
-    font-size: 0.85rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: inline-block;
-    text-align: center;
-  }
-  
-  .actionBtn:hover {
-    background: rgb(225, 196, 32);
-  }
-  
-  /* Delete variant */
-  .deleteBtn {
-    background: rgb(166, 18, 18);
-  }
-  
-  .deleteBtn:hover {
-    background: rgb(85, 6, 6);
-  }
-  
-  /* Events */
-  .eventsHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-left: 10rem;
-  }
-  
-  .eventsHeader h2 {
-    font-weight: 800;
-    font-size: 21px;
-  }
-  
-  .eventGrid {
-    display: grid;
-    grid-template-columns: repeat(5, 180px);
-    gap: 2.4rem;
-    justify-content: center;
-    margin-top: 1rem;
-  }
-  
-  .eventActions {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-  
-  /* Popup */
-  .popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border: 2px solid #ccc;
-    border-radius: 12px;
-    padding: 2rem;
-    max-width: 500px;
-    width: 90%;
-    z-index: 1000;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  }
-  
-  .popup input,
-  .popup textarea {
-    width: 100%;
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    outline: none;
-  }
-  
-  .popup input:focus,
-  .popup textarea:focus {
-    border-color: #0070f3;
-  }
 
-  .popupOverlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
+/* Page shell */
+.page {
+  display: grid;
+  align-content: start;
+  min-height: 100dvh;
+}
+
+.loading {
+  width: 100%;
+  text-align: center;
+}
+
+/* Constrained center container so media queries are easier */
+.container {
+  max-width: 64rem;
+  width: 100%;
+  margin-inline: auto;   /* centers the inner content */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.profileHeader {
+  padding: 0 0 1rem 0;
+  border-bottom: 1px solid #DFDFDF;
+  max-width: 54rem;
+  width: 100%;
+  margin: auto;
+}
+
+.profileContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Tabs area */
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.eventGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, var(--event-card-width));
+  justify-content: center;
+  justify-items: stretch;
+  align-content: start;
+  width: 100%;
+}
+
+.eventCell {
+  display: block;
+}
+
+.empty {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+
+/* --- Editor layout --- */
+.editorGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* top row: image + Edit Name */
+.topRow {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* bottom column: Edit Bio + Save button */
+.bottomCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Save button row (kept simple) */
+.saveRow {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* picture editor (same sizing you had before) */
+.profilePicWrapper { position: relative; }
+.profilePicContainer {
+  position: relative;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+}
+.profilePic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 30%);
+  color: white;
+  font-size: 0.9rem;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.profilePicContainer:hover .overlay { opacity: 1; }
+
+/* cropper modal reused */
+.popupOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 40%);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 4rem;
+}
+.popup {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  max-width: 90vw;
+  height: auto;
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 2rem 3rem -1rem rgba(0, 0, 0, 0.25);
+}
+
+.popupTitle {
+  white-space: pre-wrap !important;
+}
+.cropActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+.cropBtn {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+.cancelBtn { background: #e6e6e6; }
+.saveBtn { background: #3B5998; color: white; }
+.deleteBtn { background: #d9534f; color: white; }
+
+/* --- Event card action strip (under each card) --- */
+.cardActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.5rem 0;         /* vertical padding .5rem as requested */
+}
+
+/* tighten the article so there's no extra gap between card and actions */
+.eventCell > :first-child { /* EventCard wrapper */
+  display: block;
+  margin-bottom: 0; /* ensure card itself doesn't add extra spacing */
+}
+
+/* Responsive tweak: stack image/name row on small screens */
+@media (max-width: 48rem) {
+  .topRow {
+    grid-template-columns: 1fr;
+    justify-items: center;
   }
-  
-  .profilePicContainer {
-    position: relative;
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    overflow: hidden;
-    cursor: pointer;
-    transition: box-shadow 0.3s;
-  }
-  
-  .profilePicContainer:hover {
-    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.25);
-  }
-  
-  .profilePicContainer:hover .overlay {
-    opacity: 1;
-  }
-  
-  .overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.9rem;
-    opacity: 0;
-    transition: opacity 0.3s;
-    border-radius: 50%;
-  }
-  
-  .cropPopup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    z-index: 1000;
-    max-width: 400px;
-    width: 90%;
-  }
-  
-  .cropActions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;              
-    margin-top: 1.5rem;
-  }
-  
-  .cropBtn {
-    flex: 1; 
-    max-width: 140px; 
-    padding: 0.6rem 1rem;
-    font-size: 0.9rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    text-align: center;
-  }
-  
-  .saveBtn {
-    background: gold;
-    color: black;
-  }
-  
-  .saveBtn:hover {
-    background: rgb(225, 196, 32);
-  }
-  
-  .cancelBtn {
-    background: #ccc;
-    color: #333;
-  }
-  
-  .cancelBtn:hover {
-    background: #aaa;
-  }
-  
-  
+  .profilePicContainer { margin-bottom: 0.5rem; }
+  .saveRow { justify-content: stretch; }
+}
