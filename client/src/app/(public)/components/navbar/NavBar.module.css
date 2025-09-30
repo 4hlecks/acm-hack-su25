@@ -116,6 +116,30 @@
   transition: width 160ms ease;
 }
 
+.logoWrap {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logoBox {
+  /* Prevent flexbox from stretching the child */
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 140px;   /* match the width you set in the component */
+  height: 32px;   /* match the height you set in the component */
+}
+
+/* Ensure the image itself never stretches */
+.logo {
+  display: block;
+  flex: 0 0 auto;
+  width: 140px !important;   /* hard lock */
+  height: 32px !important;   /* hard lock */
+  object-fit: contain;
+}
+
+
 /* ========= TabBar Styles (tablet/mobile top nav) ========= */
 @media screen and (max-width: 72rem) {
   .navBar .navItemList { display: none; }
@@ -167,6 +191,7 @@
 
   /* PageTab rules also apply on tablet (kept above) */
   .navItem[data-variant="pageTab"] .navLabel { font-size: 1.5rem; }
+
 }
 
 /* Mobile */
