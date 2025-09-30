@@ -22,12 +22,13 @@ const nextConfig = {
       },
     ];
   },
-  // Force all pages to be dynamic
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
     },
   },
+  // Add this for Netlify compatibility
+  distDir: '.next',
 };
 
 module.exports = nextConfig;

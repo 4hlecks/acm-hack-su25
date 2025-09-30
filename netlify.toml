@@ -3,4 +3,11 @@
   command = "npm run build"
 
 [[plugins]]
-  package = "@netlify/next-runtime"
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  node_bundler = "esbuild"
+  
+[build.environment]
+  NODE_VERSION = "18"
+  NEXT_PRIVATE_TARGET = "server"
