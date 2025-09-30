@@ -101,6 +101,8 @@
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
+  border: dashed 2px #DFDFDF;
+  background-color: #ffffff;
 }
 .profilePic {
   width: 100%;
