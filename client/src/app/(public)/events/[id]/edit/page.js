@@ -1,9 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import styles from "../../../add-event/AddEventPage.module.css";
 import Cropper from "react-easy-crop";
+import styles from "../../../add-event/AddEventPage.module.css";
+
+import { Calendar, Clock, MapPin, Image as ImageIcon, X } from "react-feather";
+import {
+  TextField,
+  DateField,
+  TimeField,
+  TextAreaField,
+  SelectField,
+} from "@/components/form/Form";
+import { Button } from "@/components/buttons/Buttons";
+import AddTags from "../../../components/events/AddTags";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5001";
 
@@ -23,6 +34,7 @@ export default function EditEventPage() {
   const { id } = useParams();
   const router = useRouter();
 
+  // form state
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
@@ -30,8 +42,9 @@ export default function EditEventPage() {
   const [endTime, setEndTime] = useState("");
   const [eventLocation, setEventLocation] = useState("");
   const [eventCategory, setEventCategory] = useState("");
-  const [coverPhoto, setCoverPhoto] = useState(null);
+  const [tags, setTags] = useState([]);
 
+  // image/cropper
   const [previewUrl, setPreviewUrl] = useState(null);
   const [rawFile, setRawFile] = useState(null);
   const [image, setImage] = useState(null);
@@ -39,10 +52,21 @@ export default function EditEventPage() {
   const [zoom, setZoom] = useState(1);
   const [croppedPixels, setCroppedPixels] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const onCropComplete = useCallback((_, croppedAreaPixels) => {
     setCroppedPixels(croppedAreaPixels);
   }, []);
+
+  function createImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.addEventListener("load", () => resolve(img));
+      img.addEventListener("error", (err) => reject(err));
+      img.setAttribute("crossOrigin", "anonymous");
+      img.src = url;
+    });
+  }
 
   async function getCroppedImg(imageSrc, cropPixels) {
     const img = await createImage(imageSrc);
@@ -69,51 +93,15 @@ export default function EditEventPage() {
     });
   }
 
-  function createImage(url) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.addEventListener("load", () => resolve(img));
-      img.addEventListener("error", (err) => reject(err));
-      img.setAttribute("crossOrigin", "anonymous");
-      img.src = url;
-    });
-  }
-
-  const [catInput, setCatInput] = useState("");
-  const [catOpen, setCatOpen] = useState(false);
-  const [catActiveIndex, setCatActiveIndex] = useState(-1);
-  const catBoxRef = useRef(null);
-
-  const query = catInput.trim().toLowerCase();
-  const filteredCategories = query
-    ? CATEGORIES.filter((c) => c.toLowerCase().includes(query))
-    : CATEGORIES;
-
-  const [tags, setTags] = useState([]);
-  const [newTag, setNewTag] = useState("");
-
-  const handleAddTag = (e) => {
-    e.preventDefault();
-    const t = newTag.trim();
-    if (t && !tags.includes(t)) {
-      setTags([...tags, t]);
-      setNewTag("");
-    }
-  };
-
-  const handleRemoveTag = (tag) => {
-    setTags(tags.filter((t) => t !== tag));
-  };
-
-  // ---------- fetch event data ----------
-  const [loading, setLoading] = useState(true);
-
+  // load existing event
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const fetchEvent = async () => {
+    async function fetchEvent() {
       try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setLoading(false);
+          return;
+        }
         const res = await fetch(`${API_BASE}/api/loadEvents/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -122,77 +110,59 @@ export default function EditEventPage() {
 
         setEventTitle(data.eventTitle || "");
         setEventDescription(data.eventDescription || "");
-        setEventDate(data.date ? data.date.split("T")[0] : "");
-        setStartTime(data.startTime || "");
-        setEndTime(data.endTime || "");
+        setEventDate(data.date ? String(data.date).split("T")[0] : "");
+        setStartTime((data.startTime || "").slice(0, 5));
+        setEndTime((data.endTime || "").slice(0, 5));
         setEventLocation(data.eventLocation || "");
         setEventCategory(data.eventCategory || "");
-        setCatInput(data.eventCategory || "");
-        setTags(data.tags || []);
+        setTags(Array.isArray(data.tags) ? data.tags : []);
         if (data.coverPhoto) setPreviewUrl(data.coverPhoto);
-      } catch (err) {
-        console.error("Error fetching event:", err);
+      } catch (e) {
+        console.error(e);
       } finally {
         setLoading(false);
       }
-    };
-
+    }
     fetchEvent();
   }, [id]);
 
-  useEffect(() => {
-    function onDocClick(e) {
-      if (catBoxRef.current && !catBoxRef.current.contains(e.target)) {
-        setCatOpen(false);
-        setCatActiveIndex(-1);
-      }
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
-
-  const handleSelectCategory = (value) => {
-    setEventCategory(value);
-    setCatInput(value);
-    setCatOpen(false);
-    setCatActiveIndex(-1);
+  // media handlers
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setRawFile(file);
+    const url = URL.createObjectURL(file);
+    setImage(url);
+    setShowCropper(true);
   };
 
-  const handleCategoryKeyDown = (e) => {
-    if (!catOpen && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
-      setCatOpen(true);
+  const handleSaveCroppedImage = async () => {
+    if (!rawFile || !croppedPixels || !image) {
+      alert("Please crop the image first.");
       return;
     }
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      const next = Math.min(
-        catActiveIndex === -1 ? 0 : catActiveIndex + 1,
-        filteredCategories.length - 1
-      );
-      setCatActiveIndex(next);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      const prev = Math.max(catActiveIndex - 1, 0);
-      setCatActiveIndex(filteredCategories.length ? prev : -1);
-    } else if (e.key === "Enter") {
-      if (catOpen && catActiveIndex >= 0 && filteredCategories[catActiveIndex]) {
-        e.preventDefault();
-        handleSelectCategory(filteredCategories[catActiveIndex]);
-      }
-    } else if (e.key === "Escape") {
-      setCatOpen(false);
-      setCatActiveIndex(-1);
-    }
+    const croppedBlob = await getCroppedImg(image, croppedPixels);
+    if (!croppedBlob) return;
+    const file = new File([croppedBlob], rawFile.name, { type: "image/jpeg" });
+
+    setRawFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setShowCropper(false);
   };
 
-  // ---------- submit ----------
+  // tags
+  function addTag(t) {
+    const v = t.trim();
+    if (!v) return;
+    const lower = v.toLowerCase();
+    if (tags.some((tag) => tag.toLowerCase() === lower)) return;
+    if (tags.length >= 6) return;
+    setTags((prev) => [...prev, v]);
+  }
+
+  // submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!CATEGORIES.includes(eventCategory)) {
-      alert("Please select a category from the list.");
-      return;
-    }
 
     const formData = new FormData();
     formData.append("eventTitle", eventTitle);
@@ -203,7 +173,7 @@ export default function EditEventPage() {
     formData.append("eventLocation", eventLocation);
     formData.append("eventCategory", eventCategory);
     formData.append("tags", tags.join(","));
-    if (coverPhoto) formData.append("coverPhoto", coverPhoto);
+    if (rawFile) formData.append("coverPhoto", rawFile);
 
     try {
       const res = await fetch(`${API_BASE}/api/loadEvents/${id}`, {
@@ -231,7 +201,13 @@ export default function EditEventPage() {
     }
   };
 
-  if (loading) return <div>Loading…</div>;
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.formWrapper}>Loading…</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -240,255 +216,186 @@ export default function EditEventPage() {
           <strong>Edit Event</strong>
         </h2>
 
-        <form onSubmit={handleSubmit}>
-          {/* Upload */}
+        <form onSubmit={handleSubmit} className={styles.form}>
+          {/* top row: upload on left, fields on right */}
           <div className={styles.topRow}>
+            {/* Upload box */}
             <div
               className={styles.uploadBox}
-              onClick={() => document.getElementById("fileInput").click()}
+              onClick={() => document.getElementById("fileInputEdit")?.click()}
             >
               {previewUrl ? (
-                <img
-                  src={previewUrl}
-                  alt="Cover"
-                  className={styles.coverPreview}
-                  onError={(e) => (e.currentTarget.style.display = "none")}
-                />
-              ) : null}
-              <div className={styles.overlay}>Click to Change</div>
-
+                <img src={previewUrl} alt="Cover" className={styles.coverPreview} />
+              ) : (
+                <div className={styles.uploadEmpty}>
+                  <ImageIcon aria-hidden />
+                  <p>No File Chosen</p>
+                  <p className={styles.subtle}>Upload a Cover Photo</p>
+                </div>
+              )}
               <input
-                id="fileInput"
+                id="fileInputEdit"
                 type="file"
                 accept="image/*"
                 hidden
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                
-                  setRawFile(file);
-                  setImage(URL.createObjectURL(file));
-                  setPreviewUrl(URL.createObjectURL(file)); 
-                  setCoverPhoto(file); 
-                  setShowCropper(true);
-                }}
-                
+                onChange={handleFileChange}
               />
             </div>
 
-            <div className={styles.inputs}>
-              <label><b>Event Name</b></label>
-              <input
-                type="text"
-                className={styles.inputBox}
-                placeholder="The event name..."
+            {/* Right column fields */}
+            <div className={styles.rightCol}>
+              <TextField
+                id="event-name"
+                label="Event Name"
                 value={eventTitle}
-                onChange={(e) => setEventTitle(e.target.value)}
+                onChange={(e) => setEventTitle(e.target.value.slice(0, 80))}
+                placeholder="The event name..."
                 required
+                fieldWidth="100%"
               />
 
-              <label><b>Date</b></label>
-              <input
-                type="date"
-                className={styles.inputBox}
+              <DateField
+                id="event-date"
+                label="Date"
                 value={eventDate}
                 onChange={(e) => setEventDate(e.target.value)}
+                icon={<Calendar size={16} />}
                 required
+                fieldWidth="100%"
               />
 
-              <div className={styles.timeRow}>
-                <div>
-                  <label><b>Start Time</b></label>
-                  <input
-                    type="time"
-                    className={styles.inputBox}
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <label><b>End Time</b></label>
-                  <input
-                    type="time"
-                    className={styles.inputBox}
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    required
-                  />
-                </div>
+              {/* Start / End / Location row (desktop 3-up, mobile stacked) */}
+              <div className={styles.dateRow}>
+                <TimeField
+                  id="event-start"
+                  label="Start Time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  icon={<Clock size={16} />}
+                  required
+                  fieldWidth="100%"
+                />
+                <TimeField
+                  id="event-end"
+                  label="End Time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  icon={<Clock size={16} />}
+                  required
+                  fieldWidth="100%"
+                />
               </div>
+              <TextField
+                  id="event-location"
+                  label="Location"
+                  value={eventLocation}
+                  onChange={(e) => setEventLocation(e.target.value.slice(0, 100))}
+                  placeholder="The location of the event..."
+                  icon={<MapPin size={16} />}
+                  required
+                  fieldWidth="100%"
+              />
             </div>
           </div>
 
-          {/* Location */}
-          <label><b>Location</b></label>
-          <input
-            type="text"
-            placeholder="The location of the event..."
-            className={styles.inputBox}
-            value={eventLocation}
-            onChange={(e) => setEventLocation(e.target.value)}
+          <TextAreaField
+            id="event-description"
+            label="Description"
+            value={eventDescription}
+            onChange={(e) => {
+              const words = e.target.value.trim().split(/\s+/);
+              if (e.target.value.trim() === "" || words.length <= 120) {
+                setEventDescription(e.target.value);
+              }
+            }}
+            rows={4}
+            placeholder="A description of the event..."
             required
           />
 
-          {/* Description */}
-          <label><b>Description</b></label>
-          <textarea
-            placeholder="A description of the event..."
-            className={styles.textarea}
-            value={eventDescription}
-            onChange={(e) => setEventDescription(e.target.value)}
+          <SelectField
+            id="event-category"
+            label="Category"
+            value={eventCategory}
+            onChange={(e) => setEventCategory(e.target.value)}
+            placeholder="e.g., GBM, Social, Workshop"
             required
-          ></textarea>
-
-          {/* Category */}
-          <label><b>Category</b></label>
-          <div
-            ref={catBoxRef}
-            className={styles.comboWrapper}
-            aria-haspopup="listbox"
-            aria-expanded={catOpen}
           >
-            <input
-              type="text"
-              className={styles.inputBox}
-              placeholder="Start typing to search categories..."
-              value={catInput}
-              onChange={(e) => {
-                setCatInput(e.target.value);
-                setEventCategory("");
-                setCatOpen(true);
-                setCatActiveIndex(-1);
-              }}
-              onFocus={() => setCatOpen(true)}
-              onKeyDown={handleCategoryKeyDown}
-              aria-autocomplete="list"
-              aria-controls="category-listbox"
-              aria-activedescendant={
-                catActiveIndex >= 0 && filteredCategories[catActiveIndex]
-                  ? `cat-opt-${catActiveIndex}`
-                  : undefined
-              }
-              required
-            />
-            {catOpen && filteredCategories.length > 0 && (
-              <ul
-                id="category-listbox"
-                role="listbox"
-                className={styles.categoryList}
-              >
-                {filteredCategories.map((c, i) => (
-                  <li
-                    id={`cat-opt-${i}`}
-                    key={c}
-                    role="option"
-                    aria-selected={eventCategory === c}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => handleSelectCategory(c)}
-                    className={[
-                      styles.categoryItem,
-                      i === catActiveIndex ? styles.activeItem : "",
-                      eventCategory === c ? styles.selectedItem : "",
-                    ].join(" ")}
-                    onMouseEnter={() => setCatActiveIndex(i)}
-                  >
-                    {c}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Tags */}
-          <label><b>Tags</b></label>
-          <div className={styles.tagContainer}>
-            {tags.map((tag) => (
-              <span key={tag} className={styles.tag}>
-                {tag}
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className={styles.removeTag}
-                  aria-label={`Remove ${tag}`}
-                >
-                  ×
-                </button>
-              </span>
+            <option value="" disabled>
+              e.g., GBM, Social, Workshop
+            </option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
             ))}
-            <div className={styles.addTagForm}>
-              <input
-                type="text"
-                placeholder="Add tags..."
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                className={styles.addTagInput}
-              />
-              <button
-                type="button"
-                onClick={handleAddTag}
-                className={styles.addTagButton}
-                aria-label="Add tag"
-              >
-                +
-              </button>
+          </SelectField>
+
+          {/* Tags as chips (click to remove) */}
+          <div className={styles.tagsBlock}>
+            <label className={styles.tagsLabel}>Tags</label>
+
+            <div className={styles.tagsList}>
+              {tags.map((t, i) => (
+                <Button
+                  key={`${t}-${i}`}
+                  size="small"
+                  width="auto"
+                  variant="primary"
+                  iconRight={<X size={14} aria-hidden />}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setTags((prev) => prev.filter((x) => x !== t));
+                  }}
+                  aria-label={`Remove tag ${t}`}
+                  title={`Remove ${t}`}
+                  type="button"
+                >
+                  {t}
+                </Button>
+              ))}
             </div>
+
+            <AddTags
+              placeholder="Add tags..."
+              onAdd={addTag}
+              className={styles.addTags}
+            />
           </div>
 
-          <button type="submit" className={styles.postButton}>
-            Save Changes
-          </button>
+          {/* Cropper modal */}
+          {showCropper && (
+            <div className={styles.cropOverlay}>
+              <div className={styles.cropModal}>
+                <div style={{ position: "relative", width: 320, height: 320 }}>
+                  <Cropper
+                    image={image || ""}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={1}
+                    cropShape="rect"
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                  />
+                </div>
+                <div className={styles.cropActions}>
+                  <Button variant="secondary" onClick={() => setShowCropper(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSaveCroppedImage}>Save Cover</Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className={styles.submitRow}>
+            <Button size="medium" variant="secondary" width="fill" type="submit">
+              Save Changes
+            </Button>
+          </div>
         </form>
       </div>
-
-      {/* Crop popup */}
-      {showCropper && (
-        <div className={styles.popupOverlay}>
-          <div className={styles.popup}>
-            <div style={{ position: "relative", width: 300, height: 300 }}>
-              <Cropper
-                image={image}
-                crop={crop}
-                zoom={zoom}
-                aspect={1}
-                cropShape="rect"
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-              />
-            </div>
-            <div className={styles.cropActions}>
-              <button
-                type="button"
-                className={`${styles.cropBtn} ${styles.cancelBtn}`}
-                onClick={() => setShowCropper(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className={`${styles.cropBtn} ${styles.saveBtn}`}
-                onClick={async () => {
-                  if (!rawFile || !croppedPixels) {
-                    alert("Please crop the image first.");
-                    return;
-                  }
-                  const croppedBlob = await getCroppedImg(image, croppedPixels);
-                  const file = new File([croppedBlob], rawFile.name, {
-                    type: "image/jpeg",
-                  });
-
-                  setCoverPhoto(file);
-                  setPreviewUrl(URL.createObjectURL(file));
-                  setShowCropper(false);
-                }}
-              >
-                Save Cover
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

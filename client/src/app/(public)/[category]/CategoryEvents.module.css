@@ -1,49 +1,25 @@
 .container {
     width: 100%;
-    margin: 0;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 6rem;
-}
-
-.header{
-    margin-bottom: 2rem;
-    padding-left: 0;
-}
-
-.headerTop{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-}
-
-.title{
-    font-size: 2rem;
-    font-weight: bold;
-    color: #1a1a1a;
-    margin: 0 0 2rem 0;
-    text-align: left;
 }
 
 .backButton{
-    background:none;
-    border:none;
-    display:flex;
+    background: none;
+    border: none;
+    display: flex;
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
     font-size: var(--font-size-heading);
     font-weight: 600;
-    color: #333;
+    color: #000000;
     padding: 0.5rem 0;
     transition: color 0.2s ease;
 }
 
 .backButton:hover{
-    color: var(--tertiary-color);
+    color: #D7D7D7;
     transition: color 0.3s ease, background-color 0.3s ease;
-    cursor: pointer;     
+    cursor: pointer
 }
 
 .backIcon{
@@ -51,24 +27,13 @@
     height: 1.5rem;
 }
 
-
-.categorySection {
+.categorySection{
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
 }
 
-
-.eventsGrid{
+.isLoading{
     display: flex;
-    flex-wrap: wrap;
-    gap: 7rem;
-    margin-bottom: 3rem;
-    margin-left: 2%;
-}
-
-.loading{
-    display:flex;
     justify-content: center;
     align-items: center;
     height: 50vh;
@@ -77,7 +42,7 @@
 }
 
 .noEvents {
-    display:flex;
+    display: flex;
     justify-content: center;
     align-items: center;
     height: 60vh;
@@ -90,12 +55,95 @@
     margin: 0;
 }
 
+.clubsContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.clubSection {
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 2rem;
+}
+
+.clubSection:last-child{
+    border-bottom: none;
+}
+
+.clubHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.clubInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.clubAvatar{
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e0e0e0;
+}
+
+.clubName{
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    align-items: center;
+}
+
+
+.eventCount{
+    font-size: 0.9rem;
+    color: #666;
+    background: #f5f5f5;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    white-space: nowrap;
+}
+
+.eventsGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
 @media (max-width: 48rem){
-    .container{
+    .container { 
         padding: 1rem;
     }
-
-    .title{
+    .title {
         font-size: 2rem;
+    }
+
+    .clubHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .clubInfo {
+        width: 100%;
+    }
+
+    .clubBio {
+        max-width: 100%;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: initial;
+    }
+
+    .eventCount {
+        align-self: flex-start;
+    }
+
+    .eventsGrid {
+        gap: 1.5rem;
     }
 }

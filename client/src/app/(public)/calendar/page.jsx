@@ -251,7 +251,6 @@ export default function CalendarPage() {
         overflow: 'hidden',
         position: 'relative',
         boxSizing: 'border-box',
-        paddingTop: 'var(--navbar-height)',
       }}
     >
       <div

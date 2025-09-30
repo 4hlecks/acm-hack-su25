@@ -76,12 +76,12 @@ function buildPayloadFromDrawer(d, ownerOptions) {
 
 // ---------- page ----------
 export default function AdminEventsPage() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState([]);       // full dataset
   const [loading, setLoading] = useState(true);
 
-  // search
+  // search (client-side like Users page)
   const [query, setQuery] = useState('');
-  const [filterKey, setFilterKey] = useState('eventTitle');
+  const [filterKey, setFilterKey] = useState('name'); // use row keys for client-side filtering
 
   // drawer
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -106,14 +106,11 @@ export default function AdminEventsPage() {
     []
   );
 
-  // load events
-  async function load({ page = 1, limit = 50 } = {}) {
+  // load events (no search params; we filter locally)
+  async function load({ page = 1, limit = 500 } = {}) {
     setLoading(true);
     try {
-      const params = { page, limit };
-      if (query) params.query = query;
-      if (filterKey) params.filterKey = filterKey;
-      const data = await adminListEvents(params); // { items, total, page, pageSize }
+      const data = await adminListEvents({ page, limit }); // expect { items, total, page, pageSize }
       setRows((data.items || []).map(eventToRow));
     } catch (e) {
       console.error(e);
@@ -133,14 +130,38 @@ export default function AdminEventsPage() {
         console.error(e);
         setOwnerOptions([]);
       }
-      await load(); // <-- you were missing this, so events never populated
+      await load();
     })();
   }, []);
 
-  // search submit
-  async function handleSearchSubmit() {
-    await load({ page: 1 });
-  }
+  // client-side visible rows (mirror Users page approach)
+  const visibleRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let filtered = rows;
+
+    if (q) {
+      // which column to check
+      if (filterKey === 'date') {
+        filtered = rows.filter(r =>
+          (r.date || '').toLowerCase().includes(q)
+          || (r.startTime || '').toLowerCase().includes(q)
+          || (r.endTime || '').toLowerCase().includes(q)
+        );
+      } else {
+        filtered = rows.filter(r => String(r[filterKey] ?? '').toLowerCase().includes(q));
+      }
+    }
+
+    // simple, stable sorting based on the active filter
+    if (filterKey === 'ownerName' || filterKey === 'name' || filterKey === 'location' || filterKey === 'category') {
+      return [...filtered].sort((a, b) => String(a[filterKey] ?? '').localeCompare(String(b[filterKey] ?? '')));
+    }
+    if (filterKey === 'date') {
+      return [...filtered].sort((a, b) => String(a.date ?? '').localeCompare(String(b.date ?? '')));
+    }
+
+    return filtered;
+  }, [rows, query, filterKey]);
 
   // create
   function handleCreate() {
@@ -151,7 +172,6 @@ export default function AdminEventsPage() {
   // save
   async function handleSave(d) {
     try {
-      console.log('drawer ->', d);
       const payload = buildPayloadFromDrawer(d, ownerOptions);
 
       if (!payload.eventOwner || !isObjectId(payload.eventOwner)) {
@@ -165,7 +185,6 @@ export default function AdminEventsPage() {
           if (v !== undefined && v !== null) fd.append(k, String(v));
         });
         fd.append('coverPhoto', d.coverFile);
-        for (const [k, v] of fd.entries()) console.log('FD', k, v);
 
         if (d.id) {
           const updated = await adminUpdateEvent(d.id, fd);
@@ -175,7 +194,6 @@ export default function AdminEventsPage() {
           setRows((prev) => [eventToRow(created), ...prev]);
         }
       } else {
-        console.log('JSON payload', payload);
         if (d.id) {
           const updated = await adminUpdateEvent(d.id, payload);
           setRows((prev) => prev.map((r) => (r.id === d.id ? eventToRow(updated) : r)));
@@ -259,11 +277,15 @@ export default function AdminEventsPage() {
     []
   );
 
+  // Use row keys for filter options (so local filter works)
   const filterOptions = useMemo(
     () => [
-      { value: 'eventTitle', label: 'Name' },
-      { value: 'eventLocation', label: 'Location' },
-      { value: 'eventDescription', label: 'Description' },
+      { value: 'name', label: 'Name' },
+      { value: 'location', label: 'Location' },
+      { value: 'description', label: 'Description' },
+      { value: 'ownerName', label: 'Owner' },
+      { value: 'category', label: 'Category' },
+      { value: 'date', label: 'Date/Time' },
     ],
     []
   );
@@ -280,7 +302,7 @@ export default function AdminEventsPage() {
           onFilterKeyChange={setFilterKey}
           filterOptions={filterOptions}
           placeholder="Search events…"
-          onSubmit={handleSearchSubmit}
+          onSubmit={() => { /* no-op; live filter like Users page */ }}
         />
         <Button
           size="medium"
@@ -293,15 +315,14 @@ export default function AdminEventsPage() {
         </Button>
       </div>
 
-      
-      {loading ? ( 
-        <div style={{ padding: '1rem' }}>Loading…</div>
-      ) : rows.length === 0 ? ( 
+      {loading ? (
+        <div style={{ padding: '1rem' }}>Loading events…</div>
+      ) : visibleRows.length === 0 ? (
         <div style={{ padding: '1rem' }}>No events found.</div>
       ) : (
         <DataTable
           columns={columns}
-          data={rows}
+          data={visibleRows}
           rowKey={(r) => r.id}
           stickyHeader
         />

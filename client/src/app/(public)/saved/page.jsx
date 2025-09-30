@@ -76,15 +76,12 @@ export default function SavedEventsPage() {
 
   return (
     <>
-      <main style={{ padding: "2rem", marginTop: "80px" }}>
+      <main style={{ display: "flex", flexDirection: "column", gap: "1rem"}}>
         <h1 className={styles.pageTitle}>Saved Events</h1>
         <section style={{ 
           display: "flex",
           flexWrap: "wrap",
-          gap: "2rem",
-          marginLeft: "2%",
-          marginBottom: "1rem",
-          marginTop: "2rem"
+          gap: "1rem"
         }}>
           {savedEvents.length === 0 ? (
             <p>No saved events found.</p>

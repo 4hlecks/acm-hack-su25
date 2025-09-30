@@ -4,6 +4,7 @@
 .field {
     display: grid;
     gap: 0.5rem; /* gap between label and field */
+    width: 100%;
 }
 
 .field[data-layout="row"] {
